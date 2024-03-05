@@ -158,7 +158,7 @@
                         "id": "executions",
                         "instructions": [
                             "call `addDesktop` it with the following parameters \"minesweeper\", ```String.fromCodePoint(0x0001F4A3)``` and minesweeper (the function reference)",
-                            "call `addDesktop` it with the following parameters \"tic-tac-toe\", ```String.fromCodePoint(0x0001F4A3)``` and tictactoe (the function reference)"
+                            "call `addDesktop` it with the following parameters \"tic-tac-toe\", ```String.fromCodePoint(0x274C)``` and tictactoe (the function reference)"
                         ]
                     }
                 ]
