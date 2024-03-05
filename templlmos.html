@@ -1,0 +1,221 @@
+
+<html>
+<head>
+<style>
+body {
+    background-color: #2E393D;
+}
+
+
+.titleBar {
+    background-color: orange;
+    border-bottom: 1px solid black;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: monospace;
+    font-size: small;
+    padding: 5px;
+}
+
+.titleBar button {
+    border: 1px solid black;
+    font-family: monospace;
+    font-size: small;
+    border-radius: 2px;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10+ */
+    user-select: none; /* Standard syntax */
+}
+
+
+.windowComponent {
+    position: absolute;
+    background-color: #fff;
+    border: 2px solid #000;
+    border-radius: 4px;
+}
+
+.contentPlaceholder {
+    padding: 5px;
+}
+
+
+.app {
+    width: 64px;
+    height: 64px;
+    text-align: center;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.icon {
+    display: block;
+    font-size: 30px;
+}
+
+.app-name {
+    display: block;
+    font-size: 8px;
+    background-color: black;
+    font-family: monospace;
+    color: white;
+    padding: 5px;
+}
+
+</style>
+<script>
+function addDesktop(name, char, func) {
+    // Create elements
+    let root = document.createElement('div');
+    let icon = document.createElement('div');
+    let appName = document.createElement('span');
+    
+    // Set classes and text content for elements
+    root.className = 'app';
+    icon.className = 'icon';
+    icon.textContent = char;
+    appName.className = 'app-name';
+    appName.textContent = name;
+    
+    // Append elements to each other in correct order
+    root.appendChild(icon);
+    root.appendChild(appName);
+    document.body.appendChild(root);
+    
+    // Add event listener for click event on root element to execute passed in function
+    root.addEventListener('click', func);
+}
+
+
+function titleBar(title, targetElement) {
+    // Create root div for title bar
+    var root = document.createElement('div');
+    root.className = 'titleBar';
+    
+    // Add span for title to root div
+    var span = document.createElement('span');
+    span.textContent = title;
+    root.appendChild(span);
+    
+    // Add button to root div
+    var button = document.createElement('button');
+    button.textContent = 'x';
+    button.addEventListener('click', () => { document.body.removeChild(targetElement); }); // Remove targetElement when button is clicked
+    root.appendChild(button);
+    
+    // Add drag event listener to move targetElement when dragging root div
+    var dragging = false;
+    var offsetX = 0;
+    var offsetY = 0;
+    
+    root.addEventListener('mousedown', (e) => {  // Start dragging when mousedown event is triggered on root div 
+        dragging = true;  // Set dragging to true 
+        offsetX = e.offsetX;  // Set offsetX to mouse position relative to targetElement 
+        offsetY = e.offsetY;  // Set offsetY to mouse position relative to targetElement 
+    }); 
+    
+    document.addEventListener('mousemove', (e) => {  // Move targetElement when mousemove event is triggered 
+        if (dragging) {  // If dragging is true 
+            targetElement.style.position = 'absolute';  // Set targetElement position to absolute 
+            targetElement.style.left = (e.pageX - offsetX) + 'px';  // Set targetElement left position to mouse position minus offsetX 
+            targetElement.style.top = (e.pageY - offsetY) + 'px';  // Set targetElement top position to mouse position minus offsetY 
+        }  // End if 
+    });  // End mousemove event listener 
+    
+    document.addEventListener('mouseup', () => { dragging = false; });  // Set dragging to false when mouseup event is triggered 
+    
+    return root;  // Return root div 
+}  // End titleBar function 
+
+
+function windowComponent(title = "Default Title", content = null, width = 400, height = 300) {
+    // Creates the root div for the component
+    let root = document.createElement("div");
+    root.className = "windowComponent";
+    root.style = `width: ${width}px; height: ${height}px;`;
+  
+    // Creates the placeholders for the title bar and the content
+    let titlePlaceholder = document.createElement("div");
+    titlePlaceholder.className = "titlePlaceholder";
+    let contentPlaceholder = document.createElement("div");
+    contentPlaceholder.className = "contentPlaceholder";
+  
+    // Appends the placeholders to the root div
+    root.appendChild(titlePlaceholder);
+    root.appendChild(contentPlaceholder);
+  
+    // Defines the constant tb using the result from the titleBar function
+    const tb = titleBar(title, root);
+  
+    // Appends the tb to the title placeholder
+    titlePlaceholder.appendChild(tb);
+  
+    // Appends the content as child to the content placeholder
+    if(content !== null){
+        contentPlaceholder.appendChild(content);
+    }
+  
+    // Appends the root div to the document body
+    document.body.appendChild(root);
+}
+
+</script>
+</head>
+<body>
+<script>
+function minesweeper() {
+    // create root div and append to body 
+    const game = document.createElement('div'); 
+    game.classList.add('minesweeper'); 
+    document.body.appendChild(game); 
+  
+    // create 8x8 grid and initialize to 0 
+    const grid = Array(8).fill().map(() => Array(8).fill(0)); 
+  
+    // pick 3 random cells and set to 'x' 
+    const mines = Array(3).fill().map(() => [Math.floor(Math.random() * 8), Math.floor(Math.random() * 8)]); 
+    mines.forEach(([x, y]) => grid[x][y] = 'x'); 
+  
+    // update neighboring cells 
+    const dx = [-1, 0, 1, -1, 1, -1, 0, 1]; 
+    const dy = [-1, -1, -1, 0, 0, 1, 1, 1]; 
+    mines.forEach(([x, y]) => { 
+        for (let i = 0; i < 8; i++) { 
+            const nx = x + dx[i], ny = y + dy[i]; 
+            if (nx >= 0 && nx < 8 && ny >= 0 && ny < 8) grid[nx][ny]++; 
+        } 
+    }); 
+  
+    // create game board 
+    grid.forEach((row, i) => { 
+        const rowDiv = document.createElement('div'); 
+        rowDiv.classList.add('row'); 
+        rowDiv.style.display = 'flex'; 
+        rowDiv.style.justifyContent = 'center'; 
+        game.appendChild(rowDiv); 
+        row.forEach((cell) => { 
+            const cellButton = document.createElement('button'); 
+            cellButton.classList.add('cell'); 
+            cellButton.textContent = '.'; 
+            cellButton.addEventListener('click', () => { 
+                if (cell === 'x') { 
+                    alert('Game Over'); 
+                } else { 
+                    cellButton.textContent = cell; 
+                } 
+            }); 
+            rowDiv.appendChild(cellButton); 
+        }); 
+    }); 
+  
+    // call windowComponent 
+    windowComponent('Minesweeper', game, 250, 300); 
+} 
+
+
+addDesktop("minesweeper", String.fromCodePoint(0x0001F4A3), minesweeper);
+
+</script>
+</body>
+</html>
