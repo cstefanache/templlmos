@@ -66,7 +66,7 @@
                     {
                         "id": "minesweeper-styles",
                         "instructions": [
-                            "css style for a .minesweeper class to follow the following rules:",
+                            "css style for a .gmroot class to follow the following rules:",
                             "1. text in buttons should be monospaced"
                         ]
                     }
@@ -121,7 +121,7 @@
         "body": {
             "script": {
                 "_defaults": {
-                    "prefix": "Generate a single javascript function code. Stop at end of script. Do not provide any code details, examples or descriptions.\n### Instruction:\n"
+                    "prefix": "Generate a single javascript function code using only vanilla javascript. Stop at end of script. Do not provide any code details, examples or descriptions.\n### Instruction:\n"
                 },
                 "_generate": [
                     {
@@ -132,7 +132,7 @@
                         "id": "minesweeper",
                         "instructions": [
                             "Create a `minesweeper` function that:",
-                            "* creates a root dom element with the class `minesweeper`",
+                            "* creates a root dom element with the class `gmroot`",
                             "* generate a matrix of 8x8 with values 0",
                             "* pick a random of 3 cells and set their value to `x`",
                             "* set the neighboring cells to the `x` cells to the number of `x` cells around them",
@@ -141,12 +141,24 @@
                         ]
                     },
                     {
+                        "id": "tic-tac-toe",
+                        "instructions": [
+                            "create a `tictactoe` function that:",
+                            " - create a root dom element with the class `gmroot`",
+                            " - store current player as `x`",
+                            " - make a 3x3 grid of buttons, a row is a div with the class `row` and a button with the class `cell` each having `.` as content",
+                            " - when a button is clicked then the content should be set to the current player and the current player should be toggled",
+                            " - calls the `windowComponent` function with the parameters: 'Tic Tac Toe', the created root element as the content, 202 and 220"
+                        ]
+                    },
+                    {
                         "_defaults": {
                             "prefix": "JS Functions `addDesktop` and `minesweeper` are already defined. Generate javascript code only without any explanations or examples. Stop after the code is generated.\n### Instruction:\n"
                         },
                         "id": "executions",
                         "instructions": [
-                            "call `addDesktop` it with the following parameters \"minesweeper\", ```String.fromCodePoint(0x0001F4A3)``` and minesweeper (the function reference)"
+                            "call `addDesktop` it with the following parameters \"minesweeper\", ```String.fromCodePoint(0x0001F4A3)``` and minesweeper (the function reference)",
+                            "call `addDesktop` it with the following parameters \"tic-tac-toe\", ```String.fromCodePoint(0x0001F4A3)``` and tictactoe (the function reference)"
                         ]
                     }
                 ]

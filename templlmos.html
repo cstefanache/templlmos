@@ -75,7 +75,7 @@ body {
 
 
 
-.minesweeper button {
+.gmroot button {
     font-family: 'Courier New', Courier, monospace;
 }
 
@@ -182,58 +182,56 @@ function windowComponent(title, content, width = 400, height = 300) {
 </head>
 <body>
 <script>
-let desktopElement = document.createElement('div');
-desktopElement.className = 'desktop';
-document.body.appendChild(desktopElement);
+let desktop = document.createElement('div');
+desktop.className = 'desktop';
+document.body.appendChild(desktop);
 
 
 
 function minesweeper() {
     // create root div
-    const root = document.createElement('div');
-    root.classList.add('minesweeper');
-    document.body.appendChild(root);
-
-    // create 8x8 matrix and fill it with 0s
-    const matrix = Array(8).fill().map(() => Array(8).fill(0));
-
+    const gmRoot = document.createElement('div');
+    gmRoot.classList.add('gmroot');
+    document.body.appendChild(gmRoot);
+    
+    // create 8x8 matrix and initialize to 0
+    let matrix = Array(8).fill().map(() => Array(8).fill(0));
+    
     // pick 3 random cells and set their value to 'x'
-    const xCells = [];
-    while (xCells.length < 3) {
-        const x = Math.floor(Math.random() * 8);
-        const y = Math.floor(Math.random() * 8);
-        if (!xCells.some(cell => cell[0] === x && cell[1] === y)) {
-            xCells.push([x, y]);
+    let mines = [];
+    while(mines.length < 3) {
+        let x = Math.floor(Math.random() * 8);
+        let y = Math.floor(Math.random() * 8);
+        if(!mines.find(mine => mine[0] === x && mine[1] === y)) {
             matrix[x][y] = 'x';
+            mines.push([x, y]);
         }
     }
-
+    
     // set neighboring cells to number of 'x' cells around them
-    for (let i = 0; i < 8; i++) {
-        for (let j = 0; j < 8; j++) {
-            if (matrix[i][j] === 'x') {
-                for (let dx = -1; dx <= 1; dx++) {
-                    for (let dy = -1; dy <= 1; dy++) {
-                        const nx = i + dx;
-                        const ny = j + dy;
-                        if (nx >= 0 && nx < 8 && ny >= 0 && ny < 8 && matrix[nx][ny] !== 'x') {
-                            matrix[nx][ny]++;
+    for(let i = 0; i < 8; i++) {
+        for(let j = 0; j < 8; j++) {
+            if(matrix[i][j] === 'x') {
+                for(let x = i - 1; x <= i + 1; x++) {
+                    for(let y = j - 1; y <= j + 1; y++) {
+                        if(x >= 0 && x < 8 && y >= 0 && y < 8 && !(x === i && y === j)) {
+                            matrix[x][y] = (matrix[x][y] === 'x' ? 0 : matrix[x][y] + 1);
                         }
                     }
                 }
             }
         }
     }
-
-    // create cells and add them to the DOM
-    for (let i = 0; i < 8; i++) {
-        const row = document.createElement('div');
-        for (let j = 0; j < 8; j++) {
-            const cell = document.createElement('button');
+    
+    // create matrix visualization and add to gmRoot
+    for(let i = 0; i < 8; i++) {
+        let row = document.createElement('div');
+        for(let j = 0; j < 8; j++) {
+            let cell = document.createElement('button');
             cell.classList.add('cell');
             cell.textContent = '.';
             cell.addEventListener('click', () => {
-                if (matrix[i][j] === 'x') {
+                if(matrix[i][j] === 'x') {
                     alert('Game Over');
                 } else {
                     cell.textContent = matrix[i][j];
@@ -241,16 +239,50 @@ function minesweeper() {
             });
             row.appendChild(cell);
         }
-        root.appendChild(row);
+        gmRoot.appendChild(row);
     }
-
+    
     // call windowComponent
-    windowComponent('Minesweeper', root, 202, 220);
+    windowComponent('Minesweeper', gmRoot, 202, 220);
+}
+
+
+
+function tictactoe() {
+    // Create root DOM element
+    const gmRoot = document.createElement('div');
+    gmRoot.classList.add('gmRoot');
+    document.body.appendChild(gmRoot);
+    
+    // Store current player as 'x'
+    let currentPlayer = 'x';
+    
+    // Create 3x3 grid of buttons
+    for(let i = 0; i < 3; i++) {
+        const row = document.createElement('div');
+        row.classList.add('row');
+        gmRoot.appendChild(row);
+        
+        for(let j = 0; j < 3; j++) {
+            const cell = document.createElement('button');
+            cell.classList.add('cell');
+            cell.textContent = '.';
+            cell.addEventListener('click', () => {
+                cell.textContent = currentPlayer;
+                currentPlayer = currentPlayer === 'x' ? 'o' : 'x';
+            });
+            row.appendChild(cell);
+        }
+    }
+    
+    // Call windowComponent function
+    windowComponent('Tic Tac Toe', gmRoot, 202, 220);
 }
 
 
 
 addDesktop("minesweeper", String.fromCodePoint(0x0001F4A3), minesweeper);
+addDesktop("tic-tac-toe", String.fromCodePoint(0x0001F4A3), tictactoe);
 
 
 </script>
