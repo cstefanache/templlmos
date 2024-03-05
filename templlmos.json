@@ -15,14 +15,18 @@
     "definition": {
         "head": {
             "_defaults": {
-                "prefix": "Generate just the code without any explanations or examples. Stop after the code is generated.\n### Instruction:\n"
+                "prefix": "Generate code only. Stop after the code is generated. Do not provide any explanations.\n### Instruction:\n"
             },
             "style": {
                 "_generate": [
                     {
                         "id": "look-and-feel",
                         "disabled": false,
-                        "instruction": "css to apply #2E393D background for the body"
+                        "instructions": [
+                            "Generate CSS to: ",
+                            " - to apply #2E393D background for the body",
+                            " - define `.desktop` class with fixed position and 100% width and height"
+                        ]
                     },
                     {
                         "id": "title-bar-styles",
@@ -42,7 +46,7 @@
                         "disabled": false,
                         "instructions": [
                             "css style for a .windowComponent class to follow the following rules:",
-                            "1. white background color",
+                            "1. white background color and a padding of 1px",
                             "2. a border of 2px solid black",
                             "3. a border-radius of 4px",
                             "4. absolute position",
@@ -58,6 +62,13 @@
                             "2. containing `.icon` class should be a block, have a font-size of 30px",
                             "3. containing `.app-name` class should be a block, have a font-size of 8px, black background,  monospaced font, white text, padding of 5px"
                         ]
+                    },
+                    {
+                        "id": "minesweeper-styles",
+                        "instructions": [
+                            "css style for a .minesweeper class to follow the following rules:",
+                            "1. text in buttons should be monospaced"
+                        ]
                     }
                 ]
             },
@@ -67,13 +78,13 @@
                 },
                 "_generate": [
                     {
-                        "id": "desktop",
+                        "id": "desktop-add-action",
                         "rebuild": false,
                         "disabled": false,
                         "instructions": [
                             "create a function called `addDesktop` that takes as parameters a name, a character and a function:",
                             "  * create a root div element with the class `app`",
-                            "  * append the root element to the body",
+                            "  * append the root element to the `.desktop` element",
                             "  * append the character in a div with the class `.icon` to the root element",
                             "  * add a span element with the class `app-name` and the text of the name parameter",
                             "  * when root div element is clicked execute the function passed as the second parameter"
@@ -88,7 +99,7 @@
                             " add to the root DOM element a `span` containing the title parameter",
                             " add to the root DOM element a `button` with the text `x`",
                             " when the button is clicked then the DOM element passed as the second parameter should be removed from the body",
-                            " when dragging root DOM element, the  DOM element passed as second parameter should move",
+                            " when root DOM element is dragged then move the DOM element passed as the second parameter",
                             " return the root DOM element"
                         ],
                         "instruction-old": "Create a function called `titleBar` that will accept two parameters: a title and a callback for the close button and returns DOM element containing a span title and a close 'x' button aligned to the right. the class of the root DOM element should be .titleBar"
@@ -114,6 +125,10 @@
                 },
                 "_generate": [
                     {
+                        "id": "desktop",
+                        "instruction": "create a dom element with the class `.desktop` and append it to the body"
+                    },
+                    {
                         "id": "minesweeper",
                         "instructions": [
                             "Create a `minesweeper` function that:",
@@ -121,8 +136,8 @@
                             "* generate a matrix of 8x8 with values 0",
                             "* pick a random of 3 cells and set their value to `x`",
                             "* set the neighboring cells to the `x` cells to the number of `x` cells around them",
-                            "* iterate through the matrix and for each row add a div and for each item add a button with the class `cell` and  `.` as content. when the button is clicked, the content should be replaced with the value. when the user clicks on a cell with value `x` the game should end and the user should be notified",
-                            "* calls already existing function `windowComponent` with the parameters: 'Minesweeper', the created root element as the content, 250 and 300"
+                            "* iterate through the matrix and for each row add a div dom element and for each item add a button with the class `cell` and  `.` as content. when the button is clicked, the content should be replaced with the value. when the user clicks on a cell with value `x` the game should end and the user should be notified",
+                            "* calls already existing function `windowComponent` with the parameters: 'Minesweeper', the created root element as the content, 202 and 220"
                         ]
                     },
                     {
@@ -131,7 +146,7 @@
                         },
                         "id": "executions",
                         "instructions": [
-                            "call `addDesktop` it with the following parameters \"minesweeper\", `String.fromCodePoint(0x0001F4A3)` and minesweeper (the function reference)"
+                            "call `addDesktop` it with the following parameters \"minesweeper\", ```String.fromCodePoint(0x0001F4A3)``` and minesweeper (the function reference)"
                         ]
                     }
                 ]

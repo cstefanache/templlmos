@@ -39,10 +39,12 @@ class Compiler:
                         if file.file_name.endswith(".gguf"):
                             print(f"Discovered model file: {file.file_name}")
                             self.runtime_models[file.file_name] = Llama(
-                                str(file.file_path), 
-                                n_ctx=4096, 
+                                str(file.file_path),
+                                do_sample=True,
+                                num_return_sequences=1,
+                                n_ctx=4096,
                                 n_gpu_layers=48,
-                                n_threads=8
+                                n_threads=8,
                             )
 
             self.compile(data["definition"], data["defaults"], filename=filename)
@@ -55,9 +57,11 @@ class Compiler:
         output = model(
             instruction,
             max_tokens=1024,
+            top_k=10,
             temperature=0.0,
-            frequency_penalty=1.1,
-            stream = True
+            repeat_penalty=1.1,
+            stream=True,
+            stop=["```\n"],
         )
 
         # read from output stream generator
@@ -65,8 +69,8 @@ class Compiler:
         for chunk in output:
             val = chunk["choices"][0]["text"]
             result += val
-            print(val, end="")
 
+        result += "\n```"
         return result
 
         # result = output["choices"][0]["text"]

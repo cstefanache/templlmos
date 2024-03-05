@@ -6,6 +6,13 @@ body {
     background-color: #2E393D;
 }
 
+.desktop {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+}
+
+
 
 .titleBar {
     background-color: orange;
@@ -29,9 +36,11 @@ body {
 }
 
 
+
 .windowComponent {
     position: absolute;
     background-color: #fff;
+    padding: 1px;
     border: 2px solid #000;
     border-radius: 4px;
 }
@@ -39,6 +48,7 @@ body {
 .contentPlaceholder {
     padding: 5px;
 }
+
 
 
 .app {
@@ -63,158 +73,185 @@ body {
     padding: 5px;
 }
 
+
+
+.minesweeper button {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+
 </style>
 <script>
 function addDesktop(name, char, func) {
-    // Create elements
-    let root = document.createElement('div');
-    let icon = document.createElement('div');
-    let appName = document.createElement('span');
-    
-    // Set classes and text content for elements
-    root.className = 'app';
-    icon.className = 'icon';
-    icon.textContent = char;
-    appName.className = 'app-name';
-    appName.textContent = name;
-    
-    // Append elements to each other in correct order
-    root.appendChild(icon);
-    root.appendChild(appName);
-    document.body.appendChild(root);
-    
-    // Add event listener for click event on root element to execute passed in function
-    root.addEventListener('click', func);
+  // Create root div element
+  let root = document.createElement('div');
+  root.className = 'app';
+  // Append character to root element
+  let icon = document.createElement('div');
+  icon.className = 'icon';
+  icon.textContent = char;
+  root.appendChild(icon);
+  // Append span to root element
+  let appName = document.createElement('span');
+  appName.className = 'app-name';
+  appName.textContent = name;
+  root.appendChild(appName);
+  // Append root to .desktop element
+  let desktop = document.querySelector('.desktop');
+  desktop.appendChild(root);
+  // Add click event listener to execute function
+  root.addEventListener('click', func);
 }
 
 
-function titleBar(title, targetElement) {
-    // Create root div for title bar
-    var root = document.createElement('div');
-    root.className = 'titleBar';
+
+function titleBar(title, domElement) {
+    // Create root DOM element with class 'titleBar'
+    let root = document.createElement('div');
+    root.classList.add('titleBar');
     
-    // Add span for title to root div
-    var span = document.createElement('span');
+    // Add span containing title parameter to root
+    let span = document.createElement('span');
     span.textContent = title;
     root.appendChild(span);
     
-    // Add button to root div
-    var button = document.createElement('button');
+    // Add button with text 'x' to root
+    let button = document.createElement('button');
     button.textContent = 'x';
-    button.addEventListener('click', () => { document.body.removeChild(targetElement); }); // Remove targetElement when button is clicked
+    button.addEventListener('click', () => document.body.removeChild(domElement));
     root.appendChild(button);
     
-    // Add drag event listener to move targetElement when dragging root div
-    var dragging = false;
-    var offsetX = 0;
-    var offsetY = 0;
+    // Add drag event listener to root to move domElement
+    let isDragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
     
-    root.addEventListener('mousedown', (e) => {  // Start dragging when mousedown event is triggered on root div 
-        dragging = true;  // Set dragging to true 
-        offsetX = e.offsetX;  // Set offsetX to mouse position relative to targetElement 
-        offsetY = e.offsetY;  // Set offsetY to mouse position relative to targetElement 
-    }); 
+    root.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        offsetX = e.offsetX;
+        offsetY = e.offsetY;
+    });
     
-    document.addEventListener('mousemove', (e) => {  // Move targetElement when mousemove event is triggered 
-        if (dragging) {  // If dragging is true 
-            targetElement.style.position = 'absolute';  // Set targetElement position to absolute 
-            targetElement.style.left = (e.pageX - offsetX) + 'px';  // Set targetElement left position to mouse position minus offsetX 
-            targetElement.style.top = (e.pageY - offsetY) + 'px';  // Set targetElement top position to mouse position minus offsetY 
-        }  // End if 
-    });  // End mousemove event listener 
+    document.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            let x = e.clientX - offsetX;
+            let y = e.clientY - offsetY;
+            domElement.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        }
+    });
     
-    document.addEventListener('mouseup', () => { dragging = false; });  // Set dragging to false when mouseup event is triggered 
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
     
-    return root;  // Return root div 
-}  // End titleBar function 
+    return root;
+}
 
 
-function windowComponent(title = "Default Title", content = null, width = 400, height = 300) {
-    // Creates the root div for the component
-    let root = document.createElement("div");
-    root.className = "windowComponent";
-    root.style = `width: ${width}px; height: ${height}px;`;
-  
-    // Creates the placeholders for the title bar and the content
-    let titlePlaceholder = document.createElement("div");
-    titlePlaceholder.className = "titlePlaceholder";
-    let contentPlaceholder = document.createElement("div");
-    contentPlaceholder.className = "contentPlaceholder";
-  
-    // Appends the placeholders to the root div
+
+function windowComponent(title, content, width = 400, height = 300) {
+    // Creates a DOM element with the class `windowComponent` with the width and height passed to parameters
+    let root = document.createElement('div');
+    root.className = 'windowComponent';
+    root.style.width = width + 'px';
+    root.style.height = height + 'px';
+    
+    // Creates placeholders for the title and content
+    let titlePlaceholder = document.createElement('div');
+    titlePlaceholder.className = 'titlePlaceholder';
+    let contentPlaceholder = document.createElement('div');
+    contentPlaceholder.className = 'contentPlaceholder';
+    
+    // Appends the placeholders to the root element
     root.appendChild(titlePlaceholder);
     root.appendChild(contentPlaceholder);
-  
-    // Defines the constant tb using the result from the titleBar function
-    const tb = titleBar(title, root);
-  
-    // Appends the tb to the title placeholder
+    
+    // Defines the title bar and appends it to the title placeholder
+    let tb = titleBar(title, root);
     titlePlaceholder.appendChild(tb);
-  
-    // Appends the content as child to the content placeholder
-    if(content !== null){
-        contentPlaceholder.appendChild(content);
-    }
-  
-    // Appends the root div to the document body
+    
+    // Appends the content as a child to the content placeholder
+    contentPlaceholder.appendChild(content);
+    
+    // Appends the root element to the document body
     document.body.appendChild(root);
 }
+
 
 </script>
 </head>
 <body>
 <script>
+let desktopElement = document.createElement('div');
+desktopElement.className = 'desktop';
+document.body.appendChild(desktopElement);
+
+
+
 function minesweeper() {
-    // create root div and append to body 
-    const game = document.createElement('div'); 
-    game.classList.add('minesweeper'); 
-    document.body.appendChild(game); 
-  
-    // create 8x8 grid and initialize to 0 
-    const grid = Array(8).fill().map(() => Array(8).fill(0)); 
-  
-    // pick 3 random cells and set to 'x' 
-    const mines = Array(3).fill().map(() => [Math.floor(Math.random() * 8), Math.floor(Math.random() * 8)]); 
-    mines.forEach(([x, y]) => grid[x][y] = 'x'); 
-  
-    // update neighboring cells 
-    const dx = [-1, 0, 1, -1, 1, -1, 0, 1]; 
-    const dy = [-1, -1, -1, 0, 0, 1, 1, 1]; 
-    mines.forEach(([x, y]) => { 
-        for (let i = 0; i < 8; i++) { 
-            const nx = x + dx[i], ny = y + dy[i]; 
-            if (nx >= 0 && nx < 8 && ny >= 0 && ny < 8) grid[nx][ny]++; 
-        } 
-    }); 
-  
-    // create game board 
-    grid.forEach((row, i) => { 
-        const rowDiv = document.createElement('div'); 
-        rowDiv.classList.add('row'); 
-        rowDiv.style.display = 'flex'; 
-        rowDiv.style.justifyContent = 'center'; 
-        game.appendChild(rowDiv); 
-        row.forEach((cell) => { 
-            const cellButton = document.createElement('button'); 
-            cellButton.classList.add('cell'); 
-            cellButton.textContent = '.'; 
-            cellButton.addEventListener('click', () => { 
-                if (cell === 'x') { 
-                    alert('Game Over'); 
-                } else { 
-                    cellButton.textContent = cell; 
-                } 
-            }); 
-            rowDiv.appendChild(cellButton); 
-        }); 
-    }); 
-  
-    // call windowComponent 
-    windowComponent('Minesweeper', game, 250, 300); 
-} 
+    // create root div
+    const root = document.createElement('div');
+    root.classList.add('minesweeper');
+    document.body.appendChild(root);
+
+    // create 8x8 matrix and fill it with 0s
+    const matrix = Array(8).fill().map(() => Array(8).fill(0));
+
+    // pick 3 random cells and set their value to 'x'
+    const xCells = [];
+    while (xCells.length < 3) {
+        const x = Math.floor(Math.random() * 8);
+        const y = Math.floor(Math.random() * 8);
+        if (!xCells.some(cell => cell[0] === x && cell[1] === y)) {
+            xCells.push([x, y]);
+            matrix[x][y] = 'x';
+        }
+    }
+
+    // set neighboring cells to number of 'x' cells around them
+    for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 8; j++) {
+            if (matrix[i][j] === 'x') {
+                for (let dx = -1; dx <= 1; dx++) {
+                    for (let dy = -1; dy <= 1; dy++) {
+                        const nx = i + dx;
+                        const ny = j + dy;
+                        if (nx >= 0 && nx < 8 && ny >= 0 && ny < 8 && matrix[nx][ny] !== 'x') {
+                            matrix[nx][ny]++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // create cells and add them to the DOM
+    for (let i = 0; i < 8; i++) {
+        const row = document.createElement('div');
+        for (let j = 0; j < 8; j++) {
+            const cell = document.createElement('button');
+            cell.classList.add('cell');
+            cell.textContent = '.';
+            cell.addEventListener('click', () => {
+                if (matrix[i][j] === 'x') {
+                    alert('Game Over');
+                } else {
+                    cell.textContent = matrix[i][j];
+                }
+            });
+            row.appendChild(cell);
+        }
+        root.appendChild(row);
+    }
+
+    // call windowComponent
+    windowComponent('Minesweeper', root, 202, 220);
+}
+
 
 
 addDesktop("minesweeper", String.fromCodePoint(0x0001F4A3), minesweeper);
+
 
 </script>
 </body>
