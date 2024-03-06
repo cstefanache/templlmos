@@ -8,11 +8,6 @@ window.os = {
 
 
 
-var files = { "temp": { "hello_world.txt": "Hello World!" } };
-localStorage.setItem('filesystem', JSON.stringify(files));
-
-
-
 (function() {
     // Load filesystem from localStorage, if it exists, otherwise initialize it as an empty object
     var filesystem = JSON.parse(localStorage.getItem('filesystem')) || {};
@@ -24,63 +19,66 @@ localStorage.setItem('filesystem', JSON.stringify(files));
             localStorage.setItem('filesystem', JSON.stringify(filesystem));
         },
         readPath: function(path) {
-            var pathArray = path.split('/').filter(Boolean); // Remove leading and trailing '/' and split by '/'
+            path = path[0] === '/' ? path.slice(1) : path;  // Remove leading '/' if exists
+            var pathArray = path.split('/');
             var current = filesystem;
             for (var i = 0; i < pathArray.length; i++) {
-                if (current[pathArray[i]]) {
-                    current = current[pathArray[i]];
+                if (current[pathArray[i]] === undefined) {
+                    return undefined;  // Path not found
                 } else {
-                    return null; // Path not found
+                    current = current[pathArray[i]];  // Traverse down the path
                 }
             }
-            return current; // Return content at path
+            return current;  // Return content at path
         },
-        write: function(path, fileName, content) {
-            var pathArray = path.split('/').filter(Boolean); // Remove leading and trailing '/' and split by '/'
+        write: function(path, content) {
+            path = path[0] === '/' ? path.slice(1) : path;  // Remove leading '/' if exists
+            var pathArray = path.split('/');
             var current = filesystem;
-            for (var i = 0; i < pathArray.length; i++) {
-                if (!current[pathArray[i]]) {
-                    current[pathArray[i]] = {}; // Create new directory if it doesn't exist
+            for (var i = 0; i < pathArray.length - 1; i++) {  // Do not traverse to last element, we will assign content there
+                if (current[pathArray[i]] === undefined) {
+                    current[pathArray[i]] = {};  // Create path if it does not exist
                 }
-                current = current[pathArray[i]]; // Move to next level in filesystem
+                current = current[pathArray[i]];  // Traverse down the path
             }
-            current[fileName] = content; // Write content to file
-            this.sync(); // Save filesystem to localStorage
+            current[pathArray[pathArray.length - 1]] = content;  // Assign content to last element in path
+            this.sync();  // Save filesystem to localStorage
         },
         ls: function(path) {
-            var current = path ? this.readPath(path) : filesystem; // Get current directory to list entries in
-            return current ? Object.keys(current) : Object.keys(filesystem); // Return entries in current directory
+            path = path[0] === '/' ? path.slice(1) : path;  // Remove leading '/' if exists
+            var current = filesystem;
+            if (path) {
+                var pathArray = path.split('/');
+                for (var i = 0; i < pathArray.length; i++) {
+                    if (current[pathArray[i]] === undefined) {
+                        return undefined;  // Path not found
+                    } else {
+                        current = current[pathArray[i]];  // Traverse down the path
+                    }
+                }
+            }
+            return Object.keys(current);  // Return entries at path
         },
         mkdir: function(path, dirName) {
-            var pathArray = path.split('/').filter(Boolean); // Remove leading and trailing '/' and split by '/'
-            var current = filesystem;
-            for (var i = 0; i < pathArray.length; i++) {
-                if (!current[pathArray[i]]) {
-                    current[pathArray[i]] = {}; // Create new directory if it doesn't exist
-                }
-                current = current[pathArray[i]]; // Move to next level in filesystem
-            }
-            current[dirName] = {}; // Create new directory at given path and name
-            this.sync(); // Save filesystem to localStorage
+            this.write(path + '/' + dirName, {});  // Write an empty directory at path
         },
         rm: function(path) {
-            var pathArray = path.split('/').filter(Boolean); // Remove leading and trailing '/' and split by '/'
-            var parent = filesystem;
-            var last = pathArray[pathArray.length - 1]; // Get last part of path (file/directory name)
-            pathArray = pathArray.slice(0, -1); // Remove last part of path
-            for (var i = 0; i < pathArray.length; i++) {
-                if (parent[pathArray[i]]) {
-                    parent = parent[pathArray[i]]; // Move to parent directory
+            path = path[0] === '/' ? path.slice(1) : path;  // Remove leading '/' if exists
+            var pathArray = path.split('/');
+            var current = filesystem;
+            for (var i = 0; i < pathArray.length - 1; i++) {  // Do not traverse to last element, we will remove it here
+                if (current[pathArray[i]] === undefined) {
+                    return;  // Path not found, do nothing
                 } else {
-                    return; // Path not found, nothing to remove
+                    current = current[pathArray[i]];  // Traverse down the path
                 }
             }
-            delete parent[last]; // Remove file/directory at given path
-            this.sync(); // Save filesystem to localStorage
+            delete current[pathArray[pathArray.length - 1]];  // Remove last element in path
+            this.sync();  // Save filesystem to localStorage
         },
         isFile: function(path) {
-            var content = this.readPath(path); // Get content at given path
-            return typeof content === 'string'; // Return true if content is a string (i.e., it's a file)
+            var content = this.readPath(path);
+            return typeof content === 'string';  // Return true if content at path is a string
         }
     };
 })();
@@ -92,6 +90,27 @@ if (typeof window.os === "undefined") {
 }
 
 window.os.gui = {};
+
+
+
+(function() {
+    if (!window.os || !window.os.gui) {
+        window.os = window.os || {};
+        window.os.gui = window.os.gui || {};
+    }
+    
+    window.os.gui.utils = {
+        setSizeAndCenter: function (root, width, height) {
+            root.style.width = width + 'px';
+            root.style.height = height + 'px';
+            
+            root.style.position = 'absolute';
+            root.style.top = '50%';
+            root.style.left = '50%';
+            root.style.transform = 'translate(-50%, -50%)';
+        }
+    };
+})();
 
 
 
@@ -153,55 +172,133 @@ window.os.gui = {};
 (function() {
     if (!window.os) window.os = {};
     if (!window.os.gui) window.os.gui = {};
+    if (!window.os.gui.utils) window.os.gui.utils = { setSizeAndCenter: setSizeAndCenter }; // Assuming this exists somewhere else in your code
+    
     window.os.gui.createWindow = function(title = "Default Title", content = null, width = 400, height = 300) {
-        // create root DOM element with class .window
-        let root = document.createElement("div");
+        var root = document.createElement("div");
         root.className = "window";
-        root.style.width = width + "px";
-        root.style.height = height + "px";
         
-        // add two empty div placeholders .titlePlaceholder and .contentPlaceholder
-        let titlePlaceholder = document.createElement("div");
+        window.os.gui.utils.setSizeAndCenter(root, width, height);
+        
+        var titlePlaceholder = document.createElement("div");
         titlePlaceholder.className = "titlePlaceholder";
-        let contentPlaceholder = document.createElement("div");
-        contentPlaceholder.className = "contentPlaceholder";
         root.appendChild(titlePlaceholder);
+        
+        var toolbarPlaceholder = document.createElement("div");
+        toolbarPlaceholder.className = "toolbarPlaceholder";
+        root.appendChild(toolbarPlaceholder);
+        
+        var contentPlaceholder = document.createElement("div");
+        contentPlaceholder.className = "contentPlaceholder";
         root.appendChild(contentPlaceholder);
         
-        // call window.os.gui.titleBar with title and root DOM element as second parameter and append result to .titlePlaceholder
+        var statusPlaceholder = document.createElement("div");
+        statusPlaceholder.className = "statusPlaceholder";
+        root.appendChild(statusPlaceholder);
+        
         if(typeof window.os.gui.titleBar === 'function') {
-            let titleBar = window.os.gui.titleBar(title, root);
+            var titleBar = window.os.gui.titleBar(title, root);
             titlePlaceholder.appendChild(titleBar);
-        } else {
-            console.error("Function window.os.gui.titleBar is not defined");
         }
         
-        // append content parameter as dom child to .contentPlaceholder
-        if(content && content instanceof HTMLElement) {
+        if(content && content instanceof Node) {
             contentPlaceholder.appendChild(content);
-        } else {
-            console.error("Content parameter is not a valid HTML Element");
         }
         
-        // create internal function bringToFront
-        let bringToFront = function() {
-            let windows = document.querySelectorAll(".window");
-            windows.forEach(function(win) {
-                if(win !== root) {
-                    win.style.zIndex = "1";
-                }
-            });
-            root.style.zIndex = "2";
-        };
+        var bringToFront = function() {
+            var windows = document.querySelectorAll(".window");
+            for(var i = 0; i < windows.length; i++) {
+                windows[i].style.zIndex = 1;
+            }
+            root.style.zIndex = 2;
+        }
         
-        // when root DOM element is clicked call bringToFront function
-        root.addEventListener("click", bringToFront);
+        root.onclick = bringToFront;
         
-        // append root dom element to document body
         document.body.appendChild(root);
         
-        // call bring to front after 20ms 
         setTimeout(bringToFront, 20);
+        
+        return root;
+    }
+})();
+
+
+
+(function() {
+    // Check if window.os exists and is an object
+    if (typeof window.os === 'undefined' || typeof window.os !== 'object') {
+        window.os = {};
+    }
+    
+    // Check if window.os.gui exists and is an object
+    if (typeof window.os.gui === 'undefined' || typeof window.os.gui !== 'object') {
+        window.os.gui = {};
+    }
+    
+    // Define the updateStatus function
+    window.os.gui.updateStatus = function(win, value) {
+        var statusElement = win.querySelector('.statusPlaceholder');
+        if (statusElement !== null && statusElement !== undefined) {
+            statusElement.innerText = value;
+        } else {
+            console.error('Element with class .statusPlaceholder not found in provided win DOM element');
+        }
+    };
+})();
+
+
+
+(function() {
+    if (!window.os) window.os = {};
+    if (!window.os.gui) window.os.gui = {};
+    
+    window.os.gui.toolbar = function(rootElement) {
+        var toolbar = document.createElement('div');
+        toolbar.className = 'toolbar';
+        
+        rootElement.querySelector('.toolbarPlaceholder').appendChild(toolbar);
+        
+        return {
+            addButton: function(text, callback) {
+                var button = document.createElement('button');
+                button.textContent = text;
+                button.addEventListener('click', callback);
+                toolbar.appendChild(button);
+            }
+        };
+    };
+})();
+
+
+
+(function() {
+    if (!window.os) window.os = {};
+    if (!window.os.gui) window.os.gui = {};
+    
+    window.os.gui.createPrompt = function(title, callback) {
+        // create root dom element with class 'editor'
+        var root = document.createElement('div');
+        root.className = 'editor';
+        
+        // add text input element to root dom element full width
+        var input = document.createElement('input');
+        input.style.width = '100%';
+        root.appendChild(input);
+        
+        // add button element to root dom element and set text to 'OK'
+        var button = document.createElement('button');
+        button.textContent = 'OK';
+        root.appendChild(button);
+        
+        // call os.gui.createWindow with given parameters
+        var win = window.os.gui.createWindow(title, root, 300, 100);
+        
+        // when button is clicked, call callback with input value and remove win element from body
+        button.addEventListener('click', function() {
+            callback(input.value);
+            document.body.removeChild(win);
+        });
     };
 })();
 
@@ -241,29 +338,61 @@ window.os.gui = {};
     window.os.apps = window.os.apps || {};
     
     window.os.apps.browser = function(path) {
-        var div = document.createElement('div');
-        div.className = 'browser';
-        document.body.appendChild(div);
+        const root = document.createElement('div');
+        root.className = 'browser';
+        document.body.appendChild(root);
         
-        window.os.gui.createWindow(path, div);
+        const win = os.gui.createWindow('Browser', root);
+        const toolbar = os.gui.toolbar(win);
         
-        var files = window.os.fs.ls(path);
-        
-        files.forEach(function(name) {
-            var isFile = window.os.fs.isFile(path + '/' + name);
-            
-            var callback = (function(name) {
-                return function() {
-                    if (isFile) {
-                        window.os.apps.viewer(path + '/' + name);
-                    } else {
-                        window.os.apps.browser(path + '/' + name);
-                    }
-                };
-            })(name);
-            
-            window.os.gui.addIcon(name, isFile ? '📄' : '📁', callback, div);
+        toolbar.addButton('📁', () => {
+            os.gui.createPrompt('Enter folder name', name => {
+                os.fs.mkdir(path, name);
+                refresh();
+            });
         });
+        
+        toolbar.addButton('📄', () => {
+            os.gui.createPrompt('Enter file name', name => {
+                os.fs.write(path + '/' + name, "");
+                refresh();
+            });
+        });
+        
+        toolbar.addButton('🗑️', () => {
+            os.fs.rm(path);
+            path = path.substring(0, path.lastIndexOf('/'));
+            refresh();
+        });
+        
+        const refresh = () => {
+            while (root.firstChild) {
+                root.removeChild(root.firstChild);
+            }
+            
+            os.gui.updateStatus(win, path);
+            
+            const files = os.fs.ls(path);
+            
+            if (path.length > 1) {
+                os.gui.addIcon('..', '🔙', () => {
+                    path = path.substring(0, path.lastIndexOf('/'));
+                    refresh();
+                }, root);
+            }
+            
+            files.forEach(name => {
+                const isFile = os.fs.isFile(path + '/' + name);
+                
+                const callback = isFile ? 
+                    () => { os.apps.editor(path + '/' + name); refresh(); } : 
+                    () => { path = path + '/' + name; refresh(); };
+                
+                os.gui.addIcon(name, isFile ? '📄' : '📁', callback, root);
+            });
+        };
+        
+        refresh();
     };
 })();
 
@@ -274,22 +403,17 @@ window.os.gui = {};
     window.os.apps = window.os.apps || {};
     
     window.os.apps.viewer = function(path) {
-        // create new div element with class 'viewer'
         var div = document.createElement('div');
         div.className = 'viewer';
+        document.body.appendChild(div);
         
-        // call os.gui.createWindow with 'View: '+ path, div element
-        window.os.gui.createWindow('View: '+ path, div);
+        window.os.gui.createWindow('View: ' + path, div);
         
-        // call os.fs.readPath with path and store it in content variable
         var content = window.os.fs.readPath(path);
         
-        // create new pre element with class 'content' and set its innerHTML to content
         var pre = document.createElement('pre');
         pre.className = 'content';
         pre.innerHTML = content;
-        
-        // append pre element to div element
         div.appendChild(pre);
     };
 })();
@@ -349,6 +473,42 @@ window.os.gui = {};
 })();
 
 
+
+(function() {
+    window.os.apps.editor = function(path) {
+        const root = document.createElement('div');
+        root.className = 'editor';
+        document.body.appendChild(root);
+        
+        const win = os.gui.createWindow('📄 Text Editor', root, 500, 500);
+        const toolbar = os.gui.toolbar(win);
+        toolbar.addButton('💾', save);
+        
+        const textarea = document.createElement('textarea');
+        textarea.style.width = '100%';
+        textarea.style.height = '100%';
+        root.appendChild(textarea);
+        
+        let content = '';
+        if (path) {
+            content = os.fs.readPath(path);
+            textarea.value = content;
+        }
+        
+        function save() {
+            if (path) {
+                content = textarea.value;
+                os.fs.write(path, content);
+            } else {
+                os.gui.createPrompt('Save File', (newPath) => {
+                    os.fs.write(newPath, textarea.value);
+                });
+            }
+        }
+    };
+})();
+
+
 </script>
 <style>
 .titleBar {
@@ -387,6 +547,35 @@ window.os.gui = {};
     flex-grow: 1;
     overflow: auto;
     padding: 5px;
+}
+
+.toolbarPlaceholder {
+    border-bottom: 1px solid black;
+}
+
+.statusPlaceholder {
+    border-top: 1px solid black;
+    font-family: monospace;
+    font-size: small;
+}
+
+
+
+.toolbar {
+    padding: 3px 5px;
+    margin-bottom: 2px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.toolbar button {
+    border: none;
+    cursor: pointer;
+    background-color: white;
+}
+
+.toolbar button:hover {
+    background-color: lightgray;
 }
 
 
@@ -430,6 +619,7 @@ body {
 
 .browser {
     display: flex;
+    flex-wrap: wrap;
 }
 
 
@@ -453,6 +643,12 @@ body {
 
 (function() {
     os.gui.addIcon('Minesweeper', '💣', () => os.apps.minesweeper(), document.body);
+})();
+
+
+
+(function() {
+    os.gui.addIcon('Text Editor', '📄', () => os.apps.editor(), document.body);
 })();
 
 

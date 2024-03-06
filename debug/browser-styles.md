@@ -4,7 +4,7 @@
 ```
 Generate browser vanilla JS code without the use of any library or framework.
 ### Instruction:
- Define `.browser` class having display flex 
+ Define `.browser` class having display flex and allow wrap 
 ### Response:
 
 ```
@@ -12,6 +12,7 @@ Generate browser vanilla JS code without the use of any library or framework.
 ```
 .browser {
     display: flex;
+    flex-wrap: wrap;
 }
 
 

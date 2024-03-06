@@ -2,7 +2,7 @@
 
 ### Instruction
 ```
-Generate browser vanilla JS code without the use of any library or framework. All the `os` functions are already defined.
+Generate browser vanilla JS code without the use of any library or framework. All the `os` functions are already defined on global scope.
 ### Instruction:
  Create a self executing function that defines a function called `viewer` on the `window.os.apps` object having the following functionality:
 The `viewer` function accepts one parameter `path` and have the following functionality:
@@ -21,22 +21,17 @@ The `viewer` function accepts one parameter `path` and have the following functi
     window.os.apps = window.os.apps || {};
     
     window.os.apps.viewer = function(path) {
-        // create new div element with class 'viewer'
         var div = document.createElement('div');
         div.className = 'viewer';
+        document.body.appendChild(div);
         
-        // call os.gui.createWindow with 'View: '+ path, div element
-        window.os.gui.createWindow('View: '+ path, div);
+        window.os.gui.createWindow('View: ' + path, div);
         
-        // call os.fs.readPath with path and store it in content variable
         var content = window.os.fs.readPath(path);
         
-        // create new pre element with class 'content' and set its innerHTML to content
         var pre = document.createElement('pre');
         pre.className = 'content';
         pre.innerHTML = content;
-        
-        // append pre element to div element
         div.appendChild(pre);
     };
 })();

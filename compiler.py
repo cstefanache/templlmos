@@ -89,7 +89,7 @@ class Compiler:
         model = self.runtime_models[model_name]
         output = model(
             instruction,
-            max_tokens=1024,
+            max_tokens=4096,
             top_k=10,
             temperature=0.0,
             repeat_penalty=1.1,

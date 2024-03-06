@@ -17,7 +17,8 @@
         "gui.json",
         "desktop.json",
         "browser.json",
-        "games.json"
+        "games.json",
+        "apps.json"
     ],
     "definition": {
        
