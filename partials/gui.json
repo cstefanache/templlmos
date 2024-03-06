@@ -69,7 +69,10 @@
                             "- add two empty `div` placeholders: `.titlePlaceholder` and `.contentPlaceholder`",
                             "- call `window.os.gui.titleBar` with the title and the root DOM element as the second parameter and append the result to the `.titlePlaceholder`",
                             "- append the content parameter as dom child to the `.contentPlaceholder`",
-                            "- append the root dom element to document body"
+                            "- create an internal function `bringToFront` that make all `.window` elements to be behind the clicked one",
+                            "- when root DOM element is clicked call the `bringToFront` function",
+                            "- append the root dom element to document body",
+                            "- call bring to front after 20ms"
                         ]
                     }
                 ]

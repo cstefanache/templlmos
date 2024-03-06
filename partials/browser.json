@@ -42,7 +42,7 @@
                             "Create a self executing function that defines a function called `viewer` on the `window.os.apps` object having the following functionality:",
                             "The `viewer` function accepts one parameter `path` and have the following functionality:",
                             " - creates a new `div` element with the class `viewer`",
-                            " - call `os.gui.createWindow` with the following parameters: path, created DOM element",
+                            " - call `os.gui.createWindow` with the following parameters: `View: `+ path, created DOM element",
                             " - call `os.fs.readPath` with the parameter `path` and store it in a variable `content`",
                             " - create a new `pre` element with the class `content` and set its innerHTML to `content`",
                             " - append the `pre` element to the created DOM element"

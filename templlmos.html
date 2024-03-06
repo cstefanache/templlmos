@@ -8,6 +8,11 @@ window.os = {
 
 
 
+var files = { "temp": { "hello_world.txt": "Hello World!" } };
+localStorage.setItem('filesystem', JSON.stringify(files));
+
+
+
 (function() {
     // Load filesystem from localStorage, if it exists, otherwise initialize it as an empty object
     var filesystem = JSON.parse(localStorage.getItem('filesystem')) || {};
@@ -148,40 +153,55 @@ window.os.gui = {};
 (function() {
     if (!window.os) window.os = {};
     if (!window.os.gui) window.os.gui = {};
-    
     window.os.gui.createWindow = function(title = "Default Title", content = null, width = 400, height = 300) {
         // create root DOM element with class .window
-        var root = document.createElement("div");
+        let root = document.createElement("div");
         root.className = "window";
         root.style.width = width + "px";
         root.style.height = height + "px";
         
         // add two empty div placeholders .titlePlaceholder and .contentPlaceholder
-        var titlePlaceholder = document.createElement("div");
+        let titlePlaceholder = document.createElement("div");
         titlePlaceholder.className = "titlePlaceholder";
-        var contentPlaceholder = document.createElement("div");
+        let contentPlaceholder = document.createElement("div");
         contentPlaceholder.className = "contentPlaceholder";
-        
         root.appendChild(titlePlaceholder);
         root.appendChild(contentPlaceholder);
         
-        // call window.os.gui.titleBar with the title and root DOM element as second parameter and append result to .titlePlaceholder
+        // call window.os.gui.titleBar with title and root DOM element as second parameter and append result to .titlePlaceholder
         if(typeof window.os.gui.titleBar === 'function') {
-            var titleBar = window.os.gui.titleBar(title, root);
+            let titleBar = window.os.gui.titleBar(title, root);
             titlePlaceholder.appendChild(titleBar);
         } else {
-            console.error("Function window.os.gui.titleBar is not defined.");
+            console.error("Function window.os.gui.titleBar is not defined");
         }
         
         // append content parameter as dom child to .contentPlaceholder
-        if(content && content instanceof Node) {
+        if(content && content instanceof HTMLElement) {
             contentPlaceholder.appendChild(content);
         } else {
-            console.error("Content parameter is not a valid DOM node.");
+            console.error("Content parameter is not a valid HTML Element");
         }
         
-        // append root dom element to document body 
+        // create internal function bringToFront
+        let bringToFront = function() {
+            let windows = document.querySelectorAll(".window");
+            windows.forEach(function(win) {
+                if(win !== root) {
+                    win.style.zIndex = "1";
+                }
+            });
+            root.style.zIndex = "2";
+        };
+        
+        // when root DOM element is clicked call bringToFront function
+        root.addEventListener("click", bringToFront);
+        
+        // append root dom element to document body
         document.body.appendChild(root);
+        
+        // call bring to front after 20ms 
+        setTimeout(bringToFront, 20);
     };
 })();
 
@@ -254,17 +274,22 @@ window.os.gui = {};
     window.os.apps = window.os.apps || {};
     
     window.os.apps.viewer = function(path) {
+        // create new div element with class 'viewer'
         var div = document.createElement('div');
         div.className = 'viewer';
-        document.body.appendChild(div);
         
-        window.os.gui.createWindow(path, div);
+        // call os.gui.createWindow with 'View: '+ path, div element
+        window.os.gui.createWindow('View: '+ path, div);
         
+        // call os.fs.readPath with path and store it in content variable
         var content = window.os.fs.readPath(path);
         
+        // create new pre element with class 'content' and set its innerHTML to content
         var pre = document.createElement('pre');
         pre.className = 'content';
         pre.innerHTML = content;
+        
+        // append pre element to div element
         div.appendChild(pre);
     };
 })();
@@ -395,9 +420,10 @@ body {
     display: block;
     font-size: 8px;
     background-color: black;
-    font-family: monospace;
     color: white;
+    font-family: monospace;
     padding: 5px;
+    word-wrap: break-word;
 }
 
 

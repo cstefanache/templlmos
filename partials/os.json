@@ -16,9 +16,17 @@
                         ]
                     },
                     {
+                        "id": "fs-structure",
+                        "disabled": false,
+                        "regenerate": false,
+                        "instructions": [
+                            "add to local storage the following json {\"temp\":{\"hello world.txt\":\"Hello World!\"}} at the `filesystem` key"
+                        ]
+                    },
+                    {
                         "id": "filesystem",
                         "disabled": false,
-                        "regenerate": true,
+                        "regenerate": false,
                         "instructions": [
                             "Create a self executing function that holds an empty object called `filesystem` that is loaded from local storage or initialized as empty.",                     
                             "Define the following methods under the global `window.os` object under `fs` key:",
@@ -30,7 +38,7 @@
                             "* `rm(path)` - removes the object at the given path and file name. in the end execute the `sync` method.",
                             "* `isFile(path)` - returns true the entry at the given path is a string."
                         ]
-                    }
+                    }                
                 ]
             }
         }
