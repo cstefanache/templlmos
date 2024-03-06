@@ -1,0 +1,38 @@
+{
+    "definition": {
+        "head": {
+            "_defaults": {
+                "prefix": "Generate browser vanilla JS code without the use of any library or framework.\n### Instruction:\n"
+            },
+            "script": {
+                "_generate": [
+                    
+                    {
+                        "id": "os-base",
+                        "disabled": false,
+                        "instructions": [
+                            "Create a new `os` object on the window global object.",
+                            "Add an empty `apps` object to the `os` object."
+                        ]
+                    },
+                    {
+                        "id": "filesystem",
+                        "disabled": false,
+                        "regenerate": true,
+                        "instructions": [
+                            "Create a self executing function that holds an empty object called `filesystem` that is loaded from local storage or initialized as empty.",                     
+                            "Define the following methods under the global `window.os` object under `fs` key:",
+                            "* `sync()` - save the `filesystem` object to the local storage.",
+                            "* `readPath(path)` - returns the content of the entry in the `filesystem` object at the given path. path should be split by `/` and the method should traverse the `filesystem` object to find the content.",
+                            "* `write(path, fileName, content)` - writes the content to an entry in the `filesystem` object at the given path and file name. in the end execute the `sync` method.",
+                            "* `ls(path) - returns a list of entries in the `filesystem` object at the given path. if path is empty or not found, return the root entries. if the path starts with `/` remove the leading `/`",
+                            "* `mkdir(path, dirName)` - creates a new directory in the `filesystem` object at the given path and directory name. in the end execute the `sync` method.",
+                            "* `rm(path)` - removes the object at the given path and file name. in the end execute the `sync` method.",
+                            "* `isFile(path)` - returns true the entry at the given path is a string."
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+}

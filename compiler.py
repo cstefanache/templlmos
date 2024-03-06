@@ -7,12 +7,16 @@ from llama_cpp import Llama
 from huggingface_hub import hf_hub_download, scan_cache_dir
 
 CACHE = "./cache"
+DEBUG = "./debug"
 
 
 class Compiler:
     def __init__(self, filename, force_build=False):
         if not os.path.exists(CACHE):
             os.makedirs(CACHE)
+
+        if not os.path.exists(DEBUG):
+            os.makedirs(DEBUG)
 
         self.force_build = force_build
 
@@ -47,10 +51,39 @@ class Compiler:
                                 n_threads=8,
                             )
 
-            self.compile(data["definition"], data["defaults"], filename=filename)
+            html = self.compile(data["definition"], data["defaults"], filename=filename)
 
-    def evaluate_ruleset(self, ruleset, output):
-        return "tbd"
+            for partial in data.get("partials", []):
+                with open(f"./partials/{partial}", "r") as read_file:
+                    partial_data = json.load(read_file)
+                    self.compile(
+                        partial_data["definition"],
+                        data["defaults"],
+                        filename=partial,
+                        html=html,
+                    )
+
+            output = self.get_html_content("html", html)
+
+            output_filename = re.sub(r"\.json", ".html", filename)
+            with open(output_filename, "w") as file:
+                file.write(output)
+
+    def process_output(self, output):
+        result = re.search(r"```[a-zA-Z ]+\n(.*?)```", output, re.DOTALL).group(1)
+
+        return result
+
+    def get_html_content(self, parent, value):
+        output = f"\n<{parent}>"
+        for key, value in value.items():
+            if key == "_html_":
+                output += "\n".join(
+                    [f"\n{self.process_output(output)}" for output in value]
+                )
+            else:
+                output += self.get_html_content(key, value)
+        return output + f"\n</{parent}>"
 
     def call_llm(self, model_name, instruction):
         model = self.runtime_models[model_name]
@@ -69,6 +102,7 @@ class Compiler:
         for chunk in output:
             val = chunk["choices"][0]["text"]
             result += val
+            print(val, end="")
 
         result += "\n```"
         return result
@@ -129,6 +163,11 @@ class Compiler:
                 )
             )
 
+        with open(f"{DEBUG}/{id}.md", "w") as file:
+            file.write(
+                f"## {id}\n\n### Instruction\n```\n{compiled_instruction}\n```\n\n```\n{self.process_output(result)}\n```"
+            )
+
         return result
 
     def go_into_tag(self, definition, current_element, current_defs, parent):
@@ -164,10 +203,7 @@ class Compiler:
                     value, current_element[key], current_defs, parent + " > " + key
                 )
 
-    def compile(self, data, defaults, filename):
-        print("----------------------------")
-        html = {}
-
+    def compile(self, data, defaults, filename, html={}):
         for key, value in data.items():
             parent = "html"
             if key not in html.keys():
@@ -180,31 +216,7 @@ class Compiler:
             parent += " > " + key
             self.go_into_tag(value, html[key], current_defs, parent)
 
-        print(json.dumps(html, indent=4))
-
-        def process_output(output):
-            print("\n\n")
-            print(output)
-            result = re.search(r"```[a-zA-Z ]+\n(.*?)```", output, re.DOTALL).group(1)
-
-            return result
-
-        def get_html_content(parent, value):
-            output = f"\n<{parent}>"
-            for key, value in value.items():
-                if key == "_html_":
-                    output += "\n".join(
-                        [f"\n{process_output(output)}" for output in value]
-                    )
-                else:
-                    output += get_html_content(key, value)
-            return output + f"\n</{parent}>"
-
-        output = get_html_content("html", html)
-
-        output_filename = re.sub(r"\.json", ".html", filename)
-        with open(output_filename, "w") as file:
-            file.write(output)
+        return html
 
 
 Compiler("templlmos.json", force_build=False)

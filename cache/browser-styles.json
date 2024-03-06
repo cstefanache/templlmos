@@ -1,0 +1,1 @@
+{"compiled_instruction": "Generate browser vanilla JS code without the use of any library or framework.\n### Instruction:\n Define `.browser` class having display flex \n### Response:\n", "output": "Sure, you can define a CSS class named `.browser` with `display: flex;` property in your CSS file as follows:\n\n```css\n.browser {\n    display: flex;\n}\n\n```"}

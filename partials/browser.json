@@ -1,0 +1,71 @@
+{
+    "definition": {
+        "head": {
+            "_defaults": {
+                "prefix": "Generate browser vanilla JS code without the use of any library or framework.\n### Instruction:\n"
+            },
+            "style": {
+                "_generate": [
+                    {
+                        "id": "browser-styles",
+                        "disabled": false,
+                        "instructions": [
+                            "Define `.browser` class having display flex"
+                        ]
+                    }
+                ]
+            },
+            "script": {
+                "_defaults": {
+                    "prefix": "Generate browser vanilla JS code without the use of any library or framework. All the `os` functions are already defined.\n### Instruction:\n"
+                },
+                "_generate": [
+                    {
+                        "id": "browser-app",
+                        "disabled": false,
+                        "instructions": [
+                            "Create a self executing function that defines a function called `browser` on the `window.os.apps` object having the following functionality:",
+                            "The `browser` function accepts one parameter `path` and have the following functionality:",
+                            " - creates a new `div` element with the class `browser`",
+                            " - call `os.gui.createWindow` with the following parameters: path, created DOM element",
+                            " - call `os.fs.ls` and store it in a variable `files`",
+                            " - for each file in the `files` array, do the following:",
+                            "  * save to variable `isFile` the execution of `os.fs.isFile` with the parameter `path + '/' + name`",
+                            "  * create a callback function that calls if `isFile` call `os.apps.viewer` or `os.apps.browser` otherwise with the parameter `path + '/' + name`",
+                            "  * calls `os.gui.addIcon` with the following parameters: `name`, `'📄'` if isFile is true, `'📁'` otherwise, callback function and the created DOM element"
+                        ]
+                    },
+                    {
+                        "id": "viwer-app",
+                        "disabled": false,
+                        "instructions": [
+                            "Create a self executing function that defines a function called `viewer` on the `window.os.apps` object having the following functionality:",
+                            "The `viewer` function accepts one parameter `path` and have the following functionality:",
+                            " - creates a new `div` element with the class `viewer`",
+                            " - call `os.gui.createWindow` with the following parameters: path, created DOM element",
+                            " - call `os.fs.readPath` with the parameter `path` and store it in a variable `content`",
+                            " - create a new `pre` element with the class `content` and set its innerHTML to `content`",
+                            " - append the `pre` element to the created DOM element"
+                        ]
+                    }
+                ]
+            }
+        },
+        "body": {
+            "script": {
+                "_defaults": {
+                    "prefix": "Generate browser vanilla JS code without the use of any library or framework. All the `os` functions are already defined.\n### Instruction:\n"
+                },
+                "_generate": [
+                    {
+                        "id": "add browser to desktop",
+                        "disabled": false,
+                        "instructions": [
+                            "Create a self executing function that executes `os.gui.addIcon('Browser', '📁', () => os.apps.browser(''), document.body)`"
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+}

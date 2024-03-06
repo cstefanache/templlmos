@@ -1,7 +1,371 @@
 
 <html>
 <head>
+<script>
+window.os = {
+    apps: {}
+};
+
+
+
+(function() {
+    // Load filesystem from localStorage, if it exists, otherwise initialize it as an empty object
+    var filesystem = JSON.parse(localStorage.getItem('filesystem')) || {};
+    
+    // Define fs methods on window.os
+    window.os = window.os || {};
+    window.os.fs = {
+        sync: function() {
+            localStorage.setItem('filesystem', JSON.stringify(filesystem));
+        },
+        readPath: function(path) {
+            var pathArray = path.split('/').filter(Boolean); // Remove leading and trailing '/' and split by '/'
+            var current = filesystem;
+            for (var i = 0; i < pathArray.length; i++) {
+                if (current[pathArray[i]]) {
+                    current = current[pathArray[i]];
+                } else {
+                    return null; // Path not found
+                }
+            }
+            return current; // Return content at path
+        },
+        write: function(path, fileName, content) {
+            var pathArray = path.split('/').filter(Boolean); // Remove leading and trailing '/' and split by '/'
+            var current = filesystem;
+            for (var i = 0; i < pathArray.length; i++) {
+                if (!current[pathArray[i]]) {
+                    current[pathArray[i]] = {}; // Create new directory if it doesn't exist
+                }
+                current = current[pathArray[i]]; // Move to next level in filesystem
+            }
+            current[fileName] = content; // Write content to file
+            this.sync(); // Save filesystem to localStorage
+        },
+        ls: function(path) {
+            var current = path ? this.readPath(path) : filesystem; // Get current directory to list entries in
+            return current ? Object.keys(current) : Object.keys(filesystem); // Return entries in current directory
+        },
+        mkdir: function(path, dirName) {
+            var pathArray = path.split('/').filter(Boolean); // Remove leading and trailing '/' and split by '/'
+            var current = filesystem;
+            for (var i = 0; i < pathArray.length; i++) {
+                if (!current[pathArray[i]]) {
+                    current[pathArray[i]] = {}; // Create new directory if it doesn't exist
+                }
+                current = current[pathArray[i]]; // Move to next level in filesystem
+            }
+            current[dirName] = {}; // Create new directory at given path and name
+            this.sync(); // Save filesystem to localStorage
+        },
+        rm: function(path) {
+            var pathArray = path.split('/').filter(Boolean); // Remove leading and trailing '/' and split by '/'
+            var parent = filesystem;
+            var last = pathArray[pathArray.length - 1]; // Get last part of path (file/directory name)
+            pathArray = pathArray.slice(0, -1); // Remove last part of path
+            for (var i = 0; i < pathArray.length; i++) {
+                if (parent[pathArray[i]]) {
+                    parent = parent[pathArray[i]]; // Move to parent directory
+                } else {
+                    return; // Path not found, nothing to remove
+                }
+            }
+            delete parent[last]; // Remove file/directory at given path
+            this.sync(); // Save filesystem to localStorage
+        },
+        isFile: function(path) {
+            var content = this.readPath(path); // Get content at given path
+            return typeof content === 'string'; // Return true if content is a string (i.e., it's a file)
+        }
+    };
+})();
+
+
+
+if (typeof window.os === "undefined") {
+    window.os = {};
+}
+
+window.os.gui = {};
+
+
+
+(function() {
+    window.os = window.os || {};
+    window.os.gui = window.os.gui || {};
+    window.os.gui.titleBar = function(title, targetElement) {
+        // Create root DOM element
+        var titleBar = document.createElement('div');
+        titleBar.className = 'titleBar';
+        
+        // Add title to span and append to titleBar
+        var titleSpan = document.createElement('span');
+        titleSpan.textContent = title;
+        titleBar.appendChild(titleSpan);
+        
+        // Add button to titleBar
+        var closeButton = document.createElement('button');
+        closeButton.textContent = 'x';
+        closeButton.addEventListener('click', function() {
+            document.body.removeChild(targetElement);
+        });
+        titleBar.appendChild(closeButton);
+        
+        // Add drag and drop functionality to titleBar
+        var dragging = false;
+        var startX;
+        var startY;
+        var offsetX;
+        var offsetY;
+        
+        titleBar.addEventListener('mousedown', function(e) {
+            dragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            offsetX = targetElement.offsetLeft;
+            offsetY = targetElement.offsetTop;
+        });
+        
+        titleBar.addEventListener('mouseup', function() {
+            dragging = false;
+        });
+        
+        titleBar.addEventListener('mousemove', function(e) {
+            if (dragging) {
+                var x = e.clientX - startX;
+                var y = e.clientY - startY;
+                targetElement.style.left = (offsetX + x) + 'px';
+                targetElement.style.top = (offsetY + y) + 'px';
+            }
+        });
+        
+        return titleBar;
+    };
+})();
+
+
+
+(function() {
+    if (!window.os) window.os = {};
+    if (!window.os.gui) window.os.gui = {};
+    
+    window.os.gui.createWindow = function(title = "Default Title", content = null, width = 400, height = 300) {
+        // create root DOM element with class .window
+        var root = document.createElement("div");
+        root.className = "window";
+        root.style.width = width + "px";
+        root.style.height = height + "px";
+        
+        // add two empty div placeholders .titlePlaceholder and .contentPlaceholder
+        var titlePlaceholder = document.createElement("div");
+        titlePlaceholder.className = "titlePlaceholder";
+        var contentPlaceholder = document.createElement("div");
+        contentPlaceholder.className = "contentPlaceholder";
+        
+        root.appendChild(titlePlaceholder);
+        root.appendChild(contentPlaceholder);
+        
+        // call window.os.gui.titleBar with the title and root DOM element as second parameter and append result to .titlePlaceholder
+        if(typeof window.os.gui.titleBar === 'function') {
+            var titleBar = window.os.gui.titleBar(title, root);
+            titlePlaceholder.appendChild(titleBar);
+        } else {
+            console.error("Function window.os.gui.titleBar is not defined.");
+        }
+        
+        // append content parameter as dom child to .contentPlaceholder
+        if(content && content instanceof Node) {
+            contentPlaceholder.appendChild(content);
+        } else {
+            console.error("Content parameter is not a valid DOM node.");
+        }
+        
+        // append root dom element to document body 
+        document.body.appendChild(root);
+    };
+})();
+
+
+
+(function() {
+    if (!window.os) {
+        window.os = {};
+    }
+    if (!window.os.gui) {
+        window.os.gui = {};
+    }
+    window.os.gui.addIcon = function(name, icon, callback, container) {
+        var root = document.createElement('div');
+        root.classList.add('icon');
+        
+        var emoji = document.createElement('span');
+        emoji.classList.add('emoji');
+        emoji.textContent = icon;
+        root.appendChild(emoji);
+        
+        var appName = document.createElement('span');
+        appName.classList.add('app-name');
+        appName.textContent = name;
+        root.appendChild(appName);
+        
+        root.addEventListener('click', callback);
+        
+        container.appendChild(root);
+    };
+})();
+
+
+
+(function() {
+    window.os = window.os || {};
+    window.os.apps = window.os.apps || {};
+    
+    window.os.apps.browser = function(path) {
+        var div = document.createElement('div');
+        div.className = 'browser';
+        document.body.appendChild(div);
+        
+        window.os.gui.createWindow(path, div);
+        
+        var files = window.os.fs.ls(path);
+        
+        files.forEach(function(name) {
+            var isFile = window.os.fs.isFile(path + '/' + name);
+            
+            var callback = (function(name) {
+                return function() {
+                    if (isFile) {
+                        window.os.apps.viewer(path + '/' + name);
+                    } else {
+                        window.os.apps.browser(path + '/' + name);
+                    }
+                };
+            })(name);
+            
+            window.os.gui.addIcon(name, isFile ? '📄' : '📁', callback, div);
+        });
+    };
+})();
+
+
+
+(function() {
+    window.os = window.os || {};
+    window.os.apps = window.os.apps || {};
+    
+    window.os.apps.viewer = function(path) {
+        var div = document.createElement('div');
+        div.className = 'viewer';
+        document.body.appendChild(div);
+        
+        window.os.gui.createWindow(path, div);
+        
+        var content = window.os.fs.readPath(path);
+        
+        var pre = document.createElement('pre');
+        pre.className = 'content';
+        pre.innerHTML = content;
+        div.appendChild(pre);
+    };
+})();
+
+
+
+(function() {
+    window.os = window.os || {};
+    window.os.apps = window.os.apps || {};
+    
+    window.os.apps.minesweeper = function() {
+        // create root dom element with class 'gmroot'
+        let root = document.createElement('div');
+        root.className = 'gmroot';
+        document.body.appendChild(root);
+        
+        // generate matrix of 8x8 with values 0
+        let matrix = Array(8).fill().map(() => Array(8).fill(0));
+        
+        // pick 3 random cells and set their value to 'x' and increase neighboring cells' values
+        let mines = Array(3).fill().map(() => [Math.floor(Math.random() * 8), Math.floor(Math.random() * 8)]);
+        mines.forEach(([x, y]) => {
+            matrix[x][y] = 'x';
+            for (let i = -1; i <= 1; i++) {
+                for (let j = -1; j <= 1; j++) {
+                    let nx = x + i, ny = y + j;
+                    if (nx >= 0 && nx < 8 && ny >= 0 && ny < 8 && matrix[nx][ny] !== 'x') {
+                        matrix[nx][ny]++;
+                    }
+                }
+            }
+        });
+        
+        // iterate through matrix and add div and button elements for each cell
+        matrix.forEach((row, x) => {
+            let div = document.createElement('div');
+            row.forEach((value, y) => {
+                let button = document.createElement('button');
+                button.className = 'cell';
+                button.textContent = '.';
+                button.onclick = () => {
+                    if (matrix[x][y] === 'x') {
+                        button.textContent = '💣';
+                        alert('You hit a mine 💣');
+                    } else {
+                        button.textContent = value;
+                    }
+                };
+                div.appendChild(button);
+            });
+            root.appendChild(div);
+        });
+        
+        // call os.gui.createWindow with parameters '💣 minesweeper', root DOM element, 250, 280
+        window.os.gui.createWindow('💣 minesweeper', root, 250, 280);
+    };
+})();
+
+
+</script>
 <style>
+.titleBar {
+    background-color: orange;
+    border-bottom: 1px solid black;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: monospace;
+    font-size: small;
+    padding: 5px;
+    user-select: none; /* This will prevent text selection */
+}
+
+/* This will apply styles to all buttons inside titleBar */
+.titleBar button {
+    border: 1px solid black;
+    font-family: monospace;
+    font-size: small;
+    border-radius: 2px; /* This will give rounded corners */
+}
+
+
+
+.window {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    padding: 1px;
+    border: 2px solid black;
+    border-radius: 4px;
+}
+
+.contentPlaceholder {
+    flex-grow: 1;
+    overflow: auto;
+    padding: 5px;
+}
+
+
+
 body {
     background-color: #2E393D;
 }
@@ -14,44 +378,7 @@ body {
 
 
 
-.titleBar {
-    background-color: orange;
-    border-bottom: 1px solid black;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: monospace;
-    font-size: small;
-    padding: 5px;
-}
-
-.titleBar button {
-    border: 1px solid black;
-    font-family: monospace;
-    font-size: small;
-    border-radius: 2px;
-    -webkit-user-select: none; /* Safari */
-    -ms-user-select: none; /* IE 10+ */
-    user-select: none; /* Standard syntax */
-}
-
-
-
-.windowComponent {
-    position: absolute;
-    background-color: #fff;
-    padding: 1px;
-    border: 2px solid #000;
-    border-radius: 4px;
-}
-
-.contentPlaceholder {
-    padding: 5px;
-}
-
-
-
-.app {
+.icon {
     width: 64px;
     height: 64px;
     text-align: center;
@@ -59,7 +386,7 @@ body {
     cursor: pointer;
 }
 
-.icon {
+.emoji {
     display: block;
     font-size: 30px;
 }
@@ -75,214 +402,32 @@ body {
 
 
 
+.browser {
+    display: flex;
+}
+
+
+
 .gmroot button {
-    font-family: 'Courier New', Courier, monospace;
+    width: 30px;
+    height: 30px;
+    overflow: hidden;
 }
 
 
 </style>
-<script>
-function addDesktop(name, char, func) {
-  // Create root div element
-  let root = document.createElement('div');
-  root.className = 'app';
-  // Append character to root element
-  let icon = document.createElement('div');
-  icon.className = 'icon';
-  icon.textContent = char;
-  root.appendChild(icon);
-  // Append span to root element
-  let appName = document.createElement('span');
-  appName.className = 'app-name';
-  appName.textContent = name;
-  root.appendChild(appName);
-  // Append root to .desktop element
-  let desktop = document.querySelector('.desktop');
-  desktop.appendChild(root);
-  // Add click event listener to execute function
-  root.addEventListener('click', func);
-}
-
-
-
-function titleBar(title, domElement) {
-    // Create root DOM element with class 'titleBar'
-    let root = document.createElement('div');
-    root.classList.add('titleBar');
-    
-    // Add span containing title parameter to root
-    let span = document.createElement('span');
-    span.textContent = title;
-    root.appendChild(span);
-    
-    // Add button with text 'x' to root
-    let button = document.createElement('button');
-    button.textContent = 'x';
-    button.addEventListener('click', () => document.body.removeChild(domElement));
-    root.appendChild(button);
-    
-    // Add drag event listener to root to move domElement
-    let isDragging = false;
-    let offsetX = 0;
-    let offsetY = 0;
-    
-    root.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        offsetX = e.offsetX;
-        offsetY = e.offsetY;
-    });
-    
-    document.addEventListener('mousemove', (e) => {
-        if (isDragging) {
-            let x = e.clientX - offsetX;
-            let y = e.clientY - offsetY;
-            domElement.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-        }
-    });
-    
-    document.addEventListener('mouseup', () => {
-        isDragging = false;
-    });
-    
-    return root;
-}
-
-
-
-function windowComponent(title, content, width = 400, height = 300) {
-    // Creates a DOM element with the class `windowComponent` with the width and height passed to parameters
-    let root = document.createElement('div');
-    root.className = 'windowComponent';
-    root.style.width = width + 'px';
-    root.style.height = height + 'px';
-    
-    // Creates placeholders for the title and content
-    let titlePlaceholder = document.createElement('div');
-    titlePlaceholder.className = 'titlePlaceholder';
-    let contentPlaceholder = document.createElement('div');
-    contentPlaceholder.className = 'contentPlaceholder';
-    
-    // Appends the placeholders to the root element
-    root.appendChild(titlePlaceholder);
-    root.appendChild(contentPlaceholder);
-    
-    // Defines the title bar and appends it to the title placeholder
-    let tb = titleBar(title, root);
-    titlePlaceholder.appendChild(tb);
-    
-    // Appends the content as a child to the content placeholder
-    contentPlaceholder.appendChild(content);
-    
-    // Appends the root element to the document body
-    document.body.appendChild(root);
-}
-
-
-</script>
 </head>
 <body>
 <script>
-let desktop = document.createElement('div');
-desktop.className = 'desktop';
-document.body.appendChild(desktop);
+(function() {
+    os.gui.addIcon('Browser', '📁', () => os.apps.browser(''), document.body);
+})();
 
 
 
-function minesweeper() {
-    // create root div
-    const gmRoot = document.createElement('div');
-    gmRoot.classList.add('gmroot');
-    document.body.appendChild(gmRoot);
-    
-    // create 8x8 matrix and initialize to 0
-    let matrix = Array(8).fill().map(() => Array(8).fill(0));
-    
-    // pick 3 random cells and set their value to 'x'
-    let mines = [];
-    while(mines.length < 3) {
-        let x = Math.floor(Math.random() * 8);
-        let y = Math.floor(Math.random() * 8);
-        if(!mines.find(mine => mine[0] === x && mine[1] === y)) {
-            matrix[x][y] = 'x';
-            mines.push([x, y]);
-        }
-    }
-    
-    // set neighboring cells to number of 'x' cells around them
-    for(let i = 0; i < 8; i++) {
-        for(let j = 0; j < 8; j++) {
-            if(matrix[i][j] === 'x') {
-                for(let x = i - 1; x <= i + 1; x++) {
-                    for(let y = j - 1; y <= j + 1; y++) {
-                        if(x >= 0 && x < 8 && y >= 0 && y < 8 && !(x === i && y === j)) {
-                            matrix[x][y] = (matrix[x][y] === 'x' ? 0 : matrix[x][y] + 1);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    // create matrix visualization and add to gmRoot
-    for(let i = 0; i < 8; i++) {
-        let row = document.createElement('div');
-        for(let j = 0; j < 8; j++) {
-            let cell = document.createElement('button');
-            cell.classList.add('cell');
-            cell.textContent = '.';
-            cell.addEventListener('click', () => {
-                if(matrix[i][j] === 'x') {
-                    alert('Game Over');
-                } else {
-                    cell.textContent = matrix[i][j];
-                }
-            });
-            row.appendChild(cell);
-        }
-        gmRoot.appendChild(row);
-    }
-    
-    // call windowComponent
-    windowComponent('Minesweeper', gmRoot, 202, 220);
-}
-
-
-
-function tictactoe() {
-    // Create root DOM element
-    const gmRoot = document.createElement('div');
-    gmRoot.classList.add('gmRoot');
-    document.body.appendChild(gmRoot);
-    
-    // Store current player as 'x'
-    let currentPlayer = 'x';
-    
-    // Create 3x3 grid of buttons
-    for(let i = 0; i < 3; i++) {
-        const row = document.createElement('div');
-        row.classList.add('row');
-        gmRoot.appendChild(row);
-        
-        for(let j = 0; j < 3; j++) {
-            const cell = document.createElement('button');
-            cell.classList.add('cell');
-            cell.textContent = '.';
-            cell.addEventListener('click', () => {
-                cell.textContent = currentPlayer;
-                currentPlayer = currentPlayer === 'x' ? 'o' : 'x';
-            });
-            row.appendChild(cell);
-        }
-    }
-    
-    // Call windowComponent function
-    windowComponent('Tic Tac Toe', gmRoot, 202, 220);
-}
-
-
-
-addDesktop("minesweeper", String.fromCodePoint(0x0001F4A3), minesweeper);
-addDesktop("tic-tac-toe", String.fromCodePoint(0x274C), tictactoe);
+(function() {
+    os.gui.addIcon('Minesweeper', '💣', () => os.apps.minesweeper(), document.body);
+})();
 
 
 </script>

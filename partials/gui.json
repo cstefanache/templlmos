@@ -1,0 +1,79 @@
+{
+    "definition": {
+        "head": {
+            "_defaults": {
+                "prefix": "Generate browser vanilla JS code without the use of any library or framework.\n### Instruction:\n"
+            },
+            "style": {
+                "_generate": [
+                    {
+                        "id": "title-bar-styles",
+                        "disabled": false,
+                        "instructions": [
+                            "css style for a .titleBar class to follow the following rules:",
+                            "1. orange background color, a black bottom border of 1px solid",
+                            "2. display of flex, a justify-content of space-between, an align-items of center",
+                            "3. monospaced black small text",
+                            "4. internal padding of 5px",
+                            "5. all buttons should have a black border and small monospaced text and a rounded border of 2px, flat look",
+                            "6. do not allow text selection"
+                        ]
+                    },
+                    {
+                        "id": "window-container-styles",
+                        "disabled": false,
+                        "instructions": [
+                            "css style for a .window class to follow the following rules:",
+                            "- white background color and a padding of 1px",
+                            "- a border of 2px solid black",
+                            "- a border-radius of 4px",
+                            "- absolute position",
+                            "- display of flex and flex-direction of column",
+                            "- inner .contentPlaceholder class should have a padding of 5px, flex-grow of 1 and overflow of auto"
+                        ]
+                    }
+                ]
+            },
+            "script": {
+                "_defaults": {
+                    "prefix": "Generate browser vanilla JS code without the use of any library or framework.\n### Instruction:\n"
+                },
+                "_generate": [
+                    {
+                        "id": "gui-object",
+                        "disabled": false,
+                        "instructions": [
+                            "Define `gui` empty object on the global `window.os` object"
+                        ]
+                    },
+                    {
+                        "id": "title-bar",
+                        "disabled": false,
+                        "instructions": [
+                            "Create a self executing function that defines a function called `titleBar` on the `window.os.gui` object having the following functionality:",
+                            "- create a root DOM element with the class `.titleBar`",
+                            "- add to the root DOM element a `span` containing the title parameter",
+                            "- add to the root DOM element a `button` with the text `x`",
+                            "- when the button is clicked then the DOM element passed as the second parameter should be removed from the body",
+                            "- when root DOM element is dragged then move the DOM element passed as the second parameter",
+                            "- return the root DOM element"
+                        ]
+                    },
+                    {
+                        "id": "window",
+                        "disabled": false,
+                        "instructions": [
+                            "Create a self executing function that defines a function called `createWindow` on the `window.os.gui` object",
+                            "The `createWindow` function takes four parameters: title, content (as DOM element) and width and height that are defaulting to 400 and 300, respectively if not passed and have the following functionality:",
+                            "- create a root DOM element with the class `.window`",
+                            "- add two empty `div` placeholders: `.titlePlaceholder` and `.contentPlaceholder`",
+                            "- call `window.os.gui.titleBar` with the title and the root DOM element as the second parameter and append the result to the `.titlePlaceholder`",
+                            "- append the content parameter as dom child to the `.contentPlaceholder`",
+                            "- append the root dom element to document body"
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+}

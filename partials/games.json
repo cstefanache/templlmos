@@ -1,0 +1,55 @@
+{
+    "definition": {
+        "head": {
+            "style": {
+                "_defaults": {
+                    "prefix": "Generate css code without the use of any library or framework.\n### Instruction:\n"
+                },
+                "_generate": [
+                    {
+                        "id": "minesweeper-styles",
+                        "instructions": [
+                            "css style for a .gmroot class to follow the following rules:",
+                            "1. buttons in .gmroot be the size of 30px by 30px and overflow hidden"
+                        ]
+                    }
+                ]
+            },
+            "script": {
+                "_defaults": {
+                    "prefix": "Generate JS code using `let` instead of `var`. All the `os` functions are already defined.\n### Instruction:\n"
+                },
+                "_generate": [
+                    {
+                        "id": "minesweeper-app",
+                        "disabled": false,
+                        "instructions": [
+                            "Create a self executing function that defines a function called `minesweeper` on the `window.os.apps` object having the following functionality:",
+                            "* creates a root dom element with the class `gmroot`",
+                            "* generate a matrix of 8x8 with values 0",
+                            "* pick a random of 3 cells and set their value to `x` and increase the number value of the neighboring cells",
+                            "* iterate through the matrix and for each row add a div dom element and for each item add a button with the class `cell` and  `.` as content. when the button is clicked, the content should be replaced with the value. when the user clicks on a cell with value `x` replace content with `💣` and notify the user",
+                            "* call `os.gui.createWindow` with the following parameters: `'💣 minesweeper'`, created root DOM element, `250`, `280`"
+                        ]
+                    }
+                ]
+            }
+        },
+        "body": {
+            "script": {
+                "_defaults": {
+                    "prefix": "Generate browser vanilla JS code without the use of any library or framework. All the `os` functions are already defined.\n### Instruction:\n"
+                },
+                "_generate": [
+                    {
+                        "id": "minesweeper-desktop-icon",
+                        "disabled": false,
+                        "instructions": [
+                            "Create a self executing function that executes `os.gui.addIcon('Minesweeper', '💣', () => os.apps.minesweeper(), document.body)`"
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+}
