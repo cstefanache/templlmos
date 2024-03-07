@@ -6,7 +6,7 @@ Generate code only. Stop after the code is generated. Do not provide any explana
 ### Instruction:
  Generate CSS to: 
  - to apply #2E393D background for the body
- - define `.desktop` class with fixed position and 100% width and height 
+ - all `body > .icon > .app-name` have a white color 
 ### Response:
 
 ```
@@ -16,10 +16,8 @@ body {
     background-color: #2E393D;
 }
 
-.desktop {
-    position: fixed;
-    width: 100%;
-    height: 100%;
+body > .icon > .app-name {
+    color: white;
 }
 
 

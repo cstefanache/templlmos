@@ -20,6 +20,8 @@ class Compiler:
 
         self.force_build = force_build
 
+        self.source_data = {}
+
         with open(filename, "r") as read_file:
             data = json.load(read_file)
 
@@ -63,6 +65,15 @@ class Compiler:
                         html=html,
                     )
 
+            # stringify self.source_data
+            self.source_data = json.dumps({"sources": self.source_data})
+            self.source_data = self.source_data.replace("`", "\`")
+
+            html["head"]["script"]["_html_"].insert(
+                0,
+                f"```javascript\nwindow.localStorage.clear()\nconst sources = {self.source_data}\nif (localStorage.getItem('filesystem') === null) {{\n  localStorage.setItem('filesystem', JSON.stringify(sources))\n}}\n```",
+            )
+            json.dump(html, open("debug/output.json", "w"), indent=4)
             output = self.get_html_content("html", html)
 
             output_filename = re.sub(r"\.json", ".html", filename)
@@ -112,7 +123,7 @@ class Compiler:
         # print(result)
         # return result
 
-    def generate(self, definition, parent, current_defs):
+    def generate(self, definition, parent, current_defs, partial=""):
         id = definition.get("id", "undefined")
         disabled = definition.get("disabled", False)
         rebuild = definition.get("rebuild", False)
@@ -138,6 +149,17 @@ class Compiler:
         cache = f"{CACHE}/{id}.json"
         compiled_instruction = f"{prefix} {instruction} {suffix}"
 
+        partial = re.sub(r"\.json", "", partial)
+        if partial not in self.source_data.keys():
+            self.source_data[partial] = {}
+
+        # check if last element in string pattern "a > b > c" is "script"
+        source_name = id
+        if parent.split(" > ")[-1] == "script":
+            source_name += ".script"
+        elif parent.split(" > ")[-1] == "style":
+            source_name += ".style"
+
         if os.path.exists(cache):
             with open(cache, "r") as file:
                 result = json.load(file)
@@ -148,6 +170,14 @@ class Compiler:
                     and result["compiled_instruction"] == compiled_instruction
                 ):
                     print(f"Using cache for {id}")
+
+                    self.source_data[partial][source_name] = (
+                        "\n----------------[ prompt ]----------------\n"
+                        + compiled_instruction
+                        + "\n----------------[ output ]----------------\n"
+                        + result["output"]
+                    )
+
                     return result["output"]
                 else:
                     print(f"Cache for {id} is outdated, recompiling...")
@@ -155,6 +185,13 @@ class Compiler:
         print(f"Compiling {id}...")
 
         result = self.call_llm(model, compiled_instruction)
+
+        self.source_data[partial][source_name] = (
+            "\n----------------[ prompt ]----------------\n"
+            + compiled_instruction
+            + "\n----------------[ output ]----------------\n"
+            + result
+        )
 
         with open(cache, "w") as file:
             file.write(
@@ -170,12 +207,16 @@ class Compiler:
 
         return result
 
-    def go_into_tag(self, definition, current_element, current_defs, parent):
+    def go_into_tag(
+        self, definition, current_element, current_defs, parent, partial=""
+    ):
         print(f"Generating for {parent}...")
 
         if isinstance(definition, list):
             for item in definition:
-                self.go_into_tag(item, current_element, current_defs, parent)
+                self.go_into_tag(
+                    item, current_element, current_defs, parent, partial=partial
+                )
             return
 
         if "_defaults" in definition.keys():
@@ -187,7 +228,7 @@ class Compiler:
 
             if isinstance(definition["_generate"], list):
                 for item in definition["_generate"]:
-                    result = self.generate(item, parent, current_defs)
+                    result = self.generate(item, parent, current_defs, partial=partial)
                     if result is not None:
                         current_element["_html_"].append(result)
             else:
@@ -200,7 +241,11 @@ class Compiler:
                 if key not in current_element.keys():
                     current_element[key] = {"_html_": []}
                 self.go_into_tag(
-                    value, current_element[key], current_defs, parent + " > " + key
+                    value,
+                    current_element[key],
+                    current_defs,
+                    parent + " > " + key,
+                    partial=partial,
                 )
 
     def compile(self, data, defaults, filename, html={}):
@@ -214,7 +259,7 @@ class Compiler:
                 current_defs[def_key] = def_value
 
             parent += " > " + key
-            self.go_into_tag(value, html[key], current_defs, parent)
+            self.go_into_tag(value, html[key], current_defs, parent, filename)
 
         return html
 

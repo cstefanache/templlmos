@@ -9,7 +9,7 @@ Generate JS code using `let` instead of `var`. All the `os` functions are alread
 * call `os.gui.createWindow` with the following parameters: `'📄 Text Editor' {path || ''}`, created root DOM element, `500`, `500` and store the returned value to constant `win`
 * call `os.gui.toolbar(win)` and store the returned value to constant `toolbar`
 * call `toolbar.addButton` with parameters '💾' and `() => save()`
-* add a `textarea` element to the root dom element, 100% width and height
+* add a `textarea` element to the root dom element, 100% width and height and nowrap for white-space
 * if the path is not empty, store result of executiing `os.fs.readPath` into `content` constant and set it to the `textarea`
 * create an internal function `save` that:
  - if the path is not empty, store the value of the `textarea` to the `content` constant and call `os.fs.write` with the `path` and `textarea` value
@@ -32,6 +32,7 @@ Generate JS code using `let` instead of `var`. All the `os` functions are alread
         const textarea = document.createElement('textarea');
         textarea.style.width = '100%';
         textarea.style.height = '100%';
+        textarea.style.whiteSpace = 'nowrap';
         root.appendChild(textarea);
         
         let content = '';
