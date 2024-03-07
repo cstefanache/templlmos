@@ -6,7 +6,7 @@ Generate JS code using `let` instead of `var`. All the `os` functions are alread
 ### Instruction:
  Create a self executing function that defines a function called `editor` on the `window.os.apps` object that takes a parameter `path` and having the following functionality:
 * creates a root dom element with the class `editor`
-* call `os.gui.createWindow` with the following parameters: `'📄 Text Editor' {path || ''}`, created root DOM element, `500`, `500` and store the returned value to constant `win`
+* call `os.gui.createWindow` with the following parameters: `'📄 Text Editor' {path || ''}`, created root DOM element, `700`, `500` and store the returned value to constant `win`
 * call `os.gui.toolbar(win)` and store the returned value to constant `toolbar`
 * call `toolbar.addButton` with parameters '💾' and `() => save()`
 * add a `textarea` element to the root dom element, 100% width and height and nowrap for white-space
@@ -25,7 +25,7 @@ Generate JS code using `let` instead of `var`. All the `os` functions are alread
         root.className = 'editor';
         document.body.appendChild(root);
         
-        const win = os.gui.createWindow('📄 Text Editor', root, 500, 500);
+        const win = os.gui.createWindow('📄 Text Editor', root, 700, 500);
         const toolbar = os.gui.toolbar(win);
         toolbar.addButton('💾', save);
         
