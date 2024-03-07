@@ -71,7 +71,7 @@ class Compiler:
 
             html["head"]["script"]["_html_"].insert(
                 0,
-                f"```javascript\nwindow.localStorage.clear()\nconst sources = {self.source_data}\nif (localStorage.getItem('filesystem') === null) {{\n  localStorage.setItem('filesystem', JSON.stringify(sources))\n}}\n```",
+                f"```javascript\nconst sources = {self.source_data}\nif (localStorage.getItem('filesystem') === null) {{\n  localStorage.setItem('filesystem', JSON.stringify(sources))\n}}\n```",
             )
             json.dump(html, open("debug/output.json", "w"), indent=4)
             output = self.get_html_content("html", html)
