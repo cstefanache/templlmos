@@ -4,7 +4,7 @@ Inspired by Andrej Karpathy's: "The hottest new programming language is English"
 
 ![Image](assets/templlmos.gif)
 
-To test it just open the `templllmos.html` file in a browser.
+To test it just open the `templllmos.html` file in a browser or [test it online](https://cstefanache.github.io/templlmos/templlmos.html)
 
 What's implemented so far:
 - a pseudo-filesystem developed on top of localStorage - hey - it works!
