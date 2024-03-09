@@ -6,7 +6,7 @@ Inspired by Andrej Karpathy's: "The hottest new programming language is English"
 
 To test it just open the `templllmos.html` file in a browser or [test it online](https://cstefanache.github.io/templlmos/templlmos.html)
 
-What's implemented so far:
+### What's implemented so far:
 - a pseudo-filesystem developed on top of localStorage - hey - it works!
 - a GUI with windows, toolbars and statusbars
 - three applications: `file browser`, `minesweeper` and `text editor` (more to come - feel free to contribute)
@@ -15,6 +15,13 @@ What's implemented so far:
 
 - **Ease of Use:** Make coding accessible and intuitive for everyone, regardless of their programming background.
 - **Innovative Approach:** Leveraging the latest advancements in AI and natural language processing.
+
+## Next Steps
+
+- [ ] Runtime Compiler
+- [ ] Better Low-Level APIs
+- [ ] Improved FS
+- [ ] IDE
 
 ## Structure
 
