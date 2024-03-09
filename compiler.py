@@ -71,7 +71,10 @@ class Compiler:
 
             html["head"]["script"]["_html_"].insert(
                 0,
-                f"```javascript\nconst sources = {self.source_data}\nif (localStorage.getItem('filesystem') === null) {{\n  localStorage.setItem('filesystem', JSON.stringify(sources))\n}}\n```",
+                {
+                    "id": "initial-storage",
+                    "result": f"```javascript\nconst sources = {self.source_data}\nif (localStorage.getItem('filesystem') === null) {{\n  localStorage.setItem('filesystem', JSON.stringify(sources))\n}}\n```",
+                },
             )
             json.dump(html, open("debug/output.json", "w"), indent=4)
             output = self.get_html_content("html", html)
@@ -86,15 +89,20 @@ class Compiler:
         return result
 
     def get_html_content(self, parent, value):
-        output = f"\n<{parent}>"
+        output = f"\n"
         for key, value in value.items():
             if key == "_html_":
                 output += "\n".join(
-                    [f"\n{self.process_output(output)}" for output in value]
+                    [
+                        f"\n<{parent} id=\"{output['id']}\">\n{self.process_output(output['result'])}</{parent}>"
+                        for output in value
+                    ]
                 )
             else:
-                output += self.get_html_content(key, value)
-        return output + f"\n</{parent}>"
+                output += (
+                    f"\n<{parent}>\n{self.get_html_content(key, value)}\n</{parent}>\n"
+                )
+        return output
 
     def call_llm(self, model_name, instruction):
         model = self.runtime_models[model_name]
@@ -230,11 +238,15 @@ class Compiler:
                 for item in definition["_generate"]:
                     result = self.generate(item, parent, current_defs, partial=partial)
                     if result is not None:
-                        current_element["_html_"].append(result)
+                        current_element["_html_"].append(
+                            {"id": item["id"], "result": result}
+                        )
             else:
                 result = self.generate(definition["_generate"], parent, current_defs)
                 if result is not None:
-                    current_element["_html_"].append(result)
+                    current_element["_html_"].append(
+                        {"id": item["id"], "result": result}
+                    )
 
         for key, value in definition.items():
             if key not in ["_defaults", "_generate"]:
