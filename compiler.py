@@ -19,10 +19,12 @@ class Compiler:
             os.makedirs(DEBUG)
 
         self.force_build = force_build
+        self.filename = filename
 
+    def run_compile(self):
+        print("Compiling...")
         self.source_data = {}
-
-        with open(filename, "r") as read_file:
+        with open(self.filename, "r") as read_file:
             data = json.load(read_file)
 
             models = data["models"]
@@ -53,7 +55,9 @@ class Compiler:
                                 n_threads=8,
                             )
 
-            html = self.compile(data["definition"], data["defaults"], filename=filename)
+            html = self.compile(
+                data["definition"], data["defaults"], filename=self.filename, html={}
+            )
 
             for partial in data.get("partials", []):
                 with open(f"./partials/{partial}", "r") as read_file:
@@ -69,17 +73,17 @@ class Compiler:
             self.source_data = json.dumps({"sources": self.source_data})
             self.source_data = self.source_data.replace("`", "\`")
 
-            html["head"]["script"]["_html_"].insert(
-                0,
-                {
-                    "id": "initial-storage",
-                    "result": f"```javascript\nconst sources = {self.source_data}\nif (localStorage.getItem('filesystem') === null) {{\n  localStorage.setItem('filesystem', JSON.stringify(sources))\n}}\n```",
-                },
-            )
+            # html["head"]["script"]["_html_"].insert(
+            #     0,
+            #     {
+            #         "id": "initial-storage",
+            #         "result": f"```javascript\nconst sources = {self.source_data}\nif (localStorage.getItem('filesystem') === null) {{\n  localStorage.setItem('filesystem', JSON.stringify(sources))\n}}\n```",
+            #     },
+            # )
             json.dump(html, open("debug/output.json", "w"), indent=4)
             output = self.get_html_content("html", html)
 
-            output_filename = re.sub(r"\.json", ".html", filename)
+            output_filename = re.sub(r"\.json", ".html", self.filename)
             with open(output_filename, "w") as file:
                 file.write(output)
 
@@ -276,4 +280,5 @@ class Compiler:
         return html
 
 
-Compiler("templlmos.json", force_build=False)
+if __name__ == "__main__":
+    Compiler("templlmos.json", force_build=False).run_compile()

@@ -39,7 +39,7 @@
                             "  * if lenght of path is bigger than 1 then call `os.gui.addIcon` with the exact following parameters: `..`, `'🔙'`, and a callback that updates path to remove the last iterm after `/` and refresh and root DOM element",
                             "  * for each file in the `files` array, do the following:",
                             "    * save to variable `isFile` the execution of `os.fs.isFile` with the parameter `path + '/' + name`",
-                            "    * create a callback function that calls if `isFile` call `os.apps.editor` or set path to `path + '/' + name` and call `refresh()`",
+                            "    * create a callback function that calls if `isFile` call `os.apps.ide` or set path to `path + '/' + name` and call `refresh()`",
                             "    * calls `os.gui.addIcon` with the exact following parameters: `name`, `'📄'` if isFile is true, `'📁'` otherwise, callback function and the created root DOM element"
                         ]
                     },

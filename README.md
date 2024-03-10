@@ -37,8 +37,7 @@ To test it just open the `templllmos.html` file in a browser or [test it online]
 Install dependencies:
 
 ```
-python3 -m pip install huggingface_hub
-python3 -m pip install llama-cpp-python
+python3 -m pip install huggingface_hub llama-cpp-python watchdog
 ```
 
 Ona a mac (Metal)

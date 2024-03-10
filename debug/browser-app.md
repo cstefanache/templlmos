@@ -19,7 +19,7 @@ The `browser` function accepts one parameter `path` and have the following funct
   * if lenght of path is bigger than 1 then call `os.gui.addIcon` with the exact following parameters: `..`, `'🔙'`, and a callback that updates path to remove the last iterm after `/` and refresh and root DOM element
   * for each file in the `files` array, do the following:
     * save to variable `isFile` the execution of `os.fs.isFile` with the parameter `path + '/' + name`
-    * create a callback function that calls if `isFile` call `os.apps.editor` or set path to `path + '/' + name` and call `refresh()`
+    * create a callback function that calls if `isFile` call `os.apps.ide` or set path to `path + '/' + name` and call `refresh()`
     * calls `os.gui.addIcon` with the exact following parameters: `name`, `'📄'` if isFile is true, `'📁'` otherwise, callback function and the created root DOM element 
 ### Response:
 
@@ -77,9 +77,14 @@ The `browser` function accepts one parameter `path` and have the following funct
             files.forEach(name => {
                 const isFile = os.fs.isFile(path + '/' + name);
                 
-                const callback = isFile ? 
-                    () => { os.apps.editor(path + '/' + name); refresh(); } : 
-                    () => { path = path + '/' + name; refresh(); };
+                const callback = () => {
+                    if (isFile) {
+                        os.apps.ide(path + '/' + name);
+                    } else {
+                        path = path + '/' + name;
+                    }
+                    refresh();
+                };
                 
                 os.gui.addIcon(name, isFile ? '📄' : '📁', callback, root);
             });

@@ -1,0 +1,2 @@
+curl -X POST -H "Content-Type: application/json" -d '
+{ "model": "deepseek-coder-6.7b-instruct.Q5_K_M.gguf", "instruction": "### Instruction:\nGenerate JS Relu function\n### Response:\n"}' http://localhost:8080/compile

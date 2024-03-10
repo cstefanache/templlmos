@@ -16,12 +16,13 @@
         "os.json",
         "gui.json",
         "desktop.json",
-        "browser.json",
-        "games.json",
-        "apps.json"
+        "apps.json",
+        "ide.json",
+        "browser.json"
     ],
-    "definition": {
-       
+    "old": [
+        "games.json"
         
-    }
+    ],
+    "definition": {}
 }
