@@ -20,10 +20,9 @@ class Compiler:
 
         self.force_build = force_build
         self.filename = filename
+        self.load_models()
 
-    def run_compile(self):
-        print("Compiling...")
-        self.source_data = {}
+    def load_models(self):
         with open(self.filename, "r") as read_file:
             data = json.load(read_file)
 
@@ -55,6 +54,11 @@ class Compiler:
                                 n_threads=8,
                             )
 
+    def run_compile(self):
+        print("Compiling...")
+        self.source_data = {}
+        with open(self.filename, "r") as read_file:
+            data = json.load(read_file)
             html = self.compile(
                 data["definition"], data["defaults"], filename=self.filename, html={}
             )
