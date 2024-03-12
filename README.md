@@ -24,7 +24,8 @@ Create a self executing function that defines a function called `viewer` on the 
 
 There are two working modes for the experimental os: Static runtime where the precompiled code is present and injected in the root HTML and the dynamic realtime compiler mode where a server that hosts a LLM model is published that allows the user to compile new apps at runtime.
 
-- Static Runtime: Just open the `templllmos.html` file in a browser or [test it online](https://cstefanache.github.io/templlmos/templlmos.html)
+- [Static Runtime on GitHub pages](https://cstefanache.github.io/templlmos/templlmos.html)
+- Static Runtime: Just open the `templllmos.html` file
 - Realtime Compiler: `python3 templlmos.py` and open `http://localhost:8080` in a browser 
 
 For runtime compiler you need to install dependencies:
