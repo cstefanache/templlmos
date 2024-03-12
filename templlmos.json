@@ -18,11 +18,10 @@
         "desktop.json",
         "apps.json",
         "ide.json",
-        "browser.json"
-    ],
-    "old": [
+        "browser.json",
         "games.json"
-        
+    ],
+    "skip": [
     ],
     "definition": {}
 }

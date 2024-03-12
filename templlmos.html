@@ -544,6 +544,87 @@ window.os.gui = {};
 })();
 
 </script>
+
+<script id="minesweeper-app">
+(function() {
+    window.os = window.os || {};
+    window.os.apps = window.os.apps || {};
+    
+    window.os.apps.minesweeper = function() {
+        const root = document.createElement('div');
+        root.className = 'gmroot';
+        
+        const matrix = Array(8).fill().map(() => Array(8).fill(0));
+        const bombCoords = [];
+        for(let i = 0; i < 10; i++) {
+            let x, y;
+            do {
+                x = Math.floor(Math.random() * 8);
+                y = Math.floor(Math.random() * 8);
+            } while(bombCoords.find(coord => coord[0] === x && coord[1] === y));
+            bombCoords.push([x, y]);
+            matrix[x][y] = -100;
+            for(let dx = -1; dx <= 1; dx++) {
+                for(let dy = -1; dy <= 1; dy++) {
+                    if(x + dx >= 0 && x + dx < 8 && y + dy >= 0 && y + dy < 8) {
+                        matrix[x + dx][y + dy]++;
+                    }
+                }
+            }
+        }
+        
+        let score = 64;
+        const scoreDiv = document.createElement('div');
+        scoreDiv.className = 'score';
+        scoreDiv.textContent = `Discovered: ${score}`;
+        root.appendChild(scoreDiv);
+        
+        for(let x = 0; x < 8; x++) {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'row';
+            for(let y = 0; y < 8; y++) {
+                const cellDiv = document.createElement('div');
+                cellDiv.className = 'cell';
+                cellDiv.textContent = ' ';
+                cellDiv.dataset.x = x;
+                cellDiv.dataset.y = y;
+                cellDiv.addEventListener('click', () => reveal(x, y));
+                rowDiv.appendChild(cellDiv);
+            }
+            root.appendChild(rowDiv);
+        }
+        
+        window.os.gui.createWindow('💣 minesweeper', root, 250, 300);
+        
+        function reveal(x, y) {
+            const cellDiv = document.querySelector(`div[data-x="${x}"][data-y="${y}"]`);
+            if(cellDiv.classList.contains('visited')) {
+                return;
+            }
+            cellDiv.classList.add('visited');
+            const value = matrix[x][y];
+            if(value < 0) {
+                cellDiv.textContent = '💣';
+                alert('Game Over');
+            } else {
+                cellDiv.textContent = value;
+                score--;
+                scoreDiv.textContent = `Discovered: ${score}`;
+                if(value === 0) {
+                    for(let dx = -1; dx <= 1; dx++) {
+                        for(let dy = -1; dy <= 1; dy++) {
+                            if(x + dx >= 0 && x + dx < 8 && y + dy >= 0 && y + dy < 8) {
+                                reveal(x + dx, y + dy);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+})();
+
+</script>
 </head>
 
 <head>
@@ -700,6 +781,53 @@ body > .icon > .app-name {
 }
 
 </style>
+
+<style id="minesweeper-styles">
+.gmroot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 2px;
+    padding: 4px;
+    background-color: white;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.cell {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid darkgray;
+    border-radius: 2px;
+    margin: 1px;
+    font-family: monospace;
+}
+
+.cell.visited {
+    background-color: white;
+    border-color: white;
+}
+
+.score {
+    margin: 4px;
+    font-family: monospace;
+    font-weight: bold;
+    text-align: center;
+    background-color: white;
+    border: 1px solid white;
+    border-radius: 2px;
+}
+
+</style>
 </head>
 
 </html>
@@ -761,6 +889,13 @@ window.os.runtime.compile = async (code) => {
 <script id="add browser to desktop">
 (function() {
     os.gui.addIcon('Browser', '📁', () => os.apps.browser(''), document.body);
+})();
+
+</script>
+
+<script id="minesweeper-desktop-icon">
+(function() {
+    os.gui.addIcon('Minesweeper', '💣', () => os.apps.minesweeper(), document.body);
 })();
 
 </script>
