@@ -1,0 +1,9 @@
+{
+    "crc": 2250660635,
+    "compiled_instruction": [
+        " Generate JS code using `let` instead of `var`. All the `os` functions are already defined.\n### Instruction:\n Create a new empty object `os` on the window global object \n### Response:\n"
+    ],
+    "output": [
+        "```javascript\nwindow.os = {};\n\n```"
+    ]
+}

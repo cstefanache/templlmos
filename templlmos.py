@@ -1,78 +1,44 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
-from socketserver import BaseServer
-from compiler import Compiler
+import shutil
+import argparse
 import json
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+import re
 
-hostName = "localhost"
-serverPort = 8080
-
-compiler = Compiler("templlmos.json", force_build=False)
+from src.llm import LLM
+from src.compiler import Compiler
 
 
-class TempLLMOS(BaseHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == "/ping":
-            self.send_response(200)
-            self.end_headers()
-        else:
-            self.serve_compiled()
+parser = argparse.ArgumentParser()
+parser.add_argument("--serve", action="store_true", help="Serve the application")
+parser.add_argument("--descriptor", default="templlmos.json", help="Descriptor file")
+parser.add_argument("--recompile", action="store_true", help="Force build")
+args = parser.parse_args()
 
-    def do_POST(self):
-        content_length = int(self.headers["Content-Length"])
-        post_data = self.rfile.read(content_length).decode("utf-8")
-        json_data = json.loads(post_data)
-        model = json_data["model"]
-        instruction = json_data["instruction"]
-        result = compiler.call_llm(model, instruction)
-        result = compiler.process_output(result)
-        self.send_response(200)
-        self.send_header("Content-type", "application/text")
-        self.end_headers()
-        self.wfile.write(bytes(result, "utf-8"))
+descriptor = args.descriptor
+with open(descriptor, "r") as read_file:
+    data = json.load(read_file)
 
-    def serve_compiled(self):
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        with open("templlmos.html", "r") as file:
-            self.wfile.write(bytes(file.read(), "utf-16"))
+llm = LLM(data["models"])
+
+print("Avaialble models:")
+print(llm.runtime_models.keys())
+
+recompile = args.recompile
+
+if recompile:
+    shutil.rmtree("./cache")
+    shutil.rmtree("./debug")
+
+compiler = Compiler(llm, data, recompile)
 
 
-class OSSourcesHandler(FileSystemEventHandler):
-    def on_modified(self, event):
-        print(f"Event type: {event.event_type}  path : {event.src_path}")
-        print(
-            event.src_path.endswith(".json"),
-            "cache" not in event.src_path,
-            "debug" not in event.src_path,
-        )
-        if (
-            event.src_path.endswith(".json")
-            and "cache" not in event.src_path
-            and "debug" not in event.src_path
-        ):
-            print("OS source file changed, recompiling...", event.src_path)
-            try:
-                compiler.run_compile()
-            except Exception as e:
-                print(f"Error recompiling: {e}")
+def rebuild():
+    html_content = compiler.build()
+    output_filename = re.sub(r"\.json", ".html", descriptor)
+    with open(output_filename, "w") as file:
+        file.write(html_content)
+
+# if args.serve:
+#     serve()
 
 
-if __name__ == "__main__":
-    webServer = HTTPServer((hostName, serverPort), TempLLMOS)
-    print("Server started http://%s:%s" % (hostName, serverPort))
-
-    event_handler = OSSourcesHandler()
-    observer = Observer()
-    observer.schedule(event_handler, path=".", recursive=True)
-    observer.start()
-
-    try:
-        webServer.serve_forever()
-    except KeyboardInterrupt:
-        pass
-
-    webServer.server_close()
-    print("Server stopped.")
+rebuild()

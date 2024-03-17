@@ -1,904 +1,142 @@
-
-
 <html>
-
-
-<head>
-
-
-<script id="os-base">
-window.os = {
-    apps: {}
-};
-
-</script>
-
-<script id="filesystem">
-(function() {
-    // Load filesystem from localStorage, if it exists, otherwise initialize it as an empty object
-    var filesystem = JSON.parse(localStorage.getItem('filesystem')) || {};
-    
-    // Define fs methods on window.os
-    window.os = window.os || {};
-    window.os.fs = {
-        sync: function() {
-            localStorage.setItem('filesystem', JSON.stringify(filesystem));
-        },
-        readPath: function(path) {
-            path = path[0] === '/' ? path.slice(1) : path;  // Remove leading '/' if exists
-            var pathArray = path.split('/');
-            var current = filesystem;
-            for (var i = 0; i < pathArray.length; i++) {
-                if (current[pathArray[i]] === undefined) {
-                    return undefined;  // Path not found
-                } else {
-                    current = current[pathArray[i]];  // Traverse down the path
-                }
-            }
-            return current;  // Return content at path
-        },
-        write: function(path, content) {
-            path = path[0] === '/' ? path.slice(1) : path;  // Remove leading '/' if exists
-            var pathArray = path.split('/');
-            var current = filesystem;
-            for (var i = 0; i < pathArray.length - 1; i++) {  // Do not traverse to last element, we will assign content there
-                if (current[pathArray[i]] === undefined) {
-                    current[pathArray[i]] = {};  // Create path if it does not exist
-                }
-                current = current[pathArray[i]];  // Traverse down the path
-            }
-            current[pathArray[pathArray.length - 1]] = content;  // Assign content to last element in path
-            this.sync();  // Save filesystem to localStorage
-        },
-        ls: function(path) {
-            path = path[0] === '/' ? path.slice(1) : path;  // Remove leading '/' if exists
-            var current = filesystem;
-            if (path) {
-                var pathArray = path.split('/');
-                for (var i = 0; i < pathArray.length; i++) {
-                    if (current[pathArray[i]] === undefined) {
-                        return undefined;  // Path not found
-                    } else {
-                        current = current[pathArray[i]];  // Traverse down the path
-                    }
-                }
-            }
-            return Object.keys(current);  // Return entries at path
-        },
-        mkdir: function(path, dirName) {
-            this.write(path + '/' + dirName, {});  // Write an empty directory at path
-        },
-        rm: function(path) {
-            path = path[0] === '/' ? path.slice(1) : path;  // Remove leading '/' if exists
-            var pathArray = path.split('/');
-            var current = filesystem;
-            for (var i = 0; i < pathArray.length - 1; i++) {  // Do not traverse to last element, we will remove it here
-                if (current[pathArray[i]] === undefined) {
-                    return;  // Path not found, do nothing
-                } else {
-                    current = current[pathArray[i]];  // Traverse down the path
-                }
-            }
-            delete current[pathArray[pathArray.length - 1]];  // Remove last element in path
-            this.sync();  // Save filesystem to localStorage
-        },
-        isFile: function(path) {
-            var content = this.readPath(path);
-            return typeof content === 'string';  // Return true if content at path is a string
-        }
-    };
-})();
-
-</script>
-
-<script id="gui-object">
-if (typeof window.os === "undefined") {
-    window.os = {};
-}
-
-window.os.gui = {};
-
-</script>
-
-<script id="utils">
-(function() {
-    if (!window.os || !window.os.gui) {
-        window.os = window.os || {};
-        window.os.gui = window.os.gui || {};
-    }
-    
-    window.os.gui.utils = {
-        setSizeAndCenter: function (root, width, height) {
-            root.style.width = width + 'px';
-            root.style.height = height + 'px';
-            
-            root.style.position = 'absolute';
-            root.style.top = '50%';
-            root.style.left = '50%';
-            root.style.transform = 'translate(-50%, -50%)';
-        }
-    };
-})();
-
-</script>
-
-<script id="title-bar">
-(function() {
-    window.os = window.os || {};
-    window.os.gui = window.os.gui || {};
-    window.os.gui.titleBar = function(title, targetElement) {
-        // Create root DOM element
-        var titleBar = document.createElement('div');
-        titleBar.className = 'titleBar';
-        
-        // Add title to span and append to titleBar
-        var titleSpan = document.createElement('span');
-        titleSpan.textContent = title;
-        titleBar.appendChild(titleSpan);
-        
-        // Add button to titleBar
-        var closeButton = document.createElement('button');
-        closeButton.textContent = 'x';
-        closeButton.addEventListener('click', function() {
-            document.body.removeChild(targetElement);
-        });
-        titleBar.appendChild(closeButton);
-        
-        // Add drag and drop functionality to titleBar
-        var dragging = false;
-        var startX;
-        var startY;
-        var offsetX;
-        var offsetY;
-        
-        titleBar.addEventListener('mousedown', function(e) {
-            dragging = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            offsetX = targetElement.offsetLeft;
-            offsetY = targetElement.offsetTop;
-        });
-        
-        titleBar.addEventListener('mouseup', function() {
-            dragging = false;
-        });
-        
-        titleBar.addEventListener('mousemove', function(e) {
-            if (dragging) {
-                var x = e.clientX - startX;
-                var y = e.clientY - startY;
-                targetElement.style.left = (offsetX + x) + 'px';
-                targetElement.style.top = (offsetY + y) + 'px';
-            }
-        });
-        
-        return titleBar;
-    };
-})();
-
-</script>
-
-<script id="window">
-(function() {
-    if (!window.os) window.os = {};
-    if (!window.os.gui) window.os.gui = {};
-    if (!window.os.gui.utils) window.os.gui.utils = { setSizeAndCenter: setSizeAndCenter }; // Assuming this exists somewhere else in your code
-    
-    window.os.gui.createWindow = function(title = "Default Title", content = null, width = 400, height = 300) {
-        var root = document.createElement("div");
-        root.className = "window";
-        
-        window.os.gui.utils.setSizeAndCenter(root, width, height);
-        
-        var titlePlaceholder = document.createElement("div");
-        titlePlaceholder.className = "titlePlaceholder";
-        root.appendChild(titlePlaceholder);
-        
-        var toolbarPlaceholder = document.createElement("div");
-        toolbarPlaceholder.className = "toolbarPlaceholder";
-        root.appendChild(toolbarPlaceholder);
-        
-        var contentPlaceholder = document.createElement("div");
-        contentPlaceholder.className = "contentPlaceholder";
-        root.appendChild(contentPlaceholder);
-        
-        var statusPlaceholder = document.createElement("div");
-        statusPlaceholder.className = "statusPlaceholder";
-        root.appendChild(statusPlaceholder);
-        
-        if(typeof window.os.gui.titleBar === 'function') {
-            var titleBar = window.os.gui.titleBar(title, root);
-            titlePlaceholder.appendChild(titleBar);
-        }
-        
-        if(content && content instanceof Node) {
-            contentPlaceholder.appendChild(content);
-        }
-        
-        var bringToFront = function() {
-            var windows = document.querySelectorAll(".window");
-            for(var i = 0; i < windows.length; i++) {
-                windows[i].style.zIndex = 1;
-            }
-            root.style.zIndex = 2;
-        }
-        
-        root.onclick = bringToFront;
-        
-        document.body.appendChild(root);
-        
-        setTimeout(bringToFront, 20);
-        
-        return root;
-    }
-})();
-
-</script>
-
-<script id="window-utils">
-(function() {
-    // Check if window.os exists and is an object
-    if (typeof window.os === 'undefined' || typeof window.os !== 'object') {
-        window.os = {};
-    }
-    
-    // Check if window.os.gui exists and is an object
-    if (typeof window.os.gui === 'undefined' || typeof window.os.gui !== 'object') {
-        window.os.gui = {};
-    }
-    
-    // Define the updateStatus function
-    window.os.gui.updateStatus = function(win, value) {
-        var statusElement = win.querySelector('.statusPlaceholder');
-        if (statusElement !== null && statusElement !== undefined) {
-            statusElement.innerText = value;
-        } else {
-            console.error('Element with class .statusPlaceholder not found in provided win DOM element');
-        }
-    };
-})();
-
-</script>
-
-<script id="toolbar">
-(function() {
-    if (!window.os) window.os = {};
-    if (!window.os.gui) window.os.gui = {};
-    
-    window.os.gui.toolbar = function(rootElement) {
-        var toolbar = document.createElement('div');
-        toolbar.className = 'toolbar';
-        
-        rootElement.querySelector('.toolbarPlaceholder').appendChild(toolbar);
-        
-        return {
-            addButton: function(text, callback) {
-                var button = document.createElement('button');
-                button.textContent = text;
-                button.addEventListener('click', callback);
-                toolbar.appendChild(button);
-            }
-        };
-    };
-})();
-
-</script>
-
-<script id="prompt">
-(function() {
-    if (!window.os) window.os = {};
-    if (!window.os.gui) window.os.gui = {};
-    
-    window.os.gui.createPrompt = function(title, callback) {
-        // create root dom element with class 'editor'
-        var root = document.createElement('div');
-        root.className = 'editor';
-        
-        // add text input element to root dom element full width
-        var input = document.createElement('input');
-        input.style.width = '100%';
-        root.appendChild(input);
-        
-        // add button element to root dom element and set text to 'OK'
-        var button = document.createElement('button');
-        button.textContent = 'OK';
-        root.appendChild(button);
-        
-        // call os.gui.createWindow with given parameters
-        var win = window.os.gui.createWindow(title, root, 300, 100);
-        
-        // when button is clicked, call callback with input value and remove win element from body
-        button.addEventListener('click', function() {
-            callback(input.value);
-            document.body.removeChild(win);
-        });
-    };
-})();
-
-</script>
-
-<script id="os-icon">
-(function() {
-    if (!window.os) window.os = {};
-    if (!window.os.gui) window.os.gui = {};
-    
-    window.os.gui.addIcon = function(name, icon, callback, container) {
-        // create root element
-        var root = document.createElement('div');
-        root.classList.add('icon');
-        
-        // create emoji element
-        var emoji = document.createElement('div');
-        emoji.classList.add('emoji');
-        
-        // create app-name element
-        var appName = document.createElement('div');
-        appName.classList.add('app-name');
-        appName.textContent = name;
-        
-        // add icon to emoji element
-        emoji.textContent = icon;
-        
-        // add event listener to root element
-        root.addEventListener('click', callback);
-        
-        // add elements to root element
-        root.appendChild(emoji);
-        root.appendChild(appName);
-        
-        // add icon to container
-        container.appendChild(root);
-        
-        // add icon-* class to emoji element if name contains dot character
-        if (name.includes('.')) {
-            var extension = name.split('.').pop();
-            emoji.classList.add('icon-' + extension);
-        }
-    };
-})();
-
-</script>
-
-<script id="editor-app">
-(function() {
-    window.os.apps.editor = function(path) {
-        const root = document.createElement('div');
-        root.className = 'editor';
-        document.body.appendChild(root);
-        
-        const win = os.gui.createWindow('📄 Text Editor', root, 700, 500);
-        const toolbar = os.gui.toolbar(win);
-        toolbar.addButton('💾', save);
-        
-        const textarea = document.createElement('textarea');
-        textarea.style.width = '100%';
-        textarea.style.height = '100%';
-        textarea.style.whiteSpace = 'nowrap';
-        root.appendChild(textarea);
-        
-        let content = '';
-        if (path) {
-            content = os.fs.readPath(path);
-            textarea.value = content;
-        }
-        
-        function save() {
-            if (path) {
-                content = textarea.value;
-                os.fs.write(path, content);
-            } else {
-                os.gui.createPrompt('Save File', (newPath) => {
-                    os.fs.write(newPath, textarea.value);
-                });
-            }
-        }
-    };
-})();
-
-</script>
-
-<script id="ide-app">
-(async () => {
-  window.os.apps.ide = async (path) => {
-    const root = document.createElement('div');
-    root.className = 'editor';
-    document.body.appendChild(root);
-    
-    const win = os.gui.createWindow('📄 IDE', root, 700, 600);
-    const toolbar = os.gui.toolbar(win);
-    
-    const textarea = document.createElement('textarea');
-    textarea.id = 'code';
-    textarea.style.width = '100%';
-    textarea.style.height = '400px';
-    textarea.style.whiteSpace = 'nowrap';
-    root.appendChild(textarea);
-    
-    const result = document.createElement('textarea');
-    result.id = 'result';
-    result.style.width = '100%';
-    result.style.height = '130px';
-    result.style.whiteSpace = 'nowrap';
-    result.readOnly = true;
-    root.appendChild(result);
-    
-    if (path) {
-      const content = await os.fs.readPath(path);
-      textarea.value = content;
-    }
-    
-    const save = () => {
-      if (path) {
-        const content = textarea.value;
-        os.fs.write(path, content);
-      } else {
-        os.gui.createPrompt('Save File', (newPath) => {
-          os.fs.write(newPath, textarea.value);
-        });
-      }
-    };
-    
-    const run = async () => {
-      result.value = 'Compiling...';
-      const compiled = await os.runtime.compile(textarea.value);
-      result.value = compiled;
-    };
-    
-    toolbar.addButton('💾', () => save());
-    toolbar.addButton('▶️', () => run());
-  };
-})();
-
-</script>
-
-<script id="browser-app">
-(function() {
-    window.os = window.os || {};
-    window.os.apps = window.os.apps || {};
-    
-    window.os.apps.browser = function(path) {
-        const root = document.createElement('div');
-        root.className = 'browser';
-        document.body.appendChild(root);
-        
-        const win = os.gui.createWindow('Browser', root);
-        const toolbar = os.gui.toolbar(win);
-        
-        toolbar.addButton('📁', () => {
-            os.gui.createPrompt('Enter folder name', name => {
-                os.fs.mkdir(path, name);
-                refresh();
-            });
-        });
-        
-        toolbar.addButton('📄', () => {
-            os.gui.createPrompt('Enter file name', name => {
-                os.fs.write(path + '/' + name, "");
-                refresh();
-            });
-        });
-        
-        toolbar.addButton('🗑️', () => {
-            os.fs.rm(path);
-            path = path.substring(0, path.lastIndexOf('/'));
-            refresh();
-        });
-        
-        const refresh = () => {
-            while (root.firstChild) {
-                root.removeChild(root.firstChild);
-            }
-            
-            os.gui.updateStatus(win, path);
-            
-            const files = os.fs.ls(path);
-            
-            if (path.length > 1) {
-                os.gui.addIcon('..', '🔙', () => {
-                    path = path.substring(0, path.lastIndexOf('/'));
-                    refresh();
-                }, root);
-            }
-            
-            files.forEach(name => {
-                const isFile = os.fs.isFile(path + '/' + name);
-                
-                const callback = () => {
-                    if (isFile) {
-                        os.apps.ide(path + '/' + name);
-                    } else {
-                        path = path + '/' + name;
-                    }
-                    refresh();
-                };
-                
-                os.gui.addIcon(name, isFile ? '📄' : '📁', callback, root);
-            });
-        };
-        
-        refresh();
-    };
-})();
-
-</script>
-
-<script id="viwer-app">
-(function() {
-    window.os = window.os || {};
-    window.os.apps = window.os.apps || {};
-    
-    window.os.apps.viewer = function(path) {
-        var div = document.createElement('div');
-        div.className = 'viewer';
-        document.body.appendChild(div);
-        
-        window.os.gui.createWindow('View: ' + path, div);
-        
-        var content = window.os.fs.readPath(path);
-        
-        var pre = document.createElement('pre');
-        pre.className = 'content';
-        pre.innerHTML = content;
-        div.appendChild(pre);
-    };
-})();
-
-</script>
-
-<script id="minesweeper-app">
-(function() {
-    window.os = window.os || {};
-    window.os.apps = window.os.apps || {};
-    
-    window.os.apps.minesweeper = function() {
-        const root = document.createElement('div');
-        root.className = 'gmroot';
-        
-        const matrix = Array(8).fill().map(() => Array(8).fill(0));
-        const bombCoords = [];
-        for(let i = 0; i < 10; i++) {
-            let x, y;
-            do {
-                x = Math.floor(Math.random() * 8);
-                y = Math.floor(Math.random() * 8);
-            } while(bombCoords.find(coord => coord[0] === x && coord[1] === y));
-            bombCoords.push([x, y]);
-            matrix[x][y] = -100;
-            for(let dx = -1; dx <= 1; dx++) {
-                for(let dy = -1; dy <= 1; dy++) {
-                    if(x + dx >= 0 && x + dx < 8 && y + dy >= 0 && y + dy < 8) {
-                        matrix[x + dx][y + dy]++;
-                    }
-                }
-            }
-        }
-        
-        let score = 64;
-        const scoreDiv = document.createElement('div');
-        scoreDiv.className = 'score';
-        scoreDiv.textContent = `Discovered: ${score}`;
-        root.appendChild(scoreDiv);
-        
-        for(let x = 0; x < 8; x++) {
-            const rowDiv = document.createElement('div');
-            rowDiv.className = 'row';
-            for(let y = 0; y < 8; y++) {
-                const cellDiv = document.createElement('div');
-                cellDiv.className = 'cell';
-                cellDiv.textContent = ' ';
-                cellDiv.dataset.x = x;
-                cellDiv.dataset.y = y;
-                cellDiv.addEventListener('click', () => reveal(x, y));
-                rowDiv.appendChild(cellDiv);
-            }
-            root.appendChild(rowDiv);
-        }
-        
-        window.os.gui.createWindow('💣 minesweeper', root, 250, 300);
-        
-        function reveal(x, y) {
-            const cellDiv = document.querySelector(`div[data-x="${x}"][data-y="${y}"]`);
-            if(cellDiv.classList.contains('visited')) {
-                return;
-            }
-            cellDiv.classList.add('visited');
-            const value = matrix[x][y];
-            if(value < 0) {
-                cellDiv.textContent = '💣';
-                alert('Game Over');
-            } else {
-                cellDiv.textContent = value;
-                score--;
-                scoreDiv.textContent = `Discovered: ${score}`;
-                if(value === 0) {
-                    for(let dx = -1; dx <= 1; dx++) {
-                        for(let dy = -1; dy <= 1; dy++) {
-                            if(x + dx >= 0 && x + dx < 8 && y + dy >= 0 && y + dy < 8) {
-                                reveal(x + dx, y + dy);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-})();
-
-</script>
-</head>
-
-<head>
-
-
-<style id="title-bar-styles">
-.titleBar {
-    background-color: orange;
-    border-bottom: 1px solid black;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: monospace;
-    font-size: small;
-    padding: 5px;
-    user-select: none; /* This will prevent text selection */
-}
-
-/* This will apply styles to all buttons inside titleBar */
-.titleBar button {
-    border: 1px solid black;
-    font-family: monospace;
-    font-size: small;
-    border-radius: 2px; /* This will give rounded corners */
-}
-
-</style>
-
-<style id="window-container-styles">
-.window {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    background-color: white;
-    padding: 1px;
-    border: 2px solid black;
-    border-radius: 4px;
-}
-
-.contentPlaceholder {
-    flex-grow: 1;
-    overflow: auto;
-    padding: 5px;
-}
-
-.toolbarPlaceholder {
-    border-bottom: 1px solid black;
-}
-
-.statusPlaceholder {
-    border-top: 1px solid black;
-    font-family: monospace;
-    font-size: small;
-}
-
-</style>
-
-<style id="toolbar-styles">
-.toolbar {
-    padding: 3px 5px;
-    margin-bottom: 2px;
-    display: flex;
-    justify-content: flex-start;
-}
-
-.toolbar button {
-    border: none;
-    cursor: pointer;
-    background-color: white;
-}
-
-.toolbar button:hover {
-    background-color: lightgray;
-}
-
-</style>
-
-<style id="look-and-feel">
-body {
+ <head>
+  <style id="osbase_general-styles">
+   body {
     background-color: #2E393D;
 }
+  </style>
+  <script id="osbase_global-objects">
+   (() => {
+window.os = {};
 
-body > .icon > .app-name {
-    color: white;
+
+})()
+  </script>
+  <script id="osbase_filesystem">
+   (() => {
+if (!window.os) {
+    window.os = {};
 }
-
-</style>
-
-<style id="desktop-icons">
-.icon {
-    width: 64px;
-    min-height: 64px;
-    text-align: center;
-    margin: 5px;
-    cursor: pointer;
-}
-
-.emoji {
-    display: inline-block;
-    font-size: 30px;
-    position: relative;
-}
-
-.app-name {
-    display: block;
-    font-size: 8px;
-    font-family: monospace;
-    color: black;
-    padding: 5px;
-    word-wrap: break-word;
-}
-
-</style>
-
-<style id="custom-icons">
-.icon-script::after {
-    content: "\1F4DC";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    font-size: 16px;
-}
-
-.icon-style::after {
-    content: "\1F3A8";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    font-size: 16px;
-}
-
-.icon-html::after {
-    content: "\1F4C4";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    font-size: 16px;
-}
-
-.icon-txt::after {
-    content: "\1F4C4";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    font-size: 16px;
-}
-
-</style>
-
-<style id="browser-styles">
-.browser {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-</style>
-
-<style id="minesweeper-styles">
-.gmroot {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: 2px;
-    padding: 4px;
-    background-color: white;
-}
-
-.row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-}
-
-.cell {
-    width: 22px;
-    height: 22px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid darkgray;
-    border-radius: 2px;
-    margin: 1px;
-    font-family: monospace;
-}
-
-.cell.visited {
-    background-color: white;
-    border-color: white;
-}
-
-.score {
-    margin: 4px;
-    font-family: monospace;
-    font-weight: bold;
-    text-align: center;
-    background-color: white;
-    border: 1px solid white;
-    border-radius: 2px;
-}
-
-</style>
-</head>
-
-</html>
-
-<html>
-
-
-<body>
-
-
-<script id="runtime-compile">
-// Define the function on window.os.runtime under compile key
-window.os.runtime = window.os.runtime || {};
-window.os.runtime.compile = async (code) => {
-    // Make an asynchronous POST request to http://localhost:8080/compile with json body {"model": "deepseek-coder-6.7b-instruct.Q5_K_M.gguf", instruction: code}
-    const response = await fetch('http://localhost:8080/compile', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
+if (!window.os.fs) {
+    window.os.fs = {
+        filesystem: {},
+        sync: function () {
+            window.localStorage.setItem('filesystem', JSON.stringify(this.filesystem));
         },
-        body: JSON.stringify({model: "deepseek-coder-6.7b-instruct.Q5_K_M.gguf", instruction: code})
-    });
-    
-    // Read the resulted text from the response and store it in a variable called result
-    const result = await response.text();
-    
-    // Search the script element with ID 'dev' and if it exists remove it
-    const existingScript = document.getElementById('dev');
-    if (existingScript) {
-        existingScript.remove();
-    }
-    
-    // Create a new script element with ID 'dev' and set its inner text to the result
-    const newScript = document.createElement('script');
-    newScript.id = 'dev';
-    newScript.text = result;
-    document.body.appendChild(newScript);
-    
-    // Return result 
-    return result;
-};
+        readPath: function (path) {
+            if (path[0] === '/') {
+                path = path.substring(1);
+            }
+            let parts = path.split('/');
+            let obj = this.filesystem;
+            for (let part of parts) {
+                if (obj[part] === undefined) {
+                    return undefined;
+                } else {
+                    obj = obj[part];
+                }
+            }
+            return obj;
+        },
+        write: function (path, content) {
+            if (path[0] === '/') {
+                path = path.substring(1);
+            }
+            let parts = path.split('/');
+            let obj = this.filesystem;
+            for (let i = 0; i < parts.length - 1; i++) {
+                if (obj[parts[i]] === undefined) {
+                    obj[parts[i]] = {};
+                }
+                obj = obj[parts[i]];
+            }
+            obj[parts[parts.length - 1]] = content;
+            this.sync();
+        },
+        ls: function (path = '') {
+            if (path[0] === '/') {
+                path = path.substring(1);
+            }
+            let obj = this.filesystem;
+            if (path !== '') {
+                let parts = path.split('/');
+                for (let part of parts) {
+                    if (obj[part] === undefined) {
+                        return undefined;
+                    } else {
+                        obj = obj[part];
+                    }
+                }
+            }
+            return Object.keys(obj);
+        },
+        mkdir: function (path, dirName) {
+            if (path[0] === '/') {
+                path = path.substring(1);
+            }
+            let parts = path.split('/');
+            let obj = this.filesystem;
+            for (let i = 0; i < parts.length - 1; i++) {
+                if (obj[parts[i]] === undefined) {
+                    obj[parts[i]] = {};
+                }
+                obj = obj[parts[i]];
+            }
+            obj[dirName] = {};
+            this.sync();
+        },
+        rm: function (path) {
+            if (path[0] === '/') {
+                path = path.substring(1);
+            }
+            let parts = path.split('/');
+            let obj = this.filesystem;
+            let parent = obj;
+            for (let i = 0; i < parts.length - 1; i++) {
+                if (obj[parts[i]] === undefined) {
+                    return;
+                } else {
+                    parent = obj;
+                    obj = obj[parts[i]];
+                }
+            }
+            delete parent[parts[parts.length - 1]];
+            this.sync();
+        },
+        isFile: function (path) {
+            if (path[0] === '/') {
+                path = path.substring(1);
+            }
+            let parts = path.split('/');
+            let obj = this.filesystem;
+            for (let part of parts) {
+                if (obj[part] === undefined || typeof obj[part] !== 'string') {
+                    return false;
+                } else {
+                    obj = obj[part];
+                }
+            }
+            return true;
+        }
+    };
+}
 
-</script>
 
-<script id="editor-desktop-icon">
-(function() {
-    os.gui.addIcon('Text Editor', '📄', () => os.apps.editor(), document.body);
-})();
+})()
+  </script>
+ </head>
+ <body>
+  <script id="osbase_test">
+   (() => {
+// Define the path where you want to write the content
+let path = 'test/a/test.txt';
+// Define the content you want to write
+let content = 'hello world';
+// Use the write function to write content at the specified path
+window.os.fs.write(path, content);
 
-</script>
 
-<script id="ide-desktop-icon">
-(function() {
-    os.gui.addIcon('IDE', '🔥', () => os.apps.ide(), document.body);
-})();
-
-</script>
-
-<script id="add browser to desktop">
-(function() {
-    os.gui.addIcon('Browser', '📁', () => os.apps.browser(''), document.body);
-})();
-
-</script>
-
-<script id="minesweeper-desktop-icon">
-(function() {
-    os.gui.addIcon('Minesweeper', '💣', () => os.apps.minesweeper(), document.body);
-})();
-
-</script>
-</body>
-
+})()
+  </script>
+ </body>
 </html>

@@ -1,27 +1,30 @@
 {
     "models": [
+       
         {
             "repository": "TheBloke/deepseek-coder-6.7B-instruct-GGUF",
             "model": "deepseek-coder-6.7b-instruct.Q5_K_M.gguf",
-            "prefix": "### Instruction:\n",
-            "suffix": "\n### Response:\n"
+            "prefix": "{deps} Generate JS code using `let` instead of `var`. All the `os` functions are already defined.\n### Instruction:\n",
+            "suffix": "\n### Response:\n",
+            "stop": "```\n"
+        },
+        {
+            "repository": "TheBloke/CodeLlama-13B-Instruct-GGUF",
+            "model": "codellama-13b-instruct.Q6_K.gguf",
+            "prefix": "[INST]<<SYS>>\n{deps}. Generate JS code<</SYS>>\n",
+            "suffix": "\n[/INST]\n"
         }
     ],
-    "defaults": {
-        "model": "deepseek-coder-6.7b-instruct.Q5_K_M.gguf",
-        "prefix": "### Instruction:\n",
-        "suffix": "\n### Response:\n"
-    },
     "partials": [
-        "os.json",
+        "os.json"
+    ],
+    "skip": [
         "gui.json",
         "desktop.json",
         "apps.json",
         "ide.json",
         "browser.json",
         "games.json"
-    ],
-    "skip": [
     ],
     "definition": {}
 }

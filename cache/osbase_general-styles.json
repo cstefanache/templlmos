@@ -1,0 +1,9 @@
+{
+    "crc": 3193763623,
+    "compiled_instruction": [
+        "Generate CSS code\n### Instruction:\n Apply style to body:\n- background color to #2E393D \n### Response:\n"
+    ],
+    "output": [
+        "Sure, here is the CSS code for applying a background color of `#2E393D` to the body.\n\n```css\nbody {\n    background-color: #2E393D;\n}\n\n```"
+    ]
+}
