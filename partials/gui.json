@@ -1,0 +1,130 @@
+{
+    "gui": {
+        "temp": {
+            "to": "head",
+            "tag": "style",
+            "instructions": [
+               
+            ]
+        },
+        "gui-styles": {
+            "to": "head",
+            "tag": "style",
+            "instructions": [
+                [
+                    "css style for a .titleBar class to follow the following rules:",
+                    "1. orange background color, a black bottom border of 1px solid",
+                    "2. display of flex, a justify-content of space-between, an align-items of center",
+                    "3. monospaced black small text",
+                    "4. internal padding of 5px",
+                    "5. render buttons flat, no background, a cursor of pointer, font size of 6, no padding",
+                    "6. do not allow text selection"
+                ],
+                [
+                    "css style for a .window class to follow the following rules:",
+                    "- white background color and a padding of 1px",
+                    "- a border of 2px solid black",
+                    "- a border-radius of 4px",
+                    "- absolute position",
+                    "- display of flex and flex-direction of column",
+                    "- inner .contentPlaceholder class should have a padding of 5px, flex-grow of 1 and overflow of auto",
+                    "- inner .toolbarPlaceholder class should have a border-bottom of 1px solid black",
+                    "- inner .statusPlaceholder class should have  a border-top of 1px solid black and a monospaced small text"
+                ],
+                [
+                    "css style for a  `.resizeHandle` class with the following rules:",
+                    "- a width and height of 10px",
+                    "- an absolute position",
+                    "- a bottom and right of 0",
+                    "- a cursor of se-resize",
+                    "- look like a resizing handle"
+                    
+                ]
+            ]
+        }, 
+        "gui-global-objects": {
+            "to": "head",
+            "tag": "script",
+            "instructions": [
+                [
+                    "Create a new empty object `gui` on the `window.os`"
+                ]
+            ]
+        },
+        "titleBar": {
+            "to": "head",
+            "tag": "script",
+            "rebuild": false,
+            "library": true,
+            "libraryPrefix": " ### Instruction:\nCreate API documentation for window.os.titleBar\n",
+            "librarySuffix": "\n### Response:\n",
+            "prefix": "{deps} Generate browser vanilla JS code without the use of any library or framework. `window.os` function is already defined.\n### Instruction:\n",
+            "instructions": [
+                [
+                    "Define a function called `titleBar` object on `window.os.gui` having the following functionality:",
+                    "- create a root DOM element with the class `.titleBar`",
+                    "- add to the root DOM element a `span` containing the title parameter",
+                    "- add to the root DOM element a `button` with the text `❌`",
+                    "- when the button is clicked then the DOM element passed as the second parameter should be removed from the body",
+                    "- append the root DOM element to the DOM element passed as the third parameter"
+                ]
+            ]
+        },
+        "temp-script": {
+            "to": "head",
+            "tag": "script",
+            "library": true,
+            "libraryPrefix": " ### Instruction:\nlist all methods in context and prefix them with `window.os.gui`\n",
+            "librarySuffix": "\n### Response:\n",
+            "prefix": "do not use jquery.\n `window.os` object is already defined.\n### Instruction:\n",
+            "instructions": [
+                [
+                    "Implement the following functions on the `window.os` object under `gui` key:",
+                    "- `move(root, dragHandle)` - move the root element by dragging the dragHandle element",
+                    "- `resize(root, resizeHandle)` - resize the root element by dragging the resizeHandle element"
+                ]
+            ]
+        },
+        "window": {
+            "to": "head",
+            "tag": "script",
+            "rebuild": false,
+            "library": true,
+            "libraryPrefix": " ### Instruction:\nCreate API documentation for window.os.titleBar\n",
+            "librarySuffix": "\n### Response:\n",
+            "dependencies": [
+                "titleBar",
+                "temp-script"
+            ],
+            "instructions": [
+                [
+                    "Define a function called `createWindow` on the `window.os.gui` object",
+                    "The `createWindow` function takes four parameters: emoji, title, content (as DOM element) and width and height that are defaulting to 400 and 300, respectively if not passed and have the following functionality:",
+                    "- create a root DOM element with the class `.window`",
+                    "- add and empty div with class `titlePlaceholder` to the root DOM element",
+                    "- add and empty div with class `toolbarPlaceholder` to the root DOM element",
+                    "- add and empty div with class `contentPlaceholder` to the root DOM element",
+                    "- add and empty div with class `statusPlaceholder` to the root DOM element",
+                    "- add a resize handle to the root DOM element with class `resizeHandle`",
+                    "- add title bar with parameters: emoji + title, the root DOM element and rood child `.titlePlaceholder` element",
+                    "- add root element to document body",
+                    "- make root element draggable by the title placeholder element",
+                    "- make root element resizable by the resize handle element",
+                    "- return the root DOM element"
+                ]
+            ]
+        },
+        "window-tests": {
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "window"
+            ],
+            "instructions": [
+                [
+                    "Create a new window with the title `My Window` and the content `document.createElement('div')` hainv 😃 as emoji"
+                ]
+            ]
+        }
+    }
+}

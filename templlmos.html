@@ -124,16 +124,248 @@ if (!window.os.fs) {
 
 })()
   </script>
+  <style id="gui_temp">
+  </style>
+  <style id="gui_gui-styles">
+   .titleBar {
+    background-color: orange;
+    border-bottom: 1px solid black;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: monospace;
+    font-size: small;
+    padding: 5px;
+    user-select: none; /* This will prevent text selection */
+}
+
+/* This will apply styles to buttons inside the title bar */
+.titleBar button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 6;
+    padding: 0; /* This will remove default button padding */
+}
+
+.window {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    padding: 1px;
+    border: 2px solid black;
+    border-radius: 4px;
+}
+
+.contentPlaceholder {
+    flex-grow: 1;
+    overflow: auto;
+    padding: 5px;
+}
+
+.toolbarPlaceholder {
+    border-bottom: 1px solid black;
+}
+
+.statusPlaceholder {
+    border-top: 1px solid black;
+    font-family: monospace;
+    font-size: small;
+}
+
+.resizeHandle {
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    cursor: se-resize;
+    background-color: #000; /* Change this to your desired handle color */
+}
+  </style>
+  <script id="gui_gui-global-objects">
+   (() => {
+if (typeof window.os === 'undefined') {
+    window.os = {};
+}
+
+window.os.gui = {};
+
+
+})()
+  </script>
+  <script id="gui_titleBar">
+   (() => {
+if (!window.os) window.os = {};
+if (!window.os.gui) window.os.gui = {};
+
+window.os.gui.titleBar = function(title, buttonClickCallback, parentElement) {
+    // Create root element
+    var titleBar = document.createElement('div');
+    titleBar.className = 'titleBar';
+    
+    // Create title span and append to title bar
+    var titleSpan = document.createElement('span');
+    titleSpan.textContent = title;
+    titleBar.appendChild(titleSpan);
+    
+    // Create close button and append to title bar
+    var closeButton = document.createElement('button');
+    closeButton.textContent = '❌';
+    closeButton.addEventListener('click', function() {
+        buttonClickCallback();  // Callback when button is clicked
+    });
+    titleBar.appendChild(closeButton);
+    
+    // Append title bar to parent element
+    parentElement.appendChild(titleBar);
+};
+
+
+})()
+  </script>
+  <script id="gui_temp-script">
+   (() => {
+// Assuming window.os is already defined
+if (!window.os) {
+    window.os = {};
+}
+
+// Assuming window.os.gui is already defined
+if (!window.os.gui) {
+    window.os.gui = {};
+}
+
+// Move function
+window.os.gui.move = function (root, dragHandle) {
+    let offsetX = 0;
+    let offsetY = 0;
+    
+    dragHandle.addEventListener('mousedown', (e) => {
+        offsetX = e.clientX - root.getBoundingClientRect().left;
+        offsetY = e.clientY - root.getBoundingClientRect().top;
+        
+        document.addEventListener('mousemove', mouseMove);
+        document.addEventListener('mouseup', mouseUp);
+    });
+    
+    function mouseMove(e) {
+        root.style.left = (e.clientX - offsetX) + 'px';
+        root.style.top = (e.clientY - offsetY) + 'px';
+    }
+    
+    function mouseUp() {
+        document.removeEventListener('mousemove', mouseMove);
+        document.removeEventListener('mouseup', mouseUp);
+    }
+};
+
+// Resize function
+window.os.gui.resize = function (root, resizeHandle) {
+    let width = root.offsetWidth;
+    let height = root.offsetHeight;
+    
+    resizeHandle.addEventListener('mousedown', (e) => {
+        document.addEventListener('mousemove', mouseMove);
+        document.addEventListener('mouseup', mouseUp);
+    });
+    
+    function mouseMove(e) {
+        width += e.clientX - resizeHandle.getBoundingClientRect().left;
+        height += e.clientY - resizeHandle.getBoundingClientRect().top;
+        
+        root.style.width = width + 'px';
+        root.style.height = height + 'px';
+    }
+    
+    function mouseUp() {
+        document.removeEventListener('mousemove', mouseMove);
+        document.removeEventListener('mouseup', mouseUp);
+    }
+};
+
+
+})()
+  </script>
+  <script id="gui_window">
+   (() => {
+// Define the createWindow function on the window.os.gui object
+window.os.gui.createWindow = function(emoji = '🖥️', title = 'New Window', content = null, width = 400, height = 300) {
+    // Create the root DOM element with the class .window
+    var root = document.createElement('div');
+    root.className = 'window';
+    root.style.width = width + 'px';
+    root.style.height = height + 'px';
+    
+    // Add an empty div with class titlePlaceholder to the root DOM element
+    var titlePlaceholder = document.createElement('div');
+    titlePlaceholder.className = 'titlePlaceholder';
+    root.appendChild(titlePlaceholder);
+    
+    // Add an empty div with class toolbarPlaceholder to the root DOM element
+    var toolbarPlaceholder = document.createElement('div');
+    toolbarPlaceholder.className = 'toolbarPlaceholder';
+    root.appendChild(toolbarPlaceholder);
+    
+    // Add an empty div with class contentPlaceholder to the root DOM element
+    var contentPlaceholder = document.createElement('div');
+    contentPlaceholder.className = 'contentPlaceholder';
+    root.appendChild(contentPlaceholder);
+    
+    // Add an empty div with class statusPlaceholder to the root DOM element
+    var statusPlaceholder = document.createElement('div');
+    statusPlaceholder.className = 'statusPlaceholder';
+    root.appendChild(statusPlaceholder);
+    
+    // Add a resize handle to the root DOM element with class resizeHandle
+    var resizeHandle = document.createElement('div');
+    resizeHandle.className = 'resizeHandle';
+    root.appendChild(resizeHandle);
+    
+    // Add the title bar with the provided emoji + title, the root DOM element, and the titlePlaceholder child element
+    window.os.gui.titleBar(emoji + ' ' + title, null, titlePlaceholder);
+    
+    // Add the root element to the document body
+    document.body.appendChild(root);
+    
+    // Make the root element draggable by the title placeholder element
+    window.os.gui.move(root, titlePlaceholder);
+    
+    // Make the root element resizable by the resize handle element
+    window.os.gui.resize(root, resizeHandle);
+    
+    // If content is provided, append it to the contentPlaceholder element
+    if(content) {
+        contentPlaceholder.appendChild(content);
+    }
+    
+    // Return the root DOM element
+    return root;
+};
+
+
+})()
+  </script>
  </head>
  <body>
   <script id="osbase_test">
    (() => {
-// Define the path where you want to write the content
-let path = 'test/a/test.txt';
-// Define the content you want to write
-let content = 'hello world';
-// Use the write function to write content at the specified path
+// Define your path and content
+var path = 'test/a/test.txt';
+var content = 'hello world';
+
+// Use the write function from your OS's fs module
 window.os.fs.write(path, content);
+
+
+})()
+  </script>
+  <script id="gui_window-tests">
+   (() => {
+let div = document.createElement('div'); // Create a div element
+div.innerHTML = "Hello World!"; // Set the inner HTML of the div element
+let win = window.os.gui.createWindow("😃", "My Window", div); // Create the window
 
 
 })()

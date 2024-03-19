@@ -1,0 +1,9 @@
+{
+    "crc": 3396651345,
+    "compiled_instruction": [
+        " Generate browser vanilla JS code without the use of any library or framework. All the `os` functions are already defined.\n### Instruction:\n Create a new empty object `gui` on the `window.os` \n### Response:\n"
+    ],
+    "output": [
+        "```javascript\nif (typeof window.os === 'undefined') {\n    window.os = {};\n}\n\nwindow.os.gui = {};\n\n```"
+    ]
+}

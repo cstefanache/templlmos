@@ -1,9 +1,9 @@
 {
-    "crc": 2250660635,
+    "crc": 2207626248,
     "compiled_instruction": [
-        " Generate JS code using `let` instead of `var`. All the `os` functions are already defined.\n### Instruction:\n Create a new empty object `os` on the window global object \n### Response:\n"
+        " Generate browser vanilla JS code without the use of any library or framework. All the `os` functions are already defined.\n### Instruction:\n Create a new empty object `os` on the window global object \n### Response:\n"
     ],
     "output": [
-        "```javascript\nwindow.os = {};\n\n```"
+        "You can create an empty object named `os` on the window global object in JavaScript by using the following code:\n\n```javascript\nwindow.os = {};\n\n```"
     ]
 }

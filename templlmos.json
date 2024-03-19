@@ -4,7 +4,7 @@
         {
             "repository": "TheBloke/deepseek-coder-6.7B-instruct-GGUF",
             "model": "deepseek-coder-6.7b-instruct.Q5_K_M.gguf",
-            "prefix": "{deps} Generate JS code using `let` instead of `var`. All the `os` functions are already defined.\n### Instruction:\n",
+            "prefix": "{deps} Generate browser vanilla JS code without the use of any library or framework. All the `os` functions are already defined.\n### Instruction:\n",
             "suffix": "\n### Response:\n",
             "stop": "```\n"
         },
@@ -16,7 +16,8 @@
         }
     ],
     "partials": [
-        "os.json"
+        "os.json",
+        "gui.json"
     ],
     "skip": [
         "gui.json",

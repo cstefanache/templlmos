@@ -112,7 +112,7 @@ class Compiler:
                     package_src += self.process_output(res)
 
                 if library:
-                    if not skip_compilation:
+                    if not skip_compilation or "library" not in cache_data:
                         libraryPrefix = package.get("libraryPrefix", prefix)
                         librarySuffix = package.get("librarySuffix", suffix)
                         self_api = self.llm.call_llm(

@@ -1,0 +1,9 @@
+{
+    "crc": 3808915096,
+    "compiled_instruction": [
+        "# API Documentation for `window.os.gui.createWindow`\n\nThe `window.os.gui.createWindow` function is used to create a new window with a customizable emoji, title, content, width, and height. \n\n## Syntax\n```javascript\nwindow.os.gui.createWindow(emoji, title, content, width, height)\n\n``` Generate browser vanilla JS code without the use of any library or framework. All the `os` functions are already defined.\n### Instruction:\n Create a new window with the title `My Window` and the content `document.createElement('div')` hainv \ud83d\ude03 as emoji \n### Response:\n"
+    ],
+    "output": [
+        "Here's how you can do it:\n\n```javascript\nlet div = document.createElement('div'); // Create a div element\ndiv.innerHTML = \"Hello World!\"; // Set the inner HTML of the div element\nlet win = window.os.gui.createWindow(\"\ud83d\ude03\", \"My Window\", div); // Create the window\n\n```"
+    ]
+}
