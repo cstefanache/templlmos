@@ -40,18 +40,6 @@
                     "* `isFile(path)` - returns true the entry at the given path is a string."
                 ]
             ]
-        },
-        "test": {
-            "to": "body",
-            "tag": "script",
-            "dependencies": [
-                "filesystem"
-            ],
-            "instructions": [
-                [
-                    "write 'hello world' to the file 'test.txt' at path 'test/a'"
-                ]
-            ]
         }
     }
 }

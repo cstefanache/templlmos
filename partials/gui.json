@@ -1,12 +1,6 @@
 {
     "gui": {
-        "temp": {
-            "to": "head",
-            "tag": "style",
-            "instructions": [
-               
-            ]
-        },
+        
         "gui-styles": {
             "to": "head",
             "tag": "style",
@@ -38,10 +32,9 @@
                     "- a bottom and right of 0",
                     "- a cursor of se-resize",
                     "- look like a resizing handle"
-                    
                 ]
             ]
-        }, 
+        },
         "gui-global-objects": {
             "to": "head",
             "tag": "script",
@@ -51,70 +44,118 @@
                 ]
             ]
         },
-        "titleBar": {
+        "draggable": {
+            "disabled": false,
             "to": "head",
             "tag": "script",
             "rebuild": false,
             "library": true,
-            "libraryPrefix": " ### Instruction:\nCreate API documentation for window.os.titleBar\n",
-            "librarySuffix": "\n### Response:\n",
-            "prefix": "{deps} Generate browser vanilla JS code without the use of any library or framework. `window.os` function is already defined.\n### Instruction:\n",
-            "instructions": [
-                [
-                    "Define a function called `titleBar` object on `window.os.gui` having the following functionality:",
-                    "- create a root DOM element with the class `.titleBar`",
-                    "- add to the root DOM element a `span` containing the title parameter",
-                    "- add to the root DOM element a `button` with the text `❌`",
-                    "- when the button is clicked then the DOM element passed as the second parameter should be removed from the body",
-                    "- append the root DOM element to the DOM element passed as the third parameter"
-                ]
-            ]
-        },
-        "temp-script": {
-            "to": "head",
-            "tag": "script",
-            "library": true,
-            "libraryPrefix": " ### Instruction:\nlist all methods in context and prefix them with `window.os.gui`\n",
+            "libraryPrefix": " ### Instruction:\nList functions on the `window.os.gui` object only:\n\n",
             "librarySuffix": "\n### Response:\n",
             "prefix": "do not use jquery.\n `window.os` object is already defined.\n### Instruction:\n",
             "instructions": [
                 [
                     "Implement the following functions on the `window.os` object under `gui` key:",
-                    "- `move(root, dragHandle)` - move the root element by dragging the dragHandle element",
-                    "- `resize(root, resizeHandle)` - resize the root element by dragging the resizeHandle element"
+                    "- `makeDraggable(root, dragHandle)` - move the root element by dragging the dragHandle element"
+                ],
+                [
+                    "Implement the following functions on the `window.os` object under `gui` key:",
+                    "`makeResizable(root, resizeHandle) that:` ",
+                    " - resize (both width and height) the root element by dragging the resizeHandle element.",
+                    " - update starting width and height on mouseup"
+                ],
+                [
+                    "Implement `bringToFront(rootDOMNode)` on the `window.os.gui` that:",
+                    "- creates an internal function that:",
+                    "  * takes all elements with the same class as rootDomNode",
+                    "  * iterate through them and sets the z-index to 0",
+                    "  * sets the z-index of rootDOMNode to 1",
+                    "- adds a mousedown event listener to rootDOMNode that calls the internal function"
+                ]
+            ]
+        },   
+        "development": {
+            "disabled": true,
+            "to": "head",
+            "tag": "script",
+            "rebuild": true,
+            "library": true,
+            "libraryPrefix": " ### Instruction:\nList functions on the `window.os.gui` object:\n\n",
+            "librarySuffix": "\n### Response:\n",
+            "prefix": "do not use jquery.\n `window.os` object is already defined.\n### Instruction:\n",
+            "instructions": [
+                
+            ]
+        },   
+        "gui-tests": {
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "draggable"
+            ],
+            "preventRebuild": false,
+            "instructions": [
+                [
+                    "create a DOM element, absolute position, 100x100px, background color red, append to body",
+                    "add another DOM element to the first one, relative position, width:100% height:20px, background color blue, append to first one",
+                    "call make draggable the first element by the second one",
+                    "add another DOM element to the first one, absolute position, right:0, bottom:0, width:10px height:10px, background color green, append to first one",
+                    "call make resizable the first element by the third one"
                 ]
             ]
         },
-        "window": {
+
+        "titleBar": {
+            "disabled": false,
             "to": "head",
             "tag": "script",
             "rebuild": false,
             "library": true,
-            "libraryPrefix": " ### Instruction:\nCreate API documentation for window.os.titleBar\n",
+            "libraryPrefix": " ### Instruction:\nGenerate `window.os.gui.titleBar` method signature:\n\n",
+            "librarySuffix": "\n### Response:\n",
+            "prefix": "{deps} Generate browser vanilla JS code without the use of any library or framework. `window.os` function is already defined.\n### Instruction:\n",
+            "instructions": [
+                [
+                    "Define a function called `titleBar` object on `window.os.gui` that takes two parameter: parentElement (DOM element) and title (string) and has the following functionality:",
+                    "- create a root DOM element with the class `.titleBar`",
+                    "- add to the root DOM element a `span` containing the title parameter",
+                    "- add to the root DOM element a `button` with the text `❌` that when clicked removes parentElement element from the DOM",
+                    "- append the root DOM element to parentElement"
+                ]
+            ]
+        },
+        "window": {
+            "disabled": false,
+            "to": "head",
+            "tag": "script",
+            "rebuild": true,
+            "library": true,
+            "libraryPrefix": " ### Instruction:\nGenerate `window.os.gui.createWindow` method signature:\n",
             "librarySuffix": "\n### Response:\n",
             "dependencies": [
                 "titleBar",
-                "temp-script"
+                "draggable",
+                "development"
             ],
             "instructions": [
                 [
-                    "Define a function called `createWindow` on the `window.os.gui` object",
-                    "The `createWindow` function takes four parameters: emoji, title, content (as DOM element) and width and height that are defaulting to 400 and 300, respectively if not passed and have the following functionality:",
-                    "- create a root DOM element with the class `.window`",
+                    "Define a function called `window.os.gui.createWindow` that takes four parameters: emoji, title, content (as DOM element) and width and height that are defaulting to 400 and 300, respectively if not passed and have the following functionality:",
+                    "- create a root DOM element with the class `.window` and add it to document body",
+                    "- call bringToFront on the root element",
                     "- add and empty div with class `titlePlaceholder` to the root DOM element",
                     "- add and empty div with class `toolbarPlaceholder` to the root DOM element",
-                    "- add and empty div with class `contentPlaceholder` to the root DOM element",
+                    "- add and empty div with class `contentPlaceholder` to the root DOM element and append the content parameter to it",
                     "- add and empty div with class `statusPlaceholder` to the root DOM element",
                     "- add a resize handle to the root DOM element with class `resizeHandle`",
-                    "- add title bar with parameters: emoji + title, the root DOM element and rood child `.titlePlaceholder` element",
-                    "- add root element to document body",
-                    "- make root element draggable by the title placeholder element",
-                    "- make root element resizable by the resize handle element",
-                    "- return the root DOM element"
+                    "- add titleBar to `titlePlaceholder` having the text `emoji + title`",
+                    "- call makeDraggable on root element by the titlePlaceholder element",
+                    "- make root element resizable by the resizeHandle element",
+                    "- return null"
                 ]
             ]
         },
         "window-tests": {
+            "disabled": false,
             "to": "body",
             "tag": "script",
             "dependencies": [
@@ -122,7 +163,8 @@
             ],
             "instructions": [
                 [
-                    "Create a new window with the title `My Window` and the content `document.createElement('div')` hainv 😃 as emoji"
+                    "Create a new window with the title `My Window` and a div containing `hello world 1` as content having 😃 as emoji",
+                    "Create a new window with the title `My Window 2` and a div containing  `hello world 2` as content having 💄 as emoji"
                 ]
             ]
         }

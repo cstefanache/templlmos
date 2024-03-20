@@ -124,8 +124,6 @@ if (!window.os.fs) {
 
 })()
   </script>
-  <style id="gui_temp">
-  </style>
   <style id="gui_gui-styles">
    .titleBar {
     background-color: orange;
@@ -195,94 +193,145 @@ window.os.gui = {};
 
 })()
   </script>
-  <script id="gui_titleBar">
+  <script id="gui_draggable">
    (() => {
-if (!window.os) window.os = {};
-if (!window.os.gui) window.os.gui = {};
-
-window.os.gui.titleBar = function(title, buttonClickCallback, parentElement) {
-    // Create root element
-    var titleBar = document.createElement('div');
-    titleBar.className = 'titleBar';
-    
-    // Create title span and append to title bar
-    var titleSpan = document.createElement('span');
-    titleSpan.textContent = title;
-    titleBar.appendChild(titleSpan);
-    
-    // Create close button and append to title bar
-    var closeButton = document.createElement('button');
-    closeButton.textContent = '❌';
-    closeButton.addEventListener('click', function() {
-        buttonClickCallback();  // Callback when button is clicked
-    });
-    titleBar.appendChild(closeButton);
-    
-    // Append title bar to parent element
-    parentElement.appendChild(titleBar);
-};
-
-
-})()
-  </script>
-  <script id="gui_temp-script">
-   (() => {
-// Assuming window.os is already defined
+// Assuming window.os is already defined and has a gui property
 if (!window.os) {
     window.os = {};
 }
-
-// Assuming window.os.gui is already defined
 if (!window.os.gui) {
     window.os.gui = {};
 }
 
-// Move function
-window.os.gui.move = function (root, dragHandle) {
+// Define makeDraggable function
+window.os.gui.makeDraggable = function (root, dragHandle) {
     let offsetX = 0;
     let offsetY = 0;
+    let mouseX = 0;
+    let mouseY = 0;
     
-    dragHandle.addEventListener('mousedown', (e) => {
-        offsetX = e.clientX - root.getBoundingClientRect().left;
-        offsetY = e.clientY - root.getBoundingClientRect().top;
+    const handleMouseDown = function (e) {
+        e = e || window.event;
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        offsetX = root.offsetLeft - mouseX;
+        offsetY = root.offsetTop - mouseY;
         
-        document.addEventListener('mousemove', mouseMove);
-        document.addEventListener('mouseup', mouseUp);
-    });
+        document.onmouseup = function () {
+            document.onmousemove = null;
+            document.onmouseup = null;
+        };
+        
+        document.onmousemove = function (e) {
+            e = e || window.event;
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            root.style.left = (mouseX + offsetX) + 'px';
+            root.style.top = (mouseY + offsetY) + 'px';
+        };
+    };
     
-    function mouseMove(e) {
-        root.style.left = (e.clientX - offsetX) + 'px';
-        root.style.top = (e.clientY - offsetY) + 'px';
-    }
-    
-    function mouseUp() {
-        document.removeEventListener('mousemove', mouseMove);
-        document.removeEventListener('mouseup', mouseUp);
-    }
+    dragHandle.onmousedown = handleMouseDown;
 };
 
-// Resize function
-window.os.gui.resize = function (root, resizeHandle) {
-    let width = root.offsetWidth;
-    let height = root.offsetHeight;
+// Assuming window.os exists and has a gui property
+if (!window.os) {
+    window.os = {};
+}
+if (!window.os.gui) {
+    window.os.gui = {};
+}
+
+// Define makeResizable function
+window.os.gui.makeResizable = function(root, resizeHandle) {
+    let startX;
+    let startY;
+    let startWidth = root.offsetWidth;
+    let startHeight = root.offsetHeight;
     
-    resizeHandle.addEventListener('mousedown', (e) => {
-        document.addEventListener('mousemove', mouseMove);
-        document.addEventListener('mouseup', mouseUp);
+    // Handle mousedown event to start resizing
+    resizeHandle.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        startX = e.clientX;
+        startY = e.clientY;
+        
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
     });
     
-    function mouseMove(e) {
-        width += e.clientX - resizeHandle.getBoundingClientRect().left;
-        height += e.clientY - resizeHandle.getBoundingClientRect().top;
+    // Handle mousemove event to resize element
+    function handleMouseMove(e) {
+        let width = startWidth + e.clientX - startX;
+        let height = startHeight + e.clientY - startY;
         
         root.style.width = width + 'px';
         root.style.height = height + 'px';
     }
     
-    function mouseUp() {
-        document.removeEventListener('mousemove', mouseMove);
-        document.removeEventListener('mouseup', mouseUp);
+    // Handle mouseup event to stop resizing and update starting width and height
+    function handleMouseUp() {
+        startWidth = root.offsetWidth;
+        startHeight = root.offsetHeight;
+        
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
     }
+};
+
+if (!window.os || !window.os.gui) {
+    window.os = window.os || {};
+    window.os.gui = window.os.gui || {};
+}
+
+window.os.gui.bringToFront = function (rootDomNode) {
+    // Internal function to bring other nodes to front
+    var bringOthersToFront = function () {
+        // Get all nodes with same class as rootDomNode
+        var nodes = document.getElementsByClassName(rootDomNode.className);
+        // Iterate through them and set z-index to 0
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].style.zIndex = 0;
+        }
+        // Set z-index of rootDomNode to 1
+        rootDomNode.style.zIndex = 1;
+    }
+    
+    // Add mousedown event listener to rootDomNode
+    rootDomNode.addEventListener('mousedown', bringOthersToFront);
+}
+
+
+})()
+  </script>
+  <script id="gui_titleBar">
+   (() => {
+if (!window.os) window.os = {};
+if (!window.os.gui) window.os.gui = {};
+
+window.os.gui.titleBar = function(parentElement, title) {
+    // Create root DOM element with class .titleBar
+    var root = document.createElement('div');
+    root.className = 'titleBar';
+    
+    // Add span containing title to root DOM element
+    var span = document.createElement('span');
+    span.textContent = title;
+    root.appendChild(span);
+    
+    // Add button with text '❌' to root DOM element
+    var button = document.createElement('button');
+    button.textContent = '❌';
+    button.addEventListener('click', function() {
+        // When button is clicked, remove parentElement from DOM
+        var parent = parentElement.parentNode;
+        if(parent){
+            parent.removeChild(parentElement);
+        }
+    });
+    root.appendChild(button);
+    
+    // Append root DOM element to parentElement
+    parentElement.appendChild(root);
 };
 
 
@@ -290,82 +339,176 @@ window.os.gui.resize = function (root, resizeHandle) {
   </script>
   <script id="gui_window">
    (() => {
-// Define the createWindow function on the window.os.gui object
-window.os.gui.createWindow = function(emoji = '🖥️', title = 'New Window', content = null, width = 400, height = 300) {
-    // Create the root DOM element with the class .window
-    var root = document.createElement('div');
-    root.className = 'window';
-    root.style.width = width + 'px';
-    root.style.height = height + 'px';
-    
-    // Add an empty div with class titlePlaceholder to the root DOM element
-    var titlePlaceholder = document.createElement('div');
-    titlePlaceholder.className = 'titlePlaceholder';
-    root.appendChild(titlePlaceholder);
-    
-    // Add an empty div with class toolbarPlaceholder to the root DOM element
-    var toolbarPlaceholder = document.createElement('div');
-    toolbarPlaceholder.className = 'toolbarPlaceholder';
-    root.appendChild(toolbarPlaceholder);
-    
-    // Add an empty div with class contentPlaceholder to the root DOM element
-    var contentPlaceholder = document.createElement('div');
-    contentPlaceholder.className = 'contentPlaceholder';
-    root.appendChild(contentPlaceholder);
-    
-    // Add an empty div with class statusPlaceholder to the root DOM element
-    var statusPlaceholder = document.createElement('div');
-    statusPlaceholder.className = 'statusPlaceholder';
-    root.appendChild(statusPlaceholder);
-    
-    // Add a resize handle to the root DOM element with class resizeHandle
-    var resizeHandle = document.createElement('div');
-    resizeHandle.className = 'resizeHandle';
-    root.appendChild(resizeHandle);
-    
-    // Add the title bar with the provided emoji + title, the root DOM element, and the titlePlaceholder child element
-    window.os.gui.titleBar(emoji + ' ' + title, null, titlePlaceholder);
-    
-    // Add the root element to the document body
+// Check if window.os and window.os.gui exist, create them if not
+if (!window.os) {
+    window.os = {};
+}
+if (!window.os.gui) {
+    window.os.gui = {};
+}
+
+// Define createWindow function
+window.os.gui.createWindow = function (emoji = '🖥️', title = 'New Window', content = null, width = 400, height = 300) {
+    // Create root DOM element with class .window and add it to document body
+    const root = document.createElement('div');
+    root.classList.add('window');
     document.body.appendChild(root);
     
-    // Make the root element draggable by the title placeholder element
-    window.os.gui.move(root, titlePlaceholder);
+    // Call bringToFront on root element
+    window.os.gui.bringToFront(root);
     
-    // Make the root element resizable by the resize handle element
-    window.os.gui.resize(root, resizeHandle);
+    // Add and empty div with class titlePlaceholder to root DOM element
+    const titlePlaceholder = document.createElement('div');
+    titlePlaceholder.classList.add('titlePlaceholder');
+    root.appendChild(titlePlaceholder);
     
-    // If content is provided, append it to the contentPlaceholder element
-    if(content) {
+    // Add and empty div with class toolbarPlaceholder to root DOM element
+    const toolbarPlaceholder = document.createElement('div');
+    toolbarPlaceholder.classList.add('toolbarPlaceholder');
+    root.appendChild(toolbarPlaceholder);
+    
+    // Add and empty div with class contentPlaceholder to root DOM element and append content parameter to it
+    const contentPlaceholder = document.createElement('div');
+    contentPlaceholder.classList.add('contentPlaceholder');
+    root.appendChild(contentPlaceholder);
+    if (content !== null) {
         contentPlaceholder.appendChild(content);
     }
     
-    // Return the root DOM element
-    return root;
-};
+    // Add and empty div with class statusPlaceholder to root DOM element
+    const statusPlaceholder = document.createElement('div');
+    statusPlaceholder.classList.add('statusPlaceholder');
+    root.appendChild(statusPlaceholder);
+    
+    // Add resize handle to root DOM element with class resizeHandle
+    const resizeHandle = document.createElement('div');
+    resizeHandle.classList.add('resizeHandle');
+    root.appendChild(resizeHandle);
+    
+    // Add titleBar to titlePlaceholder having text emoji + title
+    window.os.gui.titleBar(titlePlaceholder, emoji + ' ' + title);
+    
+    // Call makeDraggable on root element by the titlePlaceholder element
+    window.os.gui.makeDraggable(root, titlePlaceholder);
+    
+    // Make root element resizable by resizeHandle element
+    window.os.gui.makeResizable(root, resizeHandle);
+    
+    // Set default width and height of root element
+    root.style.width = width + 'px';
+    root.style.height = height + 'px';
+    
+    // Return null
+    return null;
+}
 
 
 })()
   </script>
  </head>
  <body>
-  <script id="osbase_test">
+  <script id="gui_gui-tests">
    (() => {
-// Define your path and content
-var path = 'test/a/test.txt';
-var content = 'hello world';
+// Create a new div and set its properties
+let div = document.createElement('div');
+div.style.position = 'absolute';
+div.style.width = '100px';
+div.style.height = '100px';
+div.style.backgroundColor = 'red';
+document.body.appendChild(div);
 
-// Use the write function from your OS's fs module
-window.os.fs.write(path, content);
+// Create another div and set its properties and append it to the first div
+let div2 = document.createElement('div');
+div2.style.position = 'relative';
+div2.style.width = '100%';
+div2.style.height = '20px';
+div2.style.backgroundColor = 'blue';
+div.appendChild(div2);
+
+// Create another div and set its properties and append it to the first div
+let div3 = document.createElement('div');
+div3.style.position = 'absolute';
+div3.style.right = '0';
+div3.style.bottom = '0';
+div3.style.width = '10px';
+div3.style.height = '10px';
+div3.style.backgroundColor = 'green';
+div.appendChild(div3);
+
+// Make the first div draggable using the second div as the drag handle
+if (!window.os || !window.os.gui || !window.os.gui.makeDraggable) {
+    window.os = window.os || {};
+    window.os.gui = window.os.gui || {};
+    window.os.gui.makeDraggable = (function() {
+        var startX, startY, startLeft, startTop;
+        return function(root, dragHandle) {
+            var rect = root.getBoundingClientRect();
+            startLeft = rect.left;
+            startTop = rect.top;
+            dragHandle.addEventListener('mousedown', function(e) {
+                startX = e.clientX;
+                startY = e.clientY;
+                document.addEventListener('mousemove', move);
+                document.addEventListener('mouseup', up);
+            });
+            function move(e) {
+                var left = startLeft + e.clientX - startX;
+                var top = startTop + e.clientY - startY;
+                root.style.left = left + 'px';
+                root.style.top = top + 'px';
+            }
+            function up() {
+                document.removeEventListener('mousemove', move);
+                document.removeEventListener('mouseup', up);
+            }
+        };
+    })();
+}
+window.os.gui.makeDraggable(div, div2);
+
+// Make the first div resizable using the third div as the resize handle
+if (!window.os || !window.os.gui || !window.os.gui.makeResizable) {
+    window.os = window.os || {};
+    window.os.gui = window.os.gui || {};
+    window.os.gui.makeResizable = (function() {
+        var startWidth, startHeight;
+        return function(root, resizeHandle) {
+            var rect = root.getBoundingClientRect();
+            startWidth = rect.width;
+            startHeight = rect.height;
+            resizeHandle.addEventListener('mousedown', function(e) {
+                document.addEventListener('mousemove', move);
+                document.addEventListener('mouseup', up);
+            });
+            function move(e) {
+                var width = startWidth + e.clientX - resizeHandle.getBoundingClientRect().left;
+                var height = startHeight + e.clientY - resizeHandle.getBoundingClientRect().top;
+                root.style.width = width + 'px';
+                root.style.height = height + 'px';
+            }
+            function up() {
+                document.removeEventListener('mousemove', move);
+                document.removeEventListener('mouseup', up);
+            }
+        };
+    })();
+}
+window.os.gui.makeResizable(div, div3);
 
 
 })()
   </script>
   <script id="gui_window-tests">
    (() => {
-let div = document.createElement('div'); // Create a div element
-div.innerHTML = "Hello World!"; // Set the inner HTML of the div element
-let win = window.os.gui.createWindow("😃", "My Window", div); // Create the window
+// Create first window
+let div1 = document.createElement('div');
+div1.innerHTML = 'hello world 1';
+let win1 = window.os.gui.createWindow('😃', 'My Window', div1);
+
+// Create second window
+let div2 = document.createElement('div');
+div2.innerHTML = 'hello world 2';
+let win2 = window.os.gui.createWindow('💄', 'My Window 2', div2);
 
 
 })()

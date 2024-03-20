@@ -58,7 +58,8 @@ class LLM:
         output = model(
             instruction,
             max_tokens=4096,
-            top_k=10,
+            top_k=40,
+            seed=0,
             temperature=0.0,
             repeat_penalty=1.1,
             stream=True,

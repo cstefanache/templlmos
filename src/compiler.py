@@ -38,14 +38,18 @@ class Compiler:
                 dependencies = package.get("dependencies", [])
                 disabled = package.get("disabled", False)
                 rebuild = package.get("rebuild", False)
+                preventRebuild = package.get("preventRebuild", False)
                 library = package.get("library", False)
 
                 compiled_dependencies = ""
                 for dependency in dependencies:
-                    compiled_dependencies += api[dependency]
+                    try:
+                        compiled_dependencies += api[dependency]
+                    except KeyError:
+                        print(f"Dependency not found: {dependency}")
 
                 print(
-                    f"Processing package: {package_id}. Rebuild: {rebuild}, disabled: {disabled}"
+                    f"Processing package: {package_id}. Rebuild: {rebuild}, disabled: {disabled}, preventRebuild: {preventRebuild}"
                 )
 
                 to = package.get("to")
@@ -76,7 +80,8 @@ class Compiler:
                     ["\n".join(instruction) for instruction in compiled_instructions]
                 )
                 crc = binascii.crc32(instructions_set.encode())
-
+                print(not rebuild, not self.recompile, os.path.exists(cache_file_name))
+                print(preventRebuild, os.path.exists(cache_file_name))
                 if (
                     not rebuild
                     and not self.recompile
@@ -84,7 +89,7 @@ class Compiler:
                 ):
                     with open(cache_file_name, "r") as file:
                         cache_data = json.load(file)
-                        if cache_data["crc"] == crc:
+                        if cache_data["crc"] == crc or preventRebuild:
                             print(f"Using cache for {app}_{package_id}")
                             skip_compilation = True
                             output = cache_data["output"]
@@ -121,7 +126,7 @@ class Compiler:
                         cache_data["library"] = self_api
                     else:
                         self_api = cache_data["library"]
-                        print('>>> setting self_api from cache', package_id)
+                        print(">>> setting self_api from cache", package_id)
 
                     api[package_id] = self_api
 
@@ -135,6 +140,22 @@ class Compiler:
                 if not skip_compilation:
                     with open(cache_file_name, "w") as file:
                         json.dump(cache_data, file, indent=4)
+
+                # write debug markdown file
+                with open(f"{DEBUG}/{app}_{package_id}.md", "w") as file:
+                    file.write(f"## {app}_{package_id}\n")
+
+                    for i, res in enumerate(cache_data["compiled_instruction"]):
+                        file.write(f"### Instruction: {i}\n")
+                        instr = cache_data["compiled_instruction"][i]
+                        out = cache_data["output"][i]
+                        file.write(f"<pre style='text-wrap: wrap'>{instr}</pre>\n")
+                        file.write(f"<pre style='text-wrap: wrap'>{out}</pre>\n")
+
+                    if library:
+                        file.write(f"### Library\n")
+                        file.write(f"<pre style='text-wrap: wrap'>{self_api}</pre>\n")
+
 
                 to_html["_children_"].append(html_output)
 
