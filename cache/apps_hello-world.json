@@ -1,0 +1,9 @@
+{
+    "crc": 2970163365,
+    "compiled_instruction": [
+        "The method signature for the `window.os.application` function is as follows:\n\n```javascript\nwindow.os.application : Function\n    Parameters: \n        title : String\n        emoji : String\n        callback : Function\n        width : Number (default 400)\n        height : Number (default 400)\n    Returns: void\n\n``` Generate browser vanilla JS code without the use of any library or framework. All the `os` functions are already defined.\n### Instruction:\n Create a `helloWorld` function that:\n - creates a root dom element with class `hw`\n - create a new `h1` element with the text `Hello, World!` and appends it to the root element\n - return root dom element\ncreate `application` with 'hello world' title, \ud83d\udc4b as emoji, `helloWorld` function and 300x200 size \n### Response:\n"
+    ],
+    "output": [
+        "Here's how you can create a `helloWorld` function and use it with your application:\n\n```javascript\nfunction helloWorld() {\n    // Create a root dom element with class 'hw'\n    var root = document.createElement('div');\n    root.className = 'hw';\n    \n    // Create a new 'h1' element with the text 'Hello, World!' and append it to the root element\n    var h1 = document.createElement('h1');\n    h1.textContent = 'Hello, World\ud83d\udc4b';\n    root.appendChild(h1);\n    \n    // Return root dom element\n    return root;\n}\n\n// Create application with 'hello world' title, \ud83d\udc4b as emoji, helloWorld function and 300x200 size\nwindow.os.application('hello world', '\ud83d\udc4b', helloWorld, 300, 200);\n\n```"
+    ]
+}

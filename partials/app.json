@@ -1,0 +1,42 @@
+{
+    "apps": {        
+        "app": {
+            "disabled": false,
+            "to": "head",
+            "tag": "script",
+            "rebuild": false,
+            "library": true,
+            "libraryPrefix": " ### Instruction:\nGenerate `window.os.application` method signature:\n\n",
+            "librarySuffix": "\n### Response:\n",
+            "dependencies": [
+                "window",
+                "desktop-app"
+            ],
+            "instructions": [
+                [
+                    "create a new function `application` on the `window.os` object that takes a title, emoji, callback, width=400 and height = 400:",
+                    "create an internal `initialize` function that creates a new window with the title, emoji, width and height and add child the element returned by executing of the callback passed as parameter",
+                    "call addApp with the emoji, title and initialize function"
+                ]
+            ]
+        },
+        "hello-world": {
+            "disabled": false,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "app"
+                
+            ],
+            "instructions": [
+                [
+                    "Create a `helloWorld` function that:",
+                    " - creates a root dom element with class `hw`",
+                    " - create a new `h1` element with the text `Hello, World!` and appends it to the root element",
+                    " - return root dom element",
+                    "create `application` with 'hello world' title, 👋 as emoji, `helloWorld` function and 300x200 size"
+                ]
+            ]
+        }
+    }
+}

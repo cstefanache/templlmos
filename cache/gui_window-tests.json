@@ -1,9 +1,0 @@
-{
-    "crc": 2246476652,
-    "compiled_instruction": [
-        "The function `window.os.gui.createWindow` is a JavaScript function that creates a new GUI window with various components such as title bar, toolbar, content area, status bar, and a resize handle. The function takes in several parameters including emoji for the title bar, title of the window, content to be displayed in the content area, width of the window, and height of the window. The function returns null after creating the window. \n\nHere is the function signature:\n\n```javascript\nwindow.os.gui.createWindow(emoji?: string, title?: string, content?: Node | null, width?: number, height?: number): null;\n\n``` Generate browser vanilla JS code without the use of any library or framework. All the `os` functions are already defined.\n### Instruction:\n Create a new window with the title `My Window` and a div containing `hello world 1` as content having \ud83d\ude03 as emoji\nCreate a new window with the title `My Window 2` and a div containing  `hello world 2` as content having \ud83d\udc84 as emoji \n### Response:\n"
-    ],
-    "output": [
-        "Sure, here's how you can create two windows using your specifications:\n\n```javascript\n// Create first window\nlet div1 = document.createElement('div');\ndiv1.innerHTML = 'hello world 1';\nlet win1 = window.os.gui.createWindow('\ud83d\ude03', 'My Window', div1);\n\n// Create second window\nlet div2 = document.createElement('div');\ndiv2.innerHTML = 'hello world 2';\nlet win2 = window.os.gui.createWindow('\ud83d\udc84', 'My Window 2', div2);\n\n```"
-    ]
-}

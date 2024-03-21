@@ -6,8 +6,7 @@
             "prefix": "Generate CSS code\n### Instruction:\n",
             "instructions": [
                 [
-                    "Apply style to body:",
-                    "- background color to #2E393D"
+                    "Apply a  lite pink color to the body"
                 ]
             ]
         },

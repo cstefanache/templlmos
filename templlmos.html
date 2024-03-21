@@ -2,7 +2,7 @@
  <head>
   <style id="osbase_general-styles">
    body {
-    background-color: #2E393D;
+    background-color: #ffe4e1; /* This is a hexadecimal representation of a light pink color */
 }
   </style>
   <script id="osbase_global-objects">
@@ -124,6 +124,89 @@ if (!window.os.fs) {
 
 })()
   </script>
+  <style id="desktop_content-style">
+   #desktop_content {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow-y: hidden;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-content: flex-start;
+}
+  </style>
+  <style id="desktop_styles">
+   .icon {
+    width: 64px;
+    min-height: 64px;
+    text-align: center;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.emoji {
+    display: inline-block;
+    font-size: 30px;
+    position: relative;
+}
+
+.title {
+    display: block;
+    font-size: 8px;
+    font-family: monospace;
+    color: black;
+    padding: 5px;
+    word-wrap: break-word;
+    border: 2px solid black;
+    background-color: white;
+    border-radius: 5px;
+}
+  </style>
+  <script id="desktop_desktop-app">
+   (() => {
+// Check if os.desktop exists, if not create it
+if (!window.os) {
+    window.os = {};
+}
+if (!window.os.desktop) {
+    window.os.desktop = {};
+}
+
+// Add addApp function to os.desktop
+window.os.desktop.addApp = function(emoji, title, callback) {
+    // Create root DOM element with class .icon
+    var icon = document.createElement('div');
+    icon.className = 'icon';
+    
+    // Create span with class .emoji and add it to icon
+    var emojiSpan = document.createElement('span');
+    emojiSpan.className = 'emoji';
+    emojiSpan.textContent = emoji;
+    icon.appendChild(emojiSpan);
+    
+    // Create span with class .title and add it to icon
+    var titleSpan = document.createElement('span');
+    titleSpan.className = 'title';
+    titleSpan.textContent = title;
+    icon.appendChild(titleSpan);
+    
+    // Append icon to #desktop_content
+    document.querySelector('#desktop_content').appendChild(icon);
+    
+    // Add click event listener to icon
+    icon.addEventListener('click', function() {
+        // Call callback when icon is clicked
+        if (typeof callback === 'function') {
+            callback();
+        }
+    });
+};
+
+
+})()
+  </script>
   <style id="gui_gui-styles">
    .titleBar {
     background-color: orange;
@@ -151,9 +234,11 @@ if (!window.os.fs) {
     display: flex;
     flex-direction: column;
     background-color: white;
-    padding: 1px;
+    padding: 0;
     border: 2px solid black;
-    border-radius: 4px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 4px 4px 0 0 rgba(0,0,0,0.5);
 }
 
 .contentPlaceholder {
@@ -173,13 +258,16 @@ if (!window.os.fs) {
 }
 
 .resizeHandle {
-    width: 10px;
-    height: 10px;
+    width: 0px;
+    height: 0px;
     position: absolute;
     bottom: 0;
     right: 0;
     cursor: se-resize;
-    background-color: #000; /* Change this to your desired handle color */
+    border-width: 0 0 5px 5px;
+    border-style: solid;
+    border-color: transparent transparent #ff7200 transparent;
+    transform: rotate(0deg);
 }
   </style>
   <script id="gui_gui-global-objects">
@@ -308,7 +396,7 @@ window.os.gui.bringToFront = function (rootDomNode) {
 if (!window.os) window.os = {};
 if (!window.os.gui) window.os.gui = {};
 
-window.os.gui.titleBar = function(parentElement, title) {
+window.os.gui.titleBar = function(parentElement, title, close) {
     // Create root DOM element with class .titleBar
     var root = document.createElement('div');
     root.className = 'titleBar';
@@ -318,16 +406,11 @@ window.os.gui.titleBar = function(parentElement, title) {
     span.textContent = title;
     root.appendChild(span);
     
-    // Add button with text '❌' to root DOM element
+    // Add button with text '❌' and class 'close' to root DOM element
     var button = document.createElement('button');
     button.textContent = '❌';
-    button.addEventListener('click', function() {
-        // When button is clicked, remove parentElement from DOM
-        var parent = parentElement.parentNode;
-        if(parent){
-            parent.removeChild(parentElement);
-        }
-    });
+    button.className = 'close';
+    button.addEventListener('click', close); // Add event listener for close callback
     root.appendChild(button);
     
     // Append root DOM element to parentElement
@@ -339,7 +422,7 @@ window.os.gui.titleBar = function(parentElement, title) {
   </script>
   <script id="gui_window">
    (() => {
-// Check if window.os and window.os.gui exist, create them if not
+// Ensure window.os and window.os.gui exist
 if (!window.os) {
     window.os = {};
 }
@@ -348,167 +431,100 @@ if (!window.os.gui) {
 }
 
 // Define createWindow function
-window.os.gui.createWindow = function (emoji = '🖥️', title = 'New Window', content = null, width = 400, height = 300) {
-    // Create root DOM element with class .window and add it to document body
+window.os.gui.createWindow = function (emoji = '🖥️', title = 'Window', contentElement = null, width = 400, height = 300) {
+    // Create root DOM element with class .window and add it to document body in the middle of the document
     const root = document.createElement('div');
-    root.classList.add('window');
+    root.className = 'window';
+    root.style.width = width + 'px';
+    root.style.height = height + 'px';
     document.body.appendChild(root);
     
     // Call bringToFront on root element
     window.os.gui.bringToFront(root);
     
-    // Add and empty div with class titlePlaceholder to root DOM element
+    // Add placeholder divs to root DOM element
     const titlePlaceholder = document.createElement('div');
-    titlePlaceholder.classList.add('titlePlaceholder');
+    titlePlaceholder.className = 'titlePlaceholder';
     root.appendChild(titlePlaceholder);
     
-    // Add and empty div with class toolbarPlaceholder to root DOM element
     const toolbarPlaceholder = document.createElement('div');
-    toolbarPlaceholder.classList.add('toolbarPlaceholder');
+    toolbarPlaceholder.className = 'toolbarPlaceholder';
     root.appendChild(toolbarPlaceholder);
     
-    // Add and empty div with class contentPlaceholder to root DOM element and append content parameter to it
     const contentPlaceholder = document.createElement('div');
-    contentPlaceholder.classList.add('contentPlaceholder');
+    contentPlaceholder.className = 'contentPlaceholder';
     root.appendChild(contentPlaceholder);
-    if (content !== null) {
-        contentPlaceholder.appendChild(content);
-    }
     
-    // Add and empty div with class statusPlaceholder to root DOM element
     const statusPlaceholder = document.createElement('div');
-    statusPlaceholder.classList.add('statusPlaceholder');
+    statusPlaceholder.className = 'statusPlaceholder';
     root.appendChild(statusPlaceholder);
     
-    // Add resize handle to root DOM element with class resizeHandle
+    // Add resize handle to root DOM element
     const resizeHandle = document.createElement('div');
-    resizeHandle.classList.add('resizeHandle');
+    resizeHandle.className = 'resizeHandle';
     root.appendChild(resizeHandle);
     
-    // Add titleBar to titlePlaceholder having text emoji + title
-    window.os.gui.titleBar(titlePlaceholder, emoji + ' ' + title);
+    // Create and add title bar to titlePlaceholder
+    window.os.gui.titleBar(titlePlaceholder, emoji + ' ' + title, () => {
+        document.body.removeChild(root);
+    });
     
-    // Call makeDraggable on root element by the titlePlaceholder element
+    // Make root element draggable by titlePlaceholder and resizable by resizeHandle
     window.os.gui.makeDraggable(root, titlePlaceholder);
-    
-    // Make root element resizable by resizeHandle element
     window.os.gui.makeResizable(root, resizeHandle);
     
-    // Set default width and height of root element
-    root.style.width = width + 'px';
-    root.style.height = height + 'px';
+    // Append content element to contentPlaceholder if it exists
+    if (contentElement) {
+        contentPlaceholder.appendChild(contentElement);
+    }
     
-    // Return null
     return null;
-}
+};
+
+
+})()
+  </script>
+  <script id="apps_app">
+   (() => {
+window.os = window.os || {};
+
+window.os.application = function(title, emoji, callback, width=400, height=400) {
+    // Create an internal initialize function that creates a new window with the title, emoji, width and height and add child the element returned by executing of the callback passed as parameter
+    const initialize = () => {
+        const contentElement = document.createElement('div');
+        contentElement.appendChild(callback()); // Assuming callback returns an element
+        window.os.gui.createWindow(emoji, title, contentElement, width, height);
+    };
+    
+    // Call addApp with the emoji, title and initialize function 
+    window.os.desktop.addApp(emoji, title, initialize);
+};
 
 
 })()
   </script>
  </head>
  <body>
-  <script id="gui_gui-tests">
+  <div id="desktop_content">
+  </div>
+  <script id="apps_hello-world">
    (() => {
-// Create a new div and set its properties
-let div = document.createElement('div');
-div.style.position = 'absolute';
-div.style.width = '100px';
-div.style.height = '100px';
-div.style.backgroundColor = 'red';
-document.body.appendChild(div);
-
-// Create another div and set its properties and append it to the first div
-let div2 = document.createElement('div');
-div2.style.position = 'relative';
-div2.style.width = '100%';
-div2.style.height = '20px';
-div2.style.backgroundColor = 'blue';
-div.appendChild(div2);
-
-// Create another div and set its properties and append it to the first div
-let div3 = document.createElement('div');
-div3.style.position = 'absolute';
-div3.style.right = '0';
-div3.style.bottom = '0';
-div3.style.width = '10px';
-div3.style.height = '10px';
-div3.style.backgroundColor = 'green';
-div.appendChild(div3);
-
-// Make the first div draggable using the second div as the drag handle
-if (!window.os || !window.os.gui || !window.os.gui.makeDraggable) {
-    window.os = window.os || {};
-    window.os.gui = window.os.gui || {};
-    window.os.gui.makeDraggable = (function() {
-        var startX, startY, startLeft, startTop;
-        return function(root, dragHandle) {
-            var rect = root.getBoundingClientRect();
-            startLeft = rect.left;
-            startTop = rect.top;
-            dragHandle.addEventListener('mousedown', function(e) {
-                startX = e.clientX;
-                startY = e.clientY;
-                document.addEventListener('mousemove', move);
-                document.addEventListener('mouseup', up);
-            });
-            function move(e) {
-                var left = startLeft + e.clientX - startX;
-                var top = startTop + e.clientY - startY;
-                root.style.left = left + 'px';
-                root.style.top = top + 'px';
-            }
-            function up() {
-                document.removeEventListener('mousemove', move);
-                document.removeEventListener('mouseup', up);
-            }
-        };
-    })();
+function helloWorld() {
+    // Create a root dom element with class 'hw'
+    var root = document.createElement('div');
+    root.className = 'hw';
+    
+    // Create a new 'h1' element with the text 'Hello, World!' and append it to the root element
+    var h1 = document.createElement('h1');
+    h1.textContent = 'Hello, World👋';
+    root.appendChild(h1);
+    
+    // Return root dom element
+    return root;
 }
-window.os.gui.makeDraggable(div, div2);
 
-// Make the first div resizable using the third div as the resize handle
-if (!window.os || !window.os.gui || !window.os.gui.makeResizable) {
-    window.os = window.os || {};
-    window.os.gui = window.os.gui || {};
-    window.os.gui.makeResizable = (function() {
-        var startWidth, startHeight;
-        return function(root, resizeHandle) {
-            var rect = root.getBoundingClientRect();
-            startWidth = rect.width;
-            startHeight = rect.height;
-            resizeHandle.addEventListener('mousedown', function(e) {
-                document.addEventListener('mousemove', move);
-                document.addEventListener('mouseup', up);
-            });
-            function move(e) {
-                var width = startWidth + e.clientX - resizeHandle.getBoundingClientRect().left;
-                var height = startHeight + e.clientY - resizeHandle.getBoundingClientRect().top;
-                root.style.width = width + 'px';
-                root.style.height = height + 'px';
-            }
-            function up() {
-                document.removeEventListener('mousemove', move);
-                document.removeEventListener('mouseup', up);
-            }
-        };
-    })();
-}
-window.os.gui.makeResizable(div, div3);
-
-
-})()
-  </script>
-  <script id="gui_window-tests">
-   (() => {
-// Create first window
-let div1 = document.createElement('div');
-div1.innerHTML = 'hello world 1';
-let win1 = window.os.gui.createWindow('😃', 'My Window', div1);
-
-// Create second window
-let div2 = document.createElement('div');
-div2.innerHTML = 'hello world 2';
-let win2 = window.os.gui.createWindow('💄', 'My Window 2', div2);
+// Create application with 'hello world' title, 👋 as emoji, helloWorld function and 300x200 size
+window.os.application('hello world', '👋', helloWorld, 300, 200);
 
 
 })()

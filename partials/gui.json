@@ -18,7 +18,10 @@
                     "css style for a .window class to follow the following rules:",
                     "- white background color and a padding of 1px",
                     "- a border of 2px solid black",
-                    "- a border-radius of 4px",
+                    "- a border-radius of 8px",
+                    "- no padding",
+                    "- hidden overflow",
+                    "- a box-shadow of 4px 4px 0 0 rgba(0,0,0,0.5)",
                     "- absolute position",
                     "- display of flex and flex-direction of column",
                     "- inner .contentPlaceholder class should have a padding of 5px, flex-grow of 1 and overflow of auto",
@@ -27,11 +30,14 @@
                 ],
                 [
                     "css style for a  `.resizeHandle` class with the following rules:",
-                    "- a width and height of 10px",
+                    "- a width and height of 0px",
                     "- an absolute position",
                     "- a bottom and right of 0",
                     "- a cursor of se-resize",
-                    "- look like a resizing handle"
+                    "- border width: 0 0 5px 5px",
+                    "- border style: solid",
+                    "- `border-color: transparent transparent #ff7200 transparent`",
+                    "- transform: rotate(0deg)"
                 ]
             ]
         },
@@ -78,7 +84,7 @@
             "disabled": true,
             "to": "head",
             "tag": "script",
-            "rebuild": true,
+            "rebuild": false,
             "library": true,
             "libraryPrefix": " ### Instruction:\nList functions on the `window.os.gui` object:\n\n",
             "librarySuffix": "\n### Response:\n",
@@ -90,6 +96,7 @@
         "gui-tests": {
             "to": "body",
             "tag": "script",
+            "disabled": true,
             "dependencies": [
                 "draggable"
             ],
@@ -116,10 +123,10 @@
             "prefix": "{deps} Generate browser vanilla JS code without the use of any library or framework. `window.os` function is already defined.\n### Instruction:\n",
             "instructions": [
                 [
-                    "Define a function called `titleBar` object on `window.os.gui` that takes two parameter: parentElement (DOM element) and title (string) and has the following functionality:",
+                    "Define a function called `titleBar` object on `window.os.gui` that takes two parameter: parentElement (DOM element), title (string), and a callback `close` and has the following functionality:",
                     "- create a root DOM element with the class `.titleBar`",
                     "- add to the root DOM element a `span` containing the title parameter",
-                    "- add to the root DOM element a `button` with the text `❌` that when clicked removes parentElement element from the DOM",
+                    "- add to the root DOM element a `button` with the text `❌` and class `close` that calls the close callback",
                     "- append the root DOM element to parentElement"
                 ]
             ]
@@ -128,9 +135,9 @@
             "disabled": false,
             "to": "head",
             "tag": "script",
-            "rebuild": true,
+            "rebuild": false,
             "library": true,
-            "libraryPrefix": " ### Instruction:\nGenerate `window.os.gui.createWindow` method signature:\n",
+            "libraryPrefix": " ### Instruction:\nGive an example of how to use `window.os.gui.createWindow`:\n",
             "librarySuffix": "\n### Response:\n",
             "dependencies": [
                 "titleBar",
@@ -139,23 +146,23 @@
             ],
             "instructions": [
                 [
-                    "Define a function called `window.os.gui.createWindow` that takes four parameters: emoji, title, content (as DOM element) and width and height that are defaulting to 400 and 300, respectively if not passed and have the following functionality:",
-                    "- create a root DOM element with the class `.window` and add it to document body",
+                    "Define a function called `window.os.gui.createWindow` that takes four parameters: emoji, title, contentElement and width and height that are defaulting to 400 and 300, respectively if not passed and have the following functionality:",
+                    "- create a root DOM element with the class `.window`, no border styles, and add it to document body in the middle of the document",
                     "- call bringToFront on the root element",
                     "- add and empty div with class `titlePlaceholder` to the root DOM element",
                     "- add and empty div with class `toolbarPlaceholder` to the root DOM element",
-                    "- add and empty div with class `contentPlaceholder` to the root DOM element and append the content parameter to it",
+                    "- add and empty div with class `contentPlaceholder` to the root DOM element and append the contentElement parameter to it",
                     "- add and empty div with class `statusPlaceholder` to the root DOM element",
                     "- add a resize handle to the root DOM element with class `resizeHandle`",
-                    "- add titleBar to `titlePlaceholder` having the text `emoji + title`",
+                    "- add titleBar to `titlePlaceholder` having the text `emoji + title` and close callback removes root DOM element from the document body",
                     "- call makeDraggable on root element by the titlePlaceholder element",
                     "- make root element resizable by the resizeHandle element",
                     "- return null"
                 ]
             ]
         },
-        "window-tests": {
-            "disabled": false,
+        "tests": {
+            "disabled": true,
             "to": "body",
             "tag": "script",
             "dependencies": [

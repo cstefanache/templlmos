@@ -3,7 +3,7 @@
 <pre style='text-wrap: wrap'>The method signature for the `window.os.gui.titleBar` function is as follows:
 
 ```javascript
-function titleBar(parentElement, title)
+function titleBar(parentElement, title, close): void;
 
 ```The provided JavaScript code defines four functions on the `window.os.gui` object: 
 
@@ -19,24 +19,24 @@ In summary, this code provides a set of utility functions for creating draggable
 
 ``` Generate browser vanilla JS code without the use of any library or framework. All the `os` functions are already defined.
 ### Instruction:
- Define a function called `window.os.gui.createWindow` that takes four parameters: emoji, title, content (as DOM element) and width and height that are defaulting to 400 and 300, respectively if not passed and have the following functionality:
-- create a root DOM element with the class `.window` and add it to document body
+ Define a function called `window.os.gui.createWindow` that takes four parameters: emoji, title, contentElement and width and height that are defaulting to 400 and 300, respectively if not passed and have the following functionality:
+- create a root DOM element with the class `.window`, no border styles, and add it to document body in the middle of the document
 - call bringToFront on the root element
 - add and empty div with class `titlePlaceholder` to the root DOM element
 - add and empty div with class `toolbarPlaceholder` to the root DOM element
-- add and empty div with class `contentPlaceholder` to the root DOM element and append the content parameter to it
+- add and empty div with class `contentPlaceholder` to the root DOM element and append the contentElement parameter to it
 - add and empty div with class `statusPlaceholder` to the root DOM element
 - add a resize handle to the root DOM element with class `resizeHandle`
-- add titleBar to `titlePlaceholder` having the text `emoji + title`
+- add titleBar to `titlePlaceholder` having the text `emoji + title` and close callback removes root DOM element from the document body
 - call makeDraggable on root element by the titlePlaceholder element
 - make root element resizable by the resizeHandle element
 - return null 
 ### Response:
 </pre>
-<pre style='text-wrap: wrap'>Here's how you can define this function in vanilla JavaScript:
+<pre style='text-wrap: wrap'>Here's a possible implementation of your request using vanilla JavaScript:
 
 ```javascript
-// Check if window.os and window.os.gui exist, create them if not
+// Ensure window.os and window.os.gui exist
 if (!window.os) {
     window.os = {};
 }
@@ -45,67 +45,68 @@ if (!window.os.gui) {
 }
 
 // Define createWindow function
-window.os.gui.createWindow = function (emoji = '🖥️', title = 'New Window', content = null, width = 400, height = 300) {
-    // Create root DOM element with class .window and add it to document body
+window.os.gui.createWindow = function (emoji = '🖥️', title = 'Window', contentElement = null, width = 400, height = 300) {
+    // Create root DOM element with class .window and add it to document body in the middle of the document
     const root = document.createElement('div');
-    root.classList.add('window');
+    root.className = 'window';
+    root.style.width = width + 'px';
+    root.style.height = height + 'px';
     document.body.appendChild(root);
     
     // Call bringToFront on root element
     window.os.gui.bringToFront(root);
     
-    // Add and empty div with class titlePlaceholder to root DOM element
+    // Add placeholder divs to root DOM element
     const titlePlaceholder = document.createElement('div');
-    titlePlaceholder.classList.add('titlePlaceholder');
+    titlePlaceholder.className = 'titlePlaceholder';
     root.appendChild(titlePlaceholder);
     
-    // Add and empty div with class toolbarPlaceholder to root DOM element
     const toolbarPlaceholder = document.createElement('div');
-    toolbarPlaceholder.classList.add('toolbarPlaceholder');
+    toolbarPlaceholder.className = 'toolbarPlaceholder';
     root.appendChild(toolbarPlaceholder);
     
-    // Add and empty div with class contentPlaceholder to root DOM element and append content parameter to it
     const contentPlaceholder = document.createElement('div');
-    contentPlaceholder.classList.add('contentPlaceholder');
+    contentPlaceholder.className = 'contentPlaceholder';
     root.appendChild(contentPlaceholder);
-    if (content !== null) {
-        contentPlaceholder.appendChild(content);
-    }
     
-    // Add and empty div with class statusPlaceholder to root DOM element
     const statusPlaceholder = document.createElement('div');
-    statusPlaceholder.classList.add('statusPlaceholder');
+    statusPlaceholder.className = 'statusPlaceholder';
     root.appendChild(statusPlaceholder);
     
-    // Add resize handle to root DOM element with class resizeHandle
+    // Add resize handle to root DOM element
     const resizeHandle = document.createElement('div');
-    resizeHandle.classList.add('resizeHandle');
+    resizeHandle.className = 'resizeHandle';
     root.appendChild(resizeHandle);
     
-    // Add titleBar to titlePlaceholder having text emoji + title
-    window.os.gui.titleBar(titlePlaceholder, emoji + ' ' + title);
+    // Create and add title bar to titlePlaceholder
+    window.os.gui.titleBar(titlePlaceholder, emoji + ' ' + title, () => {
+        document.body.removeChild(root);
+    });
     
-    // Call makeDraggable on root element by the titlePlaceholder element
+    // Make root element draggable by titlePlaceholder and resizable by resizeHandle
     window.os.gui.makeDraggable(root, titlePlaceholder);
-    
-    // Make root element resizable by resizeHandle element
     window.os.gui.makeResizable(root, resizeHandle);
     
-    // Set default width and height of root element
-    root.style.width = width + 'px';
-    root.style.height = height + 'px';
+    // Append content element to contentPlaceholder if it exists
+    if (contentElement) {
+        contentPlaceholder.appendChild(contentElement);
+    }
     
-    // Return null
     return null;
-}
+};
 
 ```</pre>
 ### Library
-<pre style='text-wrap: wrap'>The function `window.os.gui.createWindow` is a JavaScript function that creates a new GUI window with various components such as title bar, toolbar, content area, status bar, and a resize handle. The function takes in several parameters including emoji for the title bar, title of the window, content to be displayed in the content area, width of the window, and height of the window. The function returns null after creating the window. 
-
-Here is the function signature:
+<pre style='text-wrap: wrap'>Sure, here's a simple usage of the `window.os.gui.createWindow` function in a JavaScript file:
 
 ```javascript
-window.os.gui.createWindow(emoji?: string, title?: string, content?: Node | null, width?: number, height?: number): null;
+// First, make sure the necessary functions are defined in the os.gui object
+// This is done in the previous code snippet, so we assume it's been done here
+// ...
+
+// Then, you can create a new window with a specific emoji, title, content, width, and height like this:
+const contentElement = document.createElement('p');
+contentElement.textContent = 'Hello, World 🌍';
+window.os.gui.createWindow('🖥️', 'My First Window', contentElement, 600, 400);
 
 ```</pre>

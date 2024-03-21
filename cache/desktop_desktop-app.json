@@ -1,0 +1,10 @@
+{
+    "crc": 3731180228,
+    "compiled_instruction": [
+        " Generate browser vanilla JS code without the use of any library or framework. All the `os` functions are already defined.\n### Instruction:\n Define a function called `addApp` on `window.os.desktop` namespace that takes four parameters: emoji, title and a callback:\n- create a root DOM element with the class `.icon` and add it to `#desktop_content`\n- add a span with the class `.emoji` and the emoji as its content\n- add a span with the class `.title` and the title as its content\n- when the icon is clicked, call the callback \n### Response:\n"
+    ],
+    "output": [
+        "Sure, here is how you can define this function in JavaScript:\n\n```javascript\n// Check if os.desktop exists, if not create it\nif (!window.os) {\n    window.os = {};\n}\nif (!window.os.desktop) {\n    window.os.desktop = {};\n}\n\n// Add addApp function to os.desktop\nwindow.os.desktop.addApp = function(emoji, title, callback) {\n    // Create root DOM element with class .icon\n    var icon = document.createElement('div');\n    icon.className = 'icon';\n    \n    // Create span with class .emoji and add it to icon\n    var emojiSpan = document.createElement('span');\n    emojiSpan.className = 'emoji';\n    emojiSpan.textContent = emoji;\n    icon.appendChild(emojiSpan);\n    \n    // Create span with class .title and add it to icon\n    var titleSpan = document.createElement('span');\n    titleSpan.className = 'title';\n    titleSpan.textContent = title;\n    icon.appendChild(titleSpan);\n    \n    // Append icon to #desktop_content\n    document.querySelector('#desktop_content').appendChild(icon);\n    \n    // Add click event listener to icon\n    icon.addEventListener('click', function() {\n        // Call callback when icon is clicked\n        if (typeof callback === 'function') {\n            callback();\n        }\n    });\n};\n\n```"
+    ],
+    "library": "The method signature for the `window.os.desktop.addApp` function is as follows:\n\n```javascript\nfunction addApp(emoji: string, title: string, callback: Function): void;\n\n```"
+}

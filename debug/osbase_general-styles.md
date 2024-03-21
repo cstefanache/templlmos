@@ -2,15 +2,14 @@
 ### Instruction: 0
 <pre style='text-wrap: wrap'>Generate CSS code
 ### Instruction:
- Apply style to body:
-- background color to #2E393D 
+ Apply a  lite pink color to the body 
 ### Response:
 </pre>
-<pre style='text-wrap: wrap'>Sure, here is the CSS code for applying a background color of `#2E393D` to the body.
+<pre style='text-wrap: wrap'>Sure, here is how you can apply a light pink color to your body using CSS:
 
 ```css
 body {
-    background-color: #2E393D;
+    background-color: #ffe4e1; /* This is a hexadecimal representation of a light pink color */
 }
 
 ```</pre>

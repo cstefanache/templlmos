@@ -1,0 +1,66 @@
+{
+    "desktop": {
+        "content-style": {
+            "disabled": false,
+            "to": "head",
+            "tag": "style",
+            "instructions": [
+                [
+                    "css style the `#desktop_content` id to match the following rules:",
+                    "absolute position, fixed size, 100% width, 100% height, overflow-y hidden, padding of 10px, display flex, flex-wrap wrap, flex-direction column, align content: flex start"
+                ]
+            ]
+        },
+        "content": {
+            "disabled": false,
+            "to": "body",
+            "tag": "div",
+            "instructions": []
+        },
+        "styles": {
+            "disabled": false,
+            "to": "head",
+            "tag": "style",
+            "instructions": [
+                [
+                    "css style the `.icon` class to match the following rules:",
+                    "1. 64px width, 64px min height, text-align center, margin of 5px, pointer cursor",
+                    "2. containing `.emoji` class should be a block, have a font-size of 30px and inline-block display, position relative",
+                    "3. containing `.title` class should be a block, have a font-size of 8px, monospaced font, black text, padding of 5px, allow word-wrap to break word, black rounded border with white background"
+                ]
+            ]
+        },
+        "desktop-app": {
+            "disabled": false,
+            "to": "head",
+            "tag": "script",
+            "rebuild": false,
+            "library": true,
+            "libraryPrefix": " ### Instruction:\nGenerate method signature for `window.os.desktop.addApp`:\n",
+            "librarySuffix": "\n### Response:\n",
+            "dependencies": [],
+            "instructions": [
+                [
+                    "Define a function called `addApp` on `window.os.desktop` namespace that takes four parameters: emoji, title and a callback:",
+                    "- create a root DOM element with the class `.icon` and add it to `#desktop_content`",
+                    "- add a span with the class `.emoji` and the emoji as its content",
+                    "- add a span with the class `.title` and the title as its content",
+                    "- when the icon is clicked, call the callback"
+                ]
+            ]
+        },
+        "tests": {
+            "disabled": true,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "desktop-app"
+            ],
+            "instructions": [
+                [
+                    "call addApp 30 times for 30 different emojis and titles"
+                ]
+            ]
+        }
+    }
+}

@@ -42,7 +42,10 @@
  css style for a .window class to follow the following rules:
 - white background color and a padding of 1px
 - a border of 2px solid black
-- a border-radius of 4px
+- a border-radius of 8px
+- no padding
+- hidden overflow
+- a box-shadow of 4px 4px 0 0 rgba(0,0,0,0.5)
 - absolute position
 - display of flex and flex-direction of column
 - inner .contentPlaceholder class should have a padding of 5px, flex-grow of 1 and overflow of auto
@@ -50,7 +53,7 @@
 - inner .statusPlaceholder class should have  a border-top of 1px solid black and a monospaced small text 
 ### Response:
 </pre>
-<pre style='text-wrap: wrap'>Here is the CSS code that matches your requirements:
+<pre style='text-wrap: wrap'>Here is your CSS code:
 
 ```css
 .window {
@@ -58,9 +61,11 @@
     display: flex;
     flex-direction: column;
     background-color: white;
-    padding: 1px;
+    padding: 0;
     border: 2px solid black;
-    border-radius: 4px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 4px 4px 0 0 rgba(0,0,0,0.5);
 }
 
 .contentPlaceholder {
@@ -84,24 +89,30 @@
 <pre style='text-wrap: wrap'> Generate browser vanilla JS code without the use of any library or framework. All the `os` functions are already defined.
 ### Instruction:
  css style for a  `.resizeHandle` class with the following rules:
-- a width and height of 10px
+- a width and height of 0px
 - an absolute position
 - a bottom and right of 0
 - a cursor of se-resize
-- look like a resizing handle 
+- border width: 0 0 5px 5px
+- border style: solid
+- `border-color: transparent transparent #ff7200 transparent`
+- transform: rotate(0deg) 
 ### Response:
 </pre>
-<pre style='text-wrap: wrap'>Sure, here is a CSS snippet that matches your requirements:
+<pre style='text-wrap: wrap'>Sure, here is the CSS code you requested:
 
 ```css
 .resizeHandle {
-    width: 10px;
-    height: 10px;
+    width: 0px;
+    height: 0px;
     position: absolute;
     bottom: 0;
     right: 0;
     cursor: se-resize;
-    background-color: #000; /* Change this to your desired handle color */
+    border-width: 0 0 5px 5px;
+    border-style: solid;
+    border-color: transparent transparent #ff7200 transparent;
+    transform: rotate(0deg);
 }
 
 ```</pre>
