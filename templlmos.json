@@ -1,18 +1,12 @@
 {
     "models": [
-       
+      
         {
             "repository": "TheBloke/deepseek-coder-6.7B-instruct-GGUF",
             "model": "deepseek-coder-6.7b-instruct.Q5_K_M.gguf",
-            "prefix": "{deps} Generate browser vanilla JS code without the use of any library or framework. All the `os` functions are already defined.\n### Instruction:\n",
+            "prefix": "You are an AI programming assistant that generates only JS and CSS code.\n### Instruction:\n {deps} \n\n",
             "suffix": "\n### Response:\n",
             "stop": "```\n"
-        },
-        {
-            "repository": "TheBloke/CodeLlama-13B-Instruct-GGUF",
-            "model": "codellama-13b-instruct.Q6_K.gguf",
-            "prefix": "[INST]<<SYS>>\n{deps}. Generate JS code<</SYS>>\n",
-            "suffix": "\n[/INST]\n"
         }
     ],
     "partials": [
@@ -22,12 +16,6 @@
         "app.json"
     ],
     "skip": [
-        "gui.json",
-        "desktop.json",
-        "apps.json",
-        "ide.json",
-        "browser.json",
-        "games.json"
     ],
     "definition": {}
 }

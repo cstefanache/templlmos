@@ -30,22 +30,40 @@
                 ]
             ]
         },
+        "icon": {
+            "disabled": false,
+            "to": "head",
+            "tag": "script",
+            "rebuild": false,
+            "library": true,
+            "libraryPrefix": " ### Instruction:\nGenerate method signature for `window.os.icon`:\n",
+            "librarySuffix": "\n### Response:\n",
+            "dependencies": [],
+            "instructions": [
+                [
+                    "Define a function called `icon` on `window.os` namespace that takes three parameters: parent, emoji, title and a callback:",
+                    "- create a root DOM element with the class `.icon` and add it to `parent`",
+                    "- add a span with the class `.emoji` and the emoji as its content",
+                    "- add a span with the class `.title` and the title as its content",
+                    "- when the icon is clicked, call the callback"
+                ]
+            ]
+        },
         "desktop-app": {
             "disabled": false,
             "to": "head",
             "tag": "script",
             "rebuild": false,
             "library": true,
-            "libraryPrefix": " ### Instruction:\nGenerate method signature for `window.os.desktop.addApp`:\n",
+            "libraryPrefix": "### Instruction:\nList method signatures of the functions and prefix them with `window.os`\n",
             "librarySuffix": "\n### Response:\n",
-            "dependencies": [],
+            "dependencies": [
+                "icon"
+            ],
             "instructions": [
                 [
-                    "Define a function called `addApp` on `window.os.desktop` namespace that takes four parameters: emoji, title and a callback:",
-                    "- create a root DOM element with the class `.icon` and add it to `#desktop_content`",
-                    "- add a span with the class `.emoji` and the emoji as its content",
-                    "- add a span with the class `.title` and the title as its content",
-                    "- when the icon is clicked, call the callback"
+                    "Define a function called `addApp` on `window.os` namespace that takes four parameters: emoji, title and a callback:",
+                    "- call `icon` with element at `#desktop_content`, emoji, title and the callback as parameters"
                 ]
             ]
         },
@@ -58,7 +76,7 @@
             ],
             "instructions": [
                 [
-                    "call addApp 30 times for 30 different emojis and titles"
+                    "call addApp 10 times for 10 different emojis and random titles"
                 ]
             ]
         }

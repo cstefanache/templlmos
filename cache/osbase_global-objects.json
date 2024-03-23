@@ -1,9 +1,9 @@
 {
-    "crc": 2207626248,
+    "crc": 3540395039,
     "compiled_instruction": [
-        " Generate browser vanilla JS code without the use of any library or framework. All the `os` functions are already defined.\n### Instruction:\n Create a new empty object `os` on the window global object \n### Response:\n"
+        "You are an AI programming assistant that generates only JS and CSS code.\n### Instruction:\n  \n\n Create a new empty object `os` on the window global object \n### Response:\n"
     ],
     "output": [
-        "You can create an empty object named `os` on the window global object in JavaScript by using the following code:\n\n```javascript\nwindow.os = {};\n\n```"
+        "```javascript\nif (typeof window !== 'undefined') {\n    window.os = {};\n} else {\n    console.error(\"This script is meant to run in a browser environment.\");\n}\n\n```"
     ]
 }

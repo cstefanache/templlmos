@@ -1,53 +1,11 @@
 ## gui_draggable
-### Instruction: 0
-<pre style='text-wrap: wrap'>do not use jquery.
- `window.os` object is already defined.
-### Instruction:
- Implement the following functions on the `window.os` object under `gui` key:
-- `makeDraggable(root, dragHandle)` - move the root element by dragging the dragHandle element 
-### Response:
-</pre>
-<pre style='text-wrap: wrap'>To implement this function, you can use JavaScript's built-in event listeners and some basic geometry to calculate the new position of the root element when the drag handle is dragged. Here's a simple implementation:
+### API
+<pre style='text-wrap: wrap'>Here are the function signatures prefixed with `window.os.gui`:
 
 ```javascript
-// Assuming window.os is already defined and has a gui property
-if (!window.os) {
-    window.os = {};
-}
-if (!window.os.gui) {
-    window.os.gui = {};
-}
-
-// Define makeDraggable function
-window.os.gui.makeDraggable = function (root, dragHandle) {
-    let offsetX = 0;
-    let offsetY = 0;
-    let mouseX = 0;
-    let mouseY = 0;
-    
-    const handleMouseDown = function (e) {
-        e = e || window.event;
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-        offsetX = root.offsetLeft - mouseX;
-        offsetY = root.offsetTop - mouseY;
-        
-        document.onmouseup = function () {
-            document.onmousemove = null;
-            document.onmouseup = null;
-        };
-        
-        document.onmousemove = function (e) {
-            e = e || window.event;
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            root.style.left = (mouseX + offsetX) + 'px';
-            root.style.top = (mouseY + offsetY) + 'px';
-        };
-    };
-    
-    dragHandle.onmousedown = handleMouseDown;
-};
+window.os.gui.makeDraggable = function (root, dragHandle) {}
+window.os.gui.makeResizable = function (root, resizeHandleDOMElement) {}
+window.os.gui.bringToFront = function (rootDomNode) {}
 
 ```</pre>
 ### Instruction: 1
@@ -55,15 +13,13 @@ window.os.gui.makeDraggable = function (root, dragHandle) {
  `window.os` object is already defined.
 ### Instruction:
  Implement the following functions on the `window.os` object under `gui` key:
-`makeResizable(root, resizeHandle) that:` 
- - resize (both width and height) the root element by dragging the resizeHandle element.
- - update starting width and height on mouseup 
+- `makeDraggable(root, dragHandle)` - drag the root  by dragging the dragHandle element. Both root and dragHandle are DOM elements. 
 ### Response:
 </pre>
-<pre style='text-wrap: wrap'>Here's a simple implementation of your request using plain JavaScript. This code assumes that you have a way to get the current width and height of your root element and a way to set them. The actual implementation of these methods would depend on your specific application and how you handle state and layout changes.
+#### Output: 0
+<pre style='text-wrap: wrap'>You can implement this function using JavaScript's built-in event listeners and properties to handle mouse events and move elements around. Here's a simple implementation of this function:
 
 ```javascript
-// Assuming window.os exists and has a gui property
 if (!window.os) {
     window.os = {};
 }
@@ -71,44 +27,93 @@ if (!window.os.gui) {
     window.os.gui = {};
 }
 
-// Define makeResizable function
-window.os.gui.makeResizable = function(root, resizeHandle) {
-    let startX;
-    let startY;
-    let startWidth = root.offsetWidth;
-    let startHeight = root.offsetHeight;
+window.os.gui.makeDraggable = function (root, dragHandle) {
+    var offsetX = 0;
+    var offsetY = 0;
     
-    // Handle mousedown event to start resizing
-    resizeHandle.addEventListener('mousedown', function(e) {
-        e.preventDefault();
-        startX = e.clientX;
-        startY = e.clientY;
+    dragHandle.addEventListener('mousedown', function (event) {
+        offsetX = event.clientX - root.getBoundingClientRect().left;
+        offsetY = event.clientY - root.getBoundingClientRect().top;
         
-        document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', handleMouseUp);
+        document.addEventListener('mousemove', move);
+        document.addEventListener('mouseup', drop);
     });
     
-    // Handle mousemove event to resize element
-    function handleMouseMove(e) {
-        let width = startWidth + e.clientX - startX;
-        let height = startHeight + e.clientY - startY;
-        
-        root.style.width = width + 'px';
-        root.style.height = height + 'px';
+    function move (event) {
+        event.preventDefault();
+        root.style.position = 'absolute';
+        root.style.left = event.clientX - offsetX + 'px';
+        root.style.top = event.clientY - offsetY + 'px';
     }
     
-    // Handle mouseup event to stop resizing and update starting width and height
-    function handleMouseUp() {
-        startWidth = root.offsetWidth;
-        startHeight = root.offsetHeight;
-        
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
+    function drop () {
+        document.removeEventListener('mousemove', move);
+        document.removeEventListener('mouseup', drop);
     }
 };
 
 ```</pre>
 ### Instruction: 2
+<pre style='text-wrap: wrap'>do not use jquery.
+ `window.os` object is already defined.
+### Instruction:
+ Implement the following functions on the `window.os` object under `gui` key:
+`makeResizable(root, resizeHandleDOMElement) that:` 
+ - resize (both width and height) the root element by dragging the resizeHandle DOM element.
+ - update starting width and height on mouseup 
+### Response:
+</pre>
+#### Output: 1
+<pre style='text-wrap: wrap'>Sure, here's a simple implementation of this function using JavaScript and CSS for resizing. This implementation assumes that you're using a flexbox layout for your root element and a simple div for your resize handle. The handle will be positioned at the bottom right of the root element and will be draggable by the user. When the user releases their mouse button, the dimensions of the root element will be updated to match the current size of the handle.
+
+```javascript
+// Add gui namespace if it doesn't exist
+if (!window.os || !window.os.gui) {
+    window.os = window.os || {};
+    window.os.gui = {};
+}
+
+// Define makeResizable function
+window.os.gui.makeResizable = function (root, resizeHandleDOMElement) {
+    let rootRect = root.getBoundingClientRect();
+    let startX = rootRect.width;
+    let startY = rootRect.height;
+    let startMouseX;
+    let startMouseY;
+    let startRootX = rootRect.x;
+    let startRootY = rootRect.y;
+    
+    // Add event listeners for mousedown and mousemove events
+    resizeHandleDOMElement.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+        startMouseX = e.clientX;
+        startMouseY = e.clientY;
+        document.addEventListener('mousemove', mouseMove);
+        document.addEventListener('mouseup', mouseUp);
+    });
+    
+    // Define mouseMove function
+    function mouseMove(e) {
+        let diffX = e.clientX - startMouseX;
+        let diffY = e.clientY - startMouseY;
+        root.style.width = startX + diffX + 'px';
+        root.style.height = startY + diffY + 'px';
+    }
+    
+    // Define mouseUp function
+    function mouseUp() {
+        document.removeEventListener('mousemove', mouseMove);
+        document.removeEventListener('mouseup', mouseUp);
+        let rootRect = root.getBoundingClientRect();
+        startX = rootRect.width;
+        startY = rootRect.height;
+        startRootX = rootRect.x;
+        startRootY = rootRect.y;
+    }
+};
+
+```</pre>
+### Instruction: 3
 <pre style='text-wrap: wrap'>do not use jquery.
  `window.os` object is already defined.
 ### Instruction:
@@ -120,6 +125,7 @@ window.os.gui.makeResizable = function(root, resizeHandle) {
 - adds a mousedown event listener to rootDOMNode that calls the internal function 
 ### Response:
 </pre>
+#### Output: 2
 <pre style='text-wrap: wrap'>Here's how you can implement this in JavaScript:
 
 ```javascript
@@ -144,19 +150,5 @@ window.os.gui.bringToFront = function (rootDomNode) {
     // Add mousedown event listener to rootDomNode
     rootDomNode.addEventListener('mousedown', bringOthersToFront);
 }
-
-```</pre>
-### Library
-<pre style='text-wrap: wrap'>The provided JavaScript code defines four functions on the `window.os.gui` object: 
-
-1. `makeDraggable(root, dragHandle)`: This function makes an element draggable by setting up event listeners for mouse events that allow for dragging of the element when the drag handle (provided as an argument to the function) is clicked and dragged over. The element's position is updated in real-time as the mouse moves, and it stops being dragged when the mouse button is released.
-
-2. `makeResizable(root, resizeHandle)`: This function makes an element resizable by setting up event listeners for mouse events that allow for resizing of the element when the resize handle (provided as an argument to the function) is clicked and dragged over. The element's width and height are updated in real-time as the mouse moves, and it stops being resized when the mouse button is released.
-
-3. `bringToFront(rootDomNode)`: This function brings a specified DOM node to the front of other nodes with the same class by setting their z-index to 0, then setting the z-index of the rootDomNode to 1. This effectively places it in front of all other nodes with the same class.
-
-4. The last part of your code checks if the `window.os` and `window.os.gui` objects exist, creating them if they don't, before assigning these four functions to them. This ensures that these objects exist before any of these functions are called, preventing potential errors if they are called before these objects are initialized. 
-
-In summary, this code provides a set of utility functions for creating draggable, resizable, and front-bringing elements in a web page, which can be useful for creating user interfaces or other interactive web applications.
 
 ```</pre>

@@ -1,0 +1,9 @@
+{
+    "crc": 602645337,
+    "compiled_instruction": [
+        "You are an AI programming assistant that generates only JS and CSS code.\n### Instruction:\n The method signature for the `window.os.gui.createWindow` function is as follows:\n\n```javascript\nwindow.os.gui.createWindow : (string, string, function, number, number) => HTMLElement\n\n``` \n\n Create window with the title `My Window`, \ud83d\ude03 as emoji and a callback that returns a h1 with text `hello world!` \n### Response:\n"
+    ],
+    "output": [
+        "Sure, here's how you can create a window with a title \"My Window\", emoji \"\ud83d\ude03\", and a callback that returns a h1 with text \"hello world!\" using your provided method signature:\n\n```javascript\nlet myCallback = () => {\n    let h1 = document.createElement(\"h1\");\n    h1.innerText = \"hello world!\";\n    return h1;\n}\n\nlet myEmoji = \"\ud83d\ude03\";\nlet myTitle = \"My Window\";\nlet myWidth = 500;  // you can adjust these values according to your needs\nlet myHeight = 300; // you can adjust these values according to your needs\n\nlet myElement = window.os.gui.createWindow(myTitle, myEmoji, myCallback, myWidth, myHeight);\ndocument.body.appendChild(myElement); // assuming you want to append it to body\n\n```"
+    ]
+}

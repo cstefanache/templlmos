@@ -1,12 +1,12 @@
 {
-    "apps": {        
+    "apps": {
         "app": {
             "disabled": false,
             "to": "head",
             "tag": "script",
             "rebuild": false,
             "library": true,
-            "libraryPrefix": " ### Instruction:\nGenerate `window.os.application` method signature:\n\n",
+            "libraryPrefix": "### Instruction:\nGenerate method signature for `registerApplication` function and prefix it with `window.os`\n",
             "librarySuffix": "\n### Response:\n",
             "dependencies": [
                 "window",
@@ -14,9 +14,10 @@
             ],
             "instructions": [
                 [
-                    "create a new function `application` on the `window.os` object that takes a title, emoji, callback, width=400 and height = 400:",
-                    "create an internal `initialize` function that creates a new window with the title, emoji, width and height and add child the element returned by executing of the callback passed as parameter",
-                    "call addApp with the emoji, title and initialize function"
+                    "create a new function `registerApplication` on the `window.os` object that takes a title, emoji, callback, width=400 and height = 400:",
+                    "create an internal `initialize` function that creates a new window with the title, emoji, callback, width and height ",
+                    "after initialized is defined, call `addApp` with the emoji, title and initialize function",
+                    "return null"
                 ]
             ]
         },
@@ -26,7 +27,6 @@
             "tag": "script",
             "dependencies": [
                 "app"
-                
             ],
             "instructions": [
                 [
@@ -34,7 +34,68 @@
                     " - creates a root dom element with class `hw`",
                     " - create a new `h1` element with the text `Hello, World!` and appends it to the root element",
                     " - return root dom element",
-                    "create `application` with 'hello world' title, 👋 as emoji, `helloWorld` function and 300x200 size"
+                    "register application with 'hello world' title, 👋 as emoji, `helloWorld` function and 300x200 size"
+                ]
+            ]
+        },
+       
+        "browser": {
+            "disabled": false,
+            "rebuild": false,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "app",
+                "filesystem",
+                "toolbar",
+                "app-icon"
+            ],
+            "instructions": [
+                [
+                    "Create a `browser` function that takes a `parent` parameter:",
+                    " - create a root dom element with class `browser`",
+                    " - set browserPath variable to `''`",
+                     " - generate internal load function that takes path parameter:",
+                    "   - set browserPath to the path",
+                    "   - removes all children of the root element",
+                    "   - if path is not empty, create a new `div` element with text `..` and on click call load with `path.split('/').slice(0, -1).join('/')`",
+                    "   - lists all files in the path",
+                    "   - on click, check if the entry isFile and if is false then call load on the new path",
+                    " - execute load on browserPath variable",
+                    " - create toolbar on the `parent` parameter",
+                    " - add button on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name",
+                    " - add button on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and '' as content",
+                    " - return root dom element",                 
+                    "exit function definition and register application with 'Browser' title, 📂 as emoji, `browser` function and 400x400 size"
+                ]
+            ]
+        },
+        "ide": {
+            "disabled": true,
+            "rebuild": false,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "app",
+                "toolbar"
+            ],
+            "instructions": [
+                [
+                    "create a new function `compile` that takes a code parameter and:",
+                    " - removes element with id `ide-development` if exists",
+                    " - sends a POST request to `localhost:8000/compiler` with the code as the body",
+                    " - creates a new `script` element with id `ide-development` and appends it to the body",
+                    " - sets the script element text to the response text"
+                ],
+                [
+                    "Create a `ide` function that takes `win` parameter:",
+                    " - creates a root dom element with class `ide`",
+                    " - adds a `textarea` element with class `editor` to the root element 100% width and 30 lines height",
+                    " - create toolbar on the `win` parameter",
+                    " - add button on the toolbar with `▶️` text and call `compile` (do not define) with the textarea value as a parameter",
+                    " - add button on the toolbar with `💾` text and alert `Save` as callback",
+                    " - return root dom element",
+                    "create `application` with 'IDE' title, 🧠 as emoji, `ide` function and 800x400 size"
                 ]
             ]
         }

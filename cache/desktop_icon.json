@@ -1,0 +1,10 @@
+{
+    "crc": 1380199761,
+    "compiled_instruction": [
+        "You are an AI programming assistant that generates only JS and CSS code.\n### Instruction:\n  \n\n Define a function called `icon` on `window.os` namespace that takes three parameters: parent, emoji, title and a callback:\n- create a root DOM element with the class `.icon` and add it to `parent`\n- add a span with the class `.emoji` and the emoji as its content\n- add a span with the class `.title` and the title as its content\n- when the icon is clicked, call the callback \n### Response:\n"
+    ],
+    "output": [
+        "Sure, here is how you can define this function in JavaScript:\n\n```javascript\n// Check if window.os exists, if not create it\nif (!window.os) {\n    window.os = {};\n}\n\n// Function to add icon to parent\nwindow.os.icon = function(parent, emoji, title, callback) {\n    // Create root DOM element\n    var icon = document.createElement('div');\n    icon.classList.add('icon');\n    \n    // Create span for emoji\n    var emojiSpan = document.createElement('span');\n    emojiSpan.classList.add('emoji');\n    emojiSpan.textContent = emoji;\n    \n    // Create span for title\n    var titleSpan = document.createElement('span');\n    titleSpan.classList.add('title');\n    titleSpan.textContent = title;\n    \n    // Append spans to icon\n    icon.appendChild(emojiSpan);\n    icon.appendChild(titleSpan);\n    \n    // Append icon to parent\n    parent.appendChild(icon);\n    \n    // Add click event listener to icon\n    icon.addEventListener('click', function() {\n        // Callback when icon is clicked\n        if (typeof callback === 'function') {\n            callback();\n        }\n    });\n};\n\n```"
+    ],
+    "library": "The method signature for the function `window.os.icon` is as follows:\n\n```javascript\nfunction(parent, emoji, title, callback)\n\n```"
+}

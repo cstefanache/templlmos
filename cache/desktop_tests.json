@@ -1,0 +1,9 @@
+{
+    "crc": 2715227997,
+    "compiled_instruction": [
+        "You are an AI programming assistant that generates only JS and CSS code.\n### Instruction:\n The function signature for `window.os.addApp` is as follows:\n\n```javascript\nwindow.os.addApp(emoji, title, callback);\n\n``` \n\n call addApp 10 times for 10 different emojis and random titles \n### Response:\n"
+    ],
+    "output": [
+        "Sure, here's a simple way to do it using a loop and some random data generation:\n\n```javascript\n// Array of emojis\nvar emojis = ['\ud83d\ude00', '\ud83d\ude02', '\ud83d\ude0d', '\ud83d\ude0e', '\ud83d\ude1c', '\ud83d\ude00', '\ud83d\ude02', '\ud83d\ude0d', '\ud83d\ude0e', '\ud83d\ude1c'];\n// Array of titles\nvar titles = ['Title1', 'Title2', 'Title3', 'Title4', 'Title5', 'Title6', 'Title7', 'Title8', 'Title9', 'Title10'];\n\n// Loop through the arrays\nfor (var i = 0; i < 10; i++) {\n    // Generate a random index within the array bounds\n    var randomIndex = Math.floor(Math.random() * emojis.length);\n    // Call addApp with the random emoji and title\n    window.os.addApp(emojis[randomIndex], titles[randomIndex], function() {\n        console.log('Callback called with emoji ' + emojis[randomIndex] + ' and title ' + titles[randomIndex]);\n    });\n}\n\n```"
+    ]
+}

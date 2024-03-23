@@ -1,10 +1,11 @@
 ## osbase_general-styles
-### Instruction: 0
+### Instruction: 1
 <pre style='text-wrap: wrap'>Generate CSS code
 ### Instruction:
  Apply a  lite pink color to the body 
 ### Response:
 </pre>
+#### Output: 0
 <pre style='text-wrap: wrap'>Sure, here is how you can apply a light pink color to your body using CSS:
 
 ```css

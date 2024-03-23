@@ -24,12 +24,13 @@
             "tag": "script",
             "rebuild": false,
             "library": true,
-            "libraryPrefix": " ### Instruction:\nlist all methods and prefix them with `window.os.fs`\n",
+            "libraryPrefix": " ### Instruction:\nlist all methods signatures, no description and prefix them with `window.os.fs`\n",
             "librarySuffix": "\n### Response:\n",
             "prefix": "`window.os` function is already defined.\n### Instruction:\n",
             "instructions": [
                 [
                     "Define the following on the `window.os` object under `fs` key:",
+                    "loads the `filesystem` object from the local storage.",
                     "* `sync()` - save the `filesystem` object to the local storage.",
                     "* `readPath(path)` - returns the content of the entry in the `filesystem` object at the given path. path should be split by `/` and the method should traverse the `filesystem` object and return the value at path (allow undefined). if the path starts with `/` remove the leading `/`",
                     "* `write(path, content)` - writes the content to an entry in the `filesystem` object at the given path and file name. in the end execute the `sync` method.",

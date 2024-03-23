@@ -1,9 +1,9 @@
 {
-    "crc": 580703958,
+    "crc": 4029693225,
     "compiled_instruction": [
-        " Generate browser vanilla JS code without the use of any library or framework. All the `os` functions are already defined.\n### Instruction:\n css style the `#desktop_content` id to match the following rules:\nabsolute position, fixed size, 100% width, 100% height, overflow-y hidden, padding of 10px, display flex, flex-wrap wrap, flex-direction column, align content: flex start \n### Response:\n"
+        "You are an AI programming assistant that generates only JS and CSS code.\n### Instruction:\n  \n\n css style the `#desktop_content` id to match the following rules:\nabsolute position, fixed size, 100% width, 100% height, overflow-y hidden, padding of 10px, display flex, flex-wrap wrap, flex-direction column, align content: flex start \n### Response:\n"
     ],
     "output": [
-        "Sure, you can achieve this by adding a CSS rule for the `#desktop_content` ID as follows:\n\n```css\n#desktop_content {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    overflow-y: hidden;\n    padding: 10px;\n    display: flex;\n    flex-wrap: wrap;\n    flex-direction: column;\n    align-content: flex-start;\n}\n\n```"
+        "Sure, here is a CSS snippet that matches your requirements:\n\n```css\n#desktop_content {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    overflow-y: hidden;\n    padding: 10px;\n    display: flex;\n    flex-wrap: wrap;\n    flex-direction: column;\n    align-content: flex-start;\n}\n\n```"
     ]
 }
