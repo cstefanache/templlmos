@@ -1,8 +1,8 @@
 ## desktop_styles
 ### Instruction: 1
-<pre style='text-wrap: wrap'>You are an AI programming assistant that generates only JS and CSS code.
+<pre style='text-wrap: wrap'>You are a frontend web developer, do not use jquery that writes only browser JS, JavaScript, HTML and CSS
 ### Instruction:
-  
+
 
  css style the `.icon` class to match the following rules:
 1. 64px width, 64px min height, text-align center, margin of 5px, pointer cursor
@@ -11,7 +11,7 @@
 ### Response:
 </pre>
 #### Output: 0
-<pre style='text-wrap: wrap'>Sure, here is a CSS snippet that matches your requirements:
+<pre style='text-wrap: wrap'>Sure, here is how you can define these styles in your CSS file:
 
 ```css
 .icon {
@@ -36,8 +36,8 @@
     padding: 5px;
     word-wrap: break-word;
     border: 2px solid black;
-    border-radius: 8px;
     background-color: white;
+    border-radius: 5px;
 }
 
 ```</pre>

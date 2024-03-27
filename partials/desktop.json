@@ -36,8 +36,6 @@
             "tag": "script",
             "rebuild": false,
             "library": true,
-            "libraryPrefix": " ### Instruction:\nGenerate method signature for `window.os.icon`:\n",
-            "librarySuffix": "\n### Response:\n",
             "dependencies": [],
             "instructions": [
                 [
@@ -55,8 +53,6 @@
             "tag": "script",
             "rebuild": false,
             "library": true,
-            "libraryPrefix": "### Instruction:\nList method signatures of the functions and prefix them with `window.os`\n",
-            "librarySuffix": "\n### Response:\n",
             "dependencies": [
                 "icon"
             ],
@@ -76,7 +72,7 @@
             ],
             "instructions": [
                 [
-                    "call addApp 10 times for 10 different emojis and random titles"
+                    "call addApp 10 times for 10 different emojis and random titles and callback to log the title when clicked"
                 ]
             ]
         }

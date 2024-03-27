@@ -20,20 +20,45 @@ class Compiler:
         self.llm = llm
         self.data = data
 
-    def process_output(self, output):
-        result = re.search(r"```\S{0,}\n(.*?)```", output, re.DOTALL).group(1)
-        return result
+    def process_output(self, output, single_group=True):
+        if single_group:
+            result = re.search(r"```\S{0,}\n(.*?)```", output, re.DOTALL).group(1)
+            return result
+        else:
+            groups = re.findall(r"```\S{0,}\n(.*?)```", output, re.DOTALL)
+            result = ""
+            for group in groups:
+                result += group + "\n"
+            return result
 
     def compile(self, partial, html, api):
-        (model, model_prefix, model_suffix, stop) = self.llm.get_prompt_wrappers()
+        (
+            model,
+            model_prefix,
+            model_suffix,
+            library_prefix,
+            library_suffix,
+            deps_prefix,
+            stop,
+        ) = self.llm.get_prompt_wrappers()
         for app, packages in partial.items():
             app_model = packages.get("model", model)
             app_prefix = packages.get("prefix", model_prefix)
             app_suffix = packages.get("suffix", model_suffix)
+            app_deps_prefix = packages.get("depsPrefix", deps_prefix)
+            app_library_prefix = packages.get("libraryPrefix", library_prefix)
+            app_library_suffix = packages.get("librarySuffix", library_suffix)
             self_api = ""
             for package_id, package in packages.items():
                 prefix = package.get("prefix", app_prefix)
                 suffix = package.get("suffix", app_suffix)
+                package_library_prefix = package.get(
+                    "libraryPrefix", app_library_prefix
+                )
+                package_library_suffix = package.get(
+                    "librarySuffix", app_library_suffix
+                )
+                package_deps_prefix = package.get("depsPrefix", app_deps_prefix)
                 model = package.get("model", app_model)
                 dependencies = package.get("dependencies", [])
                 disabled = package.get("disabled", False)
@@ -47,6 +72,11 @@ class Compiler:
                         compiled_dependencies += api[dependency]
                     except KeyError:
                         print(f"Dependency not found: {dependency}")
+
+                if len(compiled_dependencies) > 0:
+                    compiled_dependencies = (
+                        f"{package_deps_prefix} {compiled_dependencies}"
+                    )
 
                 to = package.get("to")
                 tag = package.get("tag")
@@ -109,17 +139,30 @@ class Compiler:
                 package_src = ""
                 for res in output:
                     package_src += self.process_output(res)
-                
+
                 if library:
-                    if not skip_compilation or "library" not in cache_data:
-                        libraryPrefix = package.get("libraryPrefix", prefix)
-                        librarySuffix = package.get("librarySuffix", suffix)
-                        self_api = self.llm.call_llm(
-                            model, f"{libraryPrefix} {package_src} {librarySuffix}"
+                    if not preventRebuild and not skip_compilation or "library" not in cache_data:
+                        libraryPrefix = package.get(
+                            "libraryPrefix", package_library_prefix
                         )
+                        librarySuffix = package.get(
+                            "librarySuffix", package_library_suffix
+                        )
+                        self_api = self.llm.call_llm(
+                            model,
+                            f"{libraryPrefix} {package_src} {librarySuffix}",
+                            include_stop=False,
+                        )
+                        library_input = f"{libraryPrefix} {package_src} {librarySuffix}"
+                        # try:
+                        #     self_api = self.process_output(self_api, single_group=False)
+                        # except:  # noqa: E722
+                        #     print("Error processing API", package_id)
                         cache_data["library"] = self_api
+                        cache_data["library_input"] = library_input
                     else:
                         self_api = cache_data["library"]
+                        library_input = cache_data["library_input"]
                         print(">>> setting self_api from cache", package_id)
 
                     api[package_id] = self_api
@@ -140,18 +183,18 @@ class Compiler:
                     file.write(f"## {app}_{package_id}\n")
                     if library:
                         file.write(f"### API\n")
+                        file.write(
+                            f"<pre style='text-wrap: wrap'>{library_input}</pre>\n"
+                        )
                         file.write(f"<pre style='text-wrap: wrap'>{self_api}</pre>\n")
 
-                    for i, res in enumerate(cache_data["compiled_instruction"]):                     
+                    for i, res in enumerate(cache_data["compiled_instruction"]):
                         file.write(f"### Instruction: {i+1}\n")
                         instr = cache_data["compiled_instruction"][i]
-                        out = cache_data["output"][i]              
+                        out = cache_data["output"][i]
                         file.write(f"<pre style='text-wrap: wrap'>{instr}</pre>\n")
                         file.write(f"#### Output: {i}\n")
                         file.write(f"<pre style='text-wrap: wrap'>{out}</pre>\n")
-
-                   
-
 
                 to_html["_children_"].append(html_output)
 

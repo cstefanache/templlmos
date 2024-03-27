@@ -59,18 +59,15 @@
             "tag": "script",
             "rebuild": false,
             "library": true,
-            "libraryPrefix": "### Instruction:\nList method signatures of the functions and prefix them with `window.os.gui`\n",
-            "librarySuffix": "\n### Response:\n",
-            "prefix": "do not use jquery.\n `window.os` object is already defined.\n### Instruction:\n",
             "instructions": [
                 [
                     "Implement the following functions on the `window.os` object under `gui` key:",
-                    "- `makeDraggable(root, dragHandle)` - drag the root  by dragging the dragHandle element. Both root and dragHandle are DOM elements."
+                    "- `makeDraggable(root, dragHandleHTMLElement)` - when user is dragging the dragHandleHTMLElement, move the root HTMLElement"
                 ],
                 [
                     "Implement the following functions on the `window.os` object under `gui` key:",
-                    "`makeResizable(root, resizeHandleDOMElement) that:` ",
-                    " - resize (both width and height) the root element by dragging the resizeHandle DOM element.",
+                    "`makeResizable(root, resizeHandleHTMLElement) that:` ",
+                    " - resize (both width and height) the root HTMLElement element by dragging the resizeHandle DOM element.",
                     " - update starting width and height on mouseup"
                 ],
                 [
@@ -83,18 +80,13 @@
                 ]
             ]
         },
-       
         "gui-tests": {
             "to": "body",
             "tag": "script",
-            "disabled": false,
-            "dependencies": [
-                "draggable"
-            ],
+            "disabled": true,
+            "dependencies": [],
             "preventRebuild": false,
-            "instructions": [
-               
-            ]
+            "instructions": []
         },
         "titleBar": {
             "disabled": false,
@@ -102,9 +94,6 @@
             "tag": "script",
             "rebuild": false,
             "library": true,
-            "libraryPrefix": "### Instruction:\nList method signatures of the functions and prefix them with `window.os.gui`\n",
-            "librarySuffix": "\n### Response:\n",
-            "prefix": "{deps} Generate browser vanilla JS code without the use of any library or framework. `window.os` function is already defined.\n### Instruction:\n",
             "instructions": [
                 [
                     "Define a function called `titleBar` object on `window.os.gui` that takes two parameter: parentElement (DOM element), title (string), and a callback `close` and has the following functionality:",
@@ -115,45 +104,13 @@
                 ]
             ]
         },
-        "window": {
-            "disabled": false,
-            "to": "head",
-            "tag": "script",
-            "rebuild": false,
-            "library": true,
-            "libraryPrefix": "### Instruction:\nGenerate `window.os.gui.createWindow` method signature and prefix them with `window.os.gui`\n",
-            "librarySuffix": "\n### Response:\n",
-            "dependencies": [
-                "titleBar",
-                "draggable"
-            ],
-            "instructions": [
-                [
-                    "Define a function called `window.os.gui.createWindow` that takes four parameters: emoji, title, appCallback and width and height that are defaulting to 400 and 300, respectively if not passed and have the following functionality:",
-                    "- create a root DOM element with the class `.window`, no styles, and add it to document body in the middle of the document",
-                    "- call bringToFront on the root element",
-                    "- add and empty div with class `titlePlaceholder` to the root DOM element",
-                    "- add and empty div with class `toolbarPlaceholder` to the root DOM element",
-                    "- add and empty div with class `contentPlaceholder` to the root DOM element",
-                    "- add and empty div with class `statusPlaceholder` to the root DOM element",
-                    "- add a resize handle to the root DOM element with class `resizeHandle`",
-                    "- add titleBar to `.titlePlaceholder` having the text `emoji + title` and close callback removes root DOM element from the document body",
-                    "- append to `contentPlacheolder` the execution of appCallback with the root element as parameter to it",
-                    "- call makeDraggable on root element by the `.titlePlaceholder` element",
-                    "- make root element resizable by the `resizeHandle` element",
-                    "- return root DOM element"
-                ]
-            ]
-        },
         "toolbar": {
             "disabled": false,
             "to": "head",
             "tag": "script",
             "rebuild": false,
-            "library": true,
-            "libraryPrefix": "### Instruction:\nList method signatures of the functions and prefix them with `window.os.gui`\n",
-            "librarySuffix": "\n### Response:\n",
             "dependencies": [],
+            "library": true,
             "instructions": [
                 [
                     "Define a function called `createToolbar` on the `window.os.gui` object that takes one parameter `parent`",
@@ -164,16 +121,51 @@
                 ]
             ]
         },
+        "window": {
+            "disabled": false,
+            "to": "head",
+            "tag": "script",
+            "rebuild": false,
+            "preventRebuild": false,
+            "library": true,
+            "dependencies": [
+                "titleBar",
+                "draggable",
+                "gui-tests"
+            ],
+            "instructions": [
+                [
+                    "Define a function called `createWindow` on the `window.os.gui` object that takes four parameters: emoji, title, width and height that are defaulting to 400 and 300, respectively if not passed and have the following functionality:",
+                    "- create a root DOM element with the class `.window`, set the width and height only, and add it to document body in the middle of the document",
+                    "- call bringToFront on the root element",
+                    "- add and empty div with class `titlePlaceholder` to the root DOM element",
+                    "- add and empty div with class `toolbarPlaceholder` to the root DOM element",
+                    "- add and empty div with class `contentPlaceholder` to the root DOM element",
+                    "- add and empty div with class `statusPlaceholder` to the root DOM element",
+                    "- add a resize handle to the root DOM element with class `resizeHandle`",
+                    "- add titleBar to `.titlePlaceholder` having the text `emoji + title` and close callback removes root DOM element from the document body",
+                    "- make root element draggable by the `.titlePlaceholder` element",
+                    "- make root element resizable by the `resizeHandle` element",
+                    "- set root DOM element left position document width divided by 2 minus width divided by 2",
+                    "- set root DOM element top position document height divided by 2 minus height divided by 2",
+                    "- return root DOM element"
+                ],
+                [
+                    "Define a function called `attachToWindow` on the `window.os.gui` object that takes two parameters: windowElement and contentElement that takes the contentElement and appends it to the `.contentPlaceholder` of the windowElement"
+                ]
+            ]
+        },
         "tests": {
             "disabled": true,
             "to": "body",
             "tag": "script",
+            "preventRebuild": false,
             "dependencies": [
                 "window"
             ],
             "instructions": [
                 [
-                    "Create window with the title `My Window`, 😃 as emoji and a callback that returns a h1 with text `hello world!`"
+                    "create an element h1 with text `hello world!` and attach to a window with title `Hello World` and emoji `🌍` having 300x200 size"
                 ]
             ]
         }

@@ -1,9 +1,9 @@
 {
-    "crc": 4029693225,
+    "crc": 2036882441,
     "compiled_instruction": [
-        "You are an AI programming assistant that generates only JS and CSS code.\n### Instruction:\n  \n\n css style the `#desktop_content` id to match the following rules:\nabsolute position, fixed size, 100% width, 100% height, overflow-y hidden, padding of 10px, display flex, flex-wrap wrap, flex-direction column, align content: flex start \n### Response:\n"
+        "You are a frontend web developer, do not use jquery that writes only browser JS, JavaScript, HTML and CSS\n### Instruction:\n\n\n css style the `#desktop_content` id to match the following rules:\nabsolute position, fixed size, 100% width, 100% height, overflow-y hidden, padding of 10px, display flex, flex-wrap wrap, flex-direction column, align content: flex start \n### Response:\n"
     ],
     "output": [
-        "Sure, here is a CSS snippet that matches your requirements:\n\n```css\n#desktop_content {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    overflow-y: hidden;\n    padding: 10px;\n    display: flex;\n    flex-wrap: wrap;\n    flex-direction: column;\n    align-content: flex-start;\n}\n\n```"
+        "Sure, you can achieve this by adding the following CSS code:\n\n```css\n#desktop_content {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    overflow-y: hidden;\n    padding: 10px;\n    display: flex;\n    flex-wrap: wrap;\n    flex-direction: column;\n    align-content: flex-start;\n}\n\n```"
     ]
 }

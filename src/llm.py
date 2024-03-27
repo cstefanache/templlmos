@@ -20,6 +20,9 @@ class LLM:
                     model["model"],
                     model["prefix"],
                     model["suffix"],
+                    model["libraryPrefix"],
+                    model["librarySuffix"],
+                    model["depsPrefix"],
                     model.get("stop", None),
                 )
 
@@ -27,6 +30,9 @@ class LLM:
                 model["model"],
                 model["prefix"],
                 model["suffix"],
+                model["libraryPrefix"],
+                model["librarySuffix"],
+                model["depsPrefix"],
                 model.get("stop", None),
             )
 
@@ -52,9 +58,9 @@ class LLM:
         else:
             return self.default_wrappers
 
-    def call_llm(self, model_name, instruction):
+    def call_llm(self, model_name, instruction, include_stop = True):
         model = self.runtime_models[model_name]
-        (name, pre, suff, stop) = self.prompt_wrappers[model_name]
+        (name, pre, suff, lib_pre, lib_suff, deps_prefix, stop) = self.prompt_wrappers[model_name]
         output = model(
             instruction,
             max_tokens=4096,
@@ -63,7 +69,7 @@ class LLM:
             temperature=0.0,
             repeat_penalty=1.1,
             stream=True,
-            stop=[stop] if stop is not None else None,
+            stop=[stop] if stop is not None and include_stop is True else None,
         )
 
         # read from output stream generator

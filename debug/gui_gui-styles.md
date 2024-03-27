@@ -1,8 +1,8 @@
 ## gui_gui-styles
 ### Instruction: 1
-<pre style='text-wrap: wrap'>You are an AI programming assistant that generates only JS and CSS code.
+<pre style='text-wrap: wrap'>You are a frontend web developer, do not use jquery that writes only browser JS, JavaScript, HTML and CSS
 ### Instruction:
-  
+
 
  css style for a .titleBar class to follow the following rules:
 - orange background color, a black bottom border of 1px solid
@@ -28,23 +28,24 @@
     font-size: small;
     padding: 5px;
     border-bottom: 2px solid black;
-    user-select: none; /* This will prevent text selection */
 }
 
-/* This will apply styles to buttons inside titleBar */
 .titleBar button {
     border: none;
     background: none;
     cursor: pointer;
-    font-size: 6px;
+    font-size: 6;
     padding: 0;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10+ */
+    user-select: none; /* Standard syntax */
 }
 
 ```</pre>
 ### Instruction: 2
-<pre style='text-wrap: wrap'>You are an AI programming assistant that generates only JS and CSS code.
+<pre style='text-wrap: wrap'>You are a frontend web developer, do not use jquery that writes only browser JS, JavaScript, HTML and CSS
 ### Instruction:
-  
+
 
  css style for a .window class to follow the following rules:
 - white background color and a padding of 1px
@@ -67,12 +68,14 @@
     position: absolute;
     display: flex;
     flex-direction: column;
-    background-color: white;
-    padding: 0;
-    border: 2px solid black;
-    border-radius: 8px;
     overflow: hidden;
     box-shadow: 4px 4px 0 0 rgba(0,0,0,0.5);
+    border-radius: 8px;
+    border: 2px solid black;
+    background-color: white;
+    padding: 0;
+    width: /* specify your width */;
+    height: /* specify your height */;
 }
 
 .contentPlaceholder {
@@ -89,9 +92,9 @@
 
 ```</pre>
 ### Instruction: 3
-<pre style='text-wrap: wrap'>You are an AI programming assistant that generates only JS and CSS code.
+<pre style='text-wrap: wrap'>You are a frontend web developer, do not use jquery that writes only browser JS, JavaScript, HTML and CSS
 ### Instruction:
-  
+
 
  css style for a  `.resizeHandle` class with the following rules:
 - a width and height of 0px
@@ -123,9 +126,9 @@
 
 ```</pre>
 ### Instruction: 4
-<pre style='text-wrap: wrap'>You are an AI programming assistant that generates only JS and CSS code.
+<pre style='text-wrap: wrap'>You are a frontend web developer, do not use jquery that writes only browser JS, JavaScript, HTML and CSS
 ### Instruction:
-  
+
 
  css style for a .toolbar class to follow the following rules:
 - a padding of 2px
@@ -141,16 +144,16 @@ inner buttons have:
 ### Response:
 </pre>
 #### Output: 3
-<pre style='text-wrap: wrap'>Sure, here is the CSS code you requested:
+<pre style='text-wrap: wrap'>Sure, here is the CSS code you need:
 
 ```css
 .toolbar {
     display: flex;
     justify-content: flex-start;
     padding: 2px;
-    background-color: antiquewhite;
     margin-bottom: 2px;
     border-bottom: 1px solid black;
+    background-color: antiquewhite;
 }
 
 .toolbar button {

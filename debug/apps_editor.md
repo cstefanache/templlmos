@@ -1,4 +1,4 @@
-## apps_browser
+## apps_editor
 ### Instruction: 1
 <pre style='text-wrap: wrap'>You are a frontend web developer, do not use jquery that writes only browser JS, JavaScript, HTML and CSS
 ### Instruction:
@@ -115,67 +115,48 @@ Please note, this code assumes `window.os` exists and `registerExtension` is a m
 
 ```
 
- Create a function `browser` that takes a `parent` parameter with the following functionality:
- - create a root dom element with class `browser`
- - set browserPath variable to `''`
- - generate internal load function that takes path parameter:
-   - set browserPath to the path
-   - removes all children of the root element
-   - if path is not empty, create a new `div` element with text `..` and on click call load with `path.split('/').slice(0, -1).join('/')`
-   - lists all files in the path that saves isFile to a constant and appends child to the root element the result of calling appIcon with isFile, path, name and load as callback
- - execute load on browserPath variable
+ Create a function `editor` that takes a `parent` and `path` parameters with the following functionality:
+ - creates a root dom element
  - create toolbar on the `parent` parameter
- - add button on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name
- - add button on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and '' as content
+ - add button on the toolbar with `💾` text and prompt for a name
+ - add a textarea element with class `editor` to the root element 100% width and 30 lines height
  - return root dom element
-after function is defined, register application with 'Browser' title, 📂 as emoji, already defined `browser` function and 400x400 size 
+after function is defined, register application with 'Editor' title, ✍️ as emoji, `editor` function and 500x400 size 
 ### Response:
 </pre>
 #### Output: 0
-<pre style='text-wrap: wrap'>Here's how you can define this functionality in JavaScript:
+<pre style='text-wrap: wrap'>Here's how you can define your `editor` function and register your application using it:
 
 ```javascript
-function browser(parent) {
-    const root = document.createElement('div');
-    root.className = 'browser';
-    let browserPath = '';
-    const load = (path) => {
-        browserPath = path;
-        root.innerHTML = '';
-        if (path !== '') {
-            const upButton = document.createElement('div');
-            upButton.innerHTML = '..';
-            upButton.onclick = () => load(path.split('/').slice(0, -1).join('/'));
-            root.appendChild(upButton);
-        }
-        const files = window.os.fs.ls(path);
-        files.forEach(name => {
-            const isFile = window.os.fs.isFile(path + '/' + name);
-            const element = window.os.appIcon(isFile, path + '/' + name, name, () => load(path + '/' + name));
-            root.appendChild(element);
-        });
-    };
-    load(browserPath);
-    const toolbarManager = window.os.gui.createToolbar(parent);
-    toolbarManager.addButton('📁', () => {
-        const name = prompt('Enter directory name');
-        window.os.fs.mkdir(browserPath + '/' + name);
-        load(browserPath);
+function editor(parent, path) {
+    // Create root DOM element
+    var rootElement = document.createElement('div');
+    rootElement.style.width = '100%';
+    
+    // Create toolbar
+    var toolbarManager = window.os.gui.createToolbar(parent);  // create toolbar and return its manager
+    toolbarManager.addButton('💾', function() {  // add button with text "💾" and callback function
+        var name = prompt('Enter file name');  // prompt for file name
+        window.os.fs.write(path + '/' + name, '');  // write empty file at given path
     });
-    toolbarManager.addButton('📄', () => {
-        const name = prompt('Enter file name');
-        window.os.fs.write(browserPath + '/' + name, '');
-        load(browserPath);
-    });
-    return root;
+    
+    // Add textarea element
+    var textarea = document.createElement('textarea');
+    textarea.className = 'editor';
+    textarea.style.width = '100%';
+    textarea.style.height = '300px';
+    rootElement.appendChild(textarea);
+    
+    // Return root DOM element
+    return rootElement;
 }
 
 // Register application
-const emoji = '📂';
-const title = 'Browser';
-const width = 400;
-const height = 400;
-const callback = (parent) => browser(parent);
-window.os.registerApplication(title, emoji, callback, width, height);
+var emoji = '✍️';
+var title = 'Editor';
+var width = 500; 
+var height = 400; 
+var callback = (path) => { return editor(document.body, path); };  // pass path as parameter to editor function
+window.os.registerApplication(title, emoji, callback, width, height);  // register application with title, emoji, callback, width and height
 
 ```</pre>

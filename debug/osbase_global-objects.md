@@ -1,18 +1,14 @@
 ## osbase_global-objects
 ### Instruction: 1
-<pre style='text-wrap: wrap'>You are an AI programming assistant that generates only JS and CSS code.
+<pre style='text-wrap: wrap'>You are a frontend web developer, do not use jquery that writes only browser JS, JavaScript, HTML and CSS
 ### Instruction:
-  
+
 
  Create a new empty object `os` on the window global object 
 ### Response:
 </pre>
 #### Output: 0
 <pre style='text-wrap: wrap'>```javascript
-if (typeof window !== 'undefined') {
-    window.os = {};
-} else {
-    console.error("This script is meant to run in a browser environment.");
-}
+window.os = {};
 
 ```</pre>

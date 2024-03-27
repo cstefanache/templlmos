@@ -18,28 +18,6 @@
                     "Create a new empty object `os` on the window global object"
                 ]
             ]
-        },
-        "filesystem": {
-            "to": "head",
-            "tag": "script",
-            "rebuild": false,
-            "library": true,
-            "libraryPrefix": " ### Instruction:\nlist all methods signatures, no description and prefix them with `window.os.fs`\n",
-            "librarySuffix": "\n### Response:\n",
-            "prefix": "`window.os` function is already defined.\n### Instruction:\n",
-            "instructions": [
-                [
-                    "Define the following on the `window.os` object under `fs` key:",
-                    "loads the `filesystem` object from the local storage.",
-                    "* `sync()` - save the `filesystem` object to the local storage.",
-                    "* `readPath(path)` - returns the content of the entry in the `filesystem` object at the given path. path should be split by `/` and the method should traverse the `filesystem` object and return the value at path (allow undefined). if the path starts with `/` remove the leading `/`",
-                    "* `write(path, content)` - writes the content to an entry in the `filesystem` object at the given path and file name. in the end execute the `sync` method.",
-                    "* `ls(path) - returns a list of entries in the `filesystem` object at the given path. if path is empty or not found, return the root entries. if the path starts with `/` remove the leading `/`",
-                    "* `mkdir(path, dirName)` - creates a new directory in the `filesystem` object at the given path and directory name. in the end execute the `sync` method.",
-                    "* `rm(path)` - removes the object at the given path and file name. in the end execute the `sync` method.",
-                    "* `isFile(path)` - returns true the entry at the given path is a string."
-                ]
-            ]
         }
     }
 }
