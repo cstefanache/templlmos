@@ -57,6 +57,32 @@ class LLM:
             return self.prompt_wrappers[model_name]
         else:
             return self.default_wrappers
+        
+    def call_default_llm(self, instruction, update_fn = None):
+        (name, pre, suff, lib_pre, lib_suff, deps_prefix, stop) = self.default_wrappers
+        output = self.runtime_models[name](
+            pre + instruction + suff,
+            max_tokens=4096,
+            top_k=40,
+            seed=0,
+            temperature=0.0,
+            repeat_penalty=1.1,
+            stream=True,
+            stop=[stop],
+        )
+
+        # read from output stream generator
+        result = ""
+        for chunk in output:
+            val = chunk["choices"][0]["text"]
+            result += val
+            if update_fn is not None:
+                update_fn(val)
+            print(val, end="")
+
+        result += "\n```"
+        update_fn("\n```")
+        return result
 
     def call_llm(self, model_name, instruction, include_stop = True):
         model = self.runtime_models[model_name]

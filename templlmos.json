@@ -15,6 +15,7 @@
         "os.json",
         "filesystem.json",
         "desktop.json",
+        "output.json",
         "gui.json",
         "registry.json",
         "apps.json"

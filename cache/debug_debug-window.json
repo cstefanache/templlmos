@@ -1,0 +1,9 @@
+{
+    "crc": 3188036971,
+    "compiled_instruction": [
+        "You are a frontend web developer, do not use jquery that writes only browser JS, JavaScript, HTML and CSS\n### Instruction:\n\n\n create and append to body a pre element having the class `debug` and id `debug`\ncreate an internal function that fetches the content from 'http://localhost:8080/output' and sets the innerHTML of the debug div to the fetched content\ncalls http://localhost:8080/ping and if the response is 200 then set an interval to call the internal function every 1000ms \n### Response:\n"
+    ],
+    "output": [
+        "Here is how you can achieve this using pure JavaScript. \n\n```javascript\n// Create and append to body a pre element having the class 'debug' and id 'debug'\nvar debugDiv = document.createElement('pre');\ndebugDiv.id = 'debug';\ndebugDiv.className = 'debug';\ndocument.body.appendChild(debugDiv);\n\n// Internal function that fetches the content from 'http://localhost:8080/output' \n// and sets the innerHTML of the debug div to the fetched content\nfunction fetchContent() {\n    fetch('http://localhost:8080/output')\n        .then(response => response.text())\n        .then(data => { debugDiv.innerHTML = data; })\n        .catch(error => console.error('Error:', error));\n}\n\n// Call http://localhost:8080/ping \nfetch('http://localhost:8080/ping')\n    .then(response => {\n        if (response.status === 200) {\n            // If response is 200, set an interval to call the internal function every 1000ms \n            setInterval(fetchContent, 1000);\n        } else {\n            console.error('Ping failed with status', response.status);\n        }\n    })\n    .catch(error => console.error('Error:', error));\n\n```"
+    ]
+}

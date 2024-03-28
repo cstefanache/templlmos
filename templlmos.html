@@ -195,6 +195,20 @@ window.os.addApp = function(emoji, title, callback) {
 
 })()
   </script>
+  <style id="debug_styles">
+   .debug {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* semi-transparent black */
+    color: white; /* white text */
+    white-space: pre-wrap; /* text wrap */
+    padding: 10px; /* padding */
+    margin: 0; /* no margins */
+}
+  </style>
   <style id="gui_gui-styles">
    .titleBar {
     background-color: orange;
@@ -605,10 +619,59 @@ window.os.registerApplication = function(title, emoji, callback, width=400, heig
     flex-wrap: wrap;
 }
   </style>
+  <style id="apps_assistant-styles">
+   .chat {
+    display: flex;
+    flex-direction: column;
+}
+
+.results {
+    width: 100%;
+    height: 300px;
+    overflow-y: scroll;
+    margin: 10px;
+}
+
+.results pre {
+    white-space: pre-wrap;
+}
+  </style>
  </head>
  <body>
   <div id="desktop_content">
   </div>
+  <script id="debug_debug-window">
+   (() => {
+// Create and append to body a pre element having the class 'debug' and id 'debug'
+var debugDiv = document.createElement('pre');
+debugDiv.id = 'debug';
+debugDiv.className = 'debug';
+document.body.appendChild(debugDiv);
+
+// Internal function that fetches the content from 'http://localhost:8080/output' 
+// and sets the innerHTML of the debug div to the fetched content
+function fetchContent() {
+    fetch('http://localhost:8080/output')
+        .then(response => response.text())
+        .then(data => { debugDiv.innerHTML = data; })
+        .catch(error => console.error('Error:', error));
+}
+
+// Call http://localhost:8080/ping 
+fetch('http://localhost:8080/ping')
+    .then(response => {
+        if (response.status === 200) {
+            // If response is 200, set an interval to call the internal function every 1000ms 
+            setInterval(fetchContent, 1000);
+        } else {
+            console.error('Ping failed with status', response.status);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+
+
+})()
+  </script>
   <script id="registry_hello-world">
    (() => {
 // Define your helloWorld function
@@ -735,6 +798,105 @@ function createBrowser(parent) {
 
 // Register application with 'Browser' title, 📂 as emoji, createBrowser function as callback and 400x400 size 
 window.os.registerApplication('Browser', '📂', createBrowser, 400, 400); 
+
+
+})()
+  </script>
+  <script id="apps_run">
+   (() => {
+// Define your application's callback function
+const application = (parent) => {
+  // Create root DOM element
+  const root = document.createElement('div');
+  root.className = 'chat';
+  parent.appendChild(root);
+  
+  // Create input element
+  const input = document.createElement('input');
+  input.style.width = '100%';
+  input.addEventListener('keyup', (event) => {
+    if (event.key === 'Enter') {
+      // Save input value to instruction variable
+      const instruction = event.target.value;
+      event.target.value = '';
+      
+      // POST instruction to server
+      fetch('http://localhost:8080', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ instruction: instruction, full: false })
+      })
+      .then(response => response.text())
+      .then(data => {
+        // Add script tag to body with response text content
+        const script = document.createElement('script');
+        script.id = 'run-script';
+        script.textContent = data;
+        document.body.appendChild(script);
+      });
+    }
+  });
+  root.appendChild(input);
+  
+  return root;
+};
+
+// Register your application
+window.os.registerApplication('Run', '▶️', application, 400, 70); 
+
+
+})()
+  </script>
+  <script id="apps_assistant">
+   (() => {
+// Define your assistant function
+const assistant = (parent) => {
+  // Create root dom element with class 'chat'
+  const chat = document.createElement('div');
+  chat.className = 'chat';
+  parent.appendChild(chat);
+  
+  // Create div element with class 'results'
+  const results = document.createElement('div');
+  results.style.width = '100%';
+  results.style.height = '300px';
+  results.className = 'results';
+  chat.appendChild(results);
+  
+  // Create input element
+  const input = document.createElement('input');
+  input.style.width = '100%';
+  chat.appendChild(input);
+  
+  // Add button
+  const button = document.createElement('button');
+  button.textContent = '➡️';
+  button.onclick = () => {
+    // Save input value to instruction variable
+    const instruction = input.value;
+    input.value = '';  // Clear input
+    
+    // POST request
+    fetch('http://localhost:8080', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ instruction: instruction, full: true })
+    })
+    .then(response => response.text())  // Get response text
+    .then(data => {
+      // Add pre tag with response text content to results
+      const pre = document.createElement('pre');
+      pre.textContent = data;
+      results.appendChild(pre);
+    });
+  };
+  chat.appendChild(button);
+  
+  return chat;  // Return dom element
+};
+
+// Register your assistant application
+window.os.registerApplication('Assistant', '👨🏽‍⚕️', assistant, 400, 400);  // assuming os object has been defined elsewhere
 
 
 })()

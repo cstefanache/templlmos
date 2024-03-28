@@ -68,6 +68,64 @@
                     "register application with 'Browser' title, 📂 as emoji, browser and 400x400 size"
                 ]
             ]
+        },
+       
+        "run": {
+            "disabled": false,
+            "rebuld": false,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "registry"
+            ],
+
+            "instructions": [
+                [
+                    "Create an `application` function that takes a parent parameter having the following functionality:",
+                    " - create a root dom element with class `chat`",
+                    " - create an input element with 100% width with keyup event listener that on enter key press:",
+                    "   - save the input value to instruction variable and clear the input",
+                    "   - POST the json having instruction and full as false to `http://localhost:8080`, on response add a script tag to the body with id `run-script` and add the response text content to the script tag",
+                    " - return dom element",
+                    "call register application with 'Run' title, ▶️ as emoji, already defined `application` function reference and 400x70 size"
+                ]
+            ]
+        },
+        "assistant-styles": {
+            "disabled": false,
+            "rebuild": false,
+            "to": "head",
+            "tag": "style",
+            "dependencies": [],
+            "instructions": [
+                [
+                    "style .chat class to have display flex and flex-direction column",
+                    "style .results class to have 100% width and 300px height, overflow-y scroll and margin 10px",
+                    "style .results pre to have white-space pre-wrap"
+                ]
+            ]
+        },
+        "assistant": {
+            "disabled": false,
+            "rebuld": false,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "registry"
+            ],
+            "instructions": [
+                [
+                    "Create a `assistant` function that takes a parent parameter:",
+                    " - create a root dom element with class `chat`",
+                    " - create a div element with 100% width and 300px height with class `results`",
+                    " - create an input element with 100% width",
+                    " - add a button with `➡️` text and on click:",
+                    "   - save the input value to instruction variable and clear the input",
+                    "   - POST the json having instruction and full as true to `http://localhost:8080`, on response add pre tag with the response text content to the results",
+                    " return dom element",
+                    "call register application with 'Assistant' title, 👨🏽‍⚕️ as emoji, already defined `assistant` function reference and 400x400 size"
+                ]
+            ]
         }
     }
 }
