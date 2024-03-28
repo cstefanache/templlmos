@@ -1,0 +1,42 @@
+{
+    "osbase": {
+        "filesystem": {
+            "to": "head",
+            "tag": "script",
+            "rebuild": false,
+            "library": true,
+            "instructions": [
+                [
+                    "Load the `filesystem` object from the local storage as json",
+                    "Define the `window.os.fs` object and define the following functions on it:",
+                    "- Define the `window.os.fs.sync` function that save the `filesystem` object to the local storage.",
+                    "- Define the `window.os.fs.readPath` function that returns the content of the entry in the `filesystem` object at the given path. path should be split by `/` and the method should traverse the `filesystem` object and return the value at path (allow undefined). if the path starts with `/` remove the leading `/`",
+                    "- Define the `window.os.fs.write` function that writes the content to an entry in the `filesystem` object at the given path and file name. in the end execute the `sync` method.",
+                    "- Define the `window.os.fs.ls` function that returns a list of entries in the `filesystem` object at the given path. if path is empty or not found, return the root entries. if the path starts with `/` remove the leading `/`",
+                    "- Define the `window.os.fs.mkdir` function that creates a new directory in the `filesystem` object at the given path and directory name. in the end execute the `sync` method.",
+                    "- Define the `window.os.fs.rm` function that removes the object at the given path and file name. in the end execute the `sync` method.",
+                    "- Define the `window.os.fs.isFile` function that returns true the entry at the given path is a string."
+                ]
+            ]
+        },
+        "tests": {
+            "to": "body",
+            "tag": "script",
+            "disabled": true,
+            "rebuild": false,
+            "library": false,
+            "dependencies": [
+                "filesystem"
+            ],
+            "instructions": [
+                [
+                    "create a new directory in the root directory called `fstest`",
+                    "create a new file in the `fstest` directory called `test.txt` with the content `hello world`",
+                    "list the entries in the `fstest` directory and log it to console",
+                    "read the content of the `fstest/test.txt` file and log it to console",
+                    "remove the `fstest` directory"
+                ]
+            ]
+        }
+    }
+}

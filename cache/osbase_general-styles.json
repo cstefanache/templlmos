@@ -1,0 +1,9 @@
+{
+    "crc": 804978605,
+    "compiled_instruction": [
+        "Generate CSS code\n### Instruction:\n Apply a lite pink color to the body and overflow hidden \n### Response:\n"
+    ],
+    "output": [
+        "Sure, here is an example of how you can apply a light pink color to the body using CSS and make it overflow hidden.\n\n```css\nbody {\n    background-color: #ffe4e1; /* This is a light pink color */\n    overflow: hidden; /* This will hide any content that exceeds the size of the element */\n}\n\n```"
+    ]
+}

@@ -1,0 +1,82 @@
+
+### Instruction:
+You are a javascript developer that documents all the declared functions by providing sample usage.
+```
+// Load filesystem object from local storage if it exists
+let filesystem = JSON.parse(localStorage.getItem('filesystem')) || {};
+
+// Define window.os.fs object
+if (!window.os) { window.os = {}; }
+if (!window.os.fs) { window.os.fs = {}; }
+
+// Define sync function
+window.os.fs.sync = function() {
+    localStorage.setItem('filesystem', JSON.stringify(filesystem));
+}
+
+// Define readPath function
+window.os.fs.readPath = function(path) {
+    if (path[0] === '/') { path = path.substring(1); } // remove leading '/' if exists
+    let pathArray = path.split('/');
+    let current = filesystem;
+    for (let i = 0; i < pathArray.length; i++) {
+        if (current[pathArray[i]] === undefined) { return undefined; } // path not found
+        current = current[pathArray[i]];
+    }
+    return current;
+}
+
+// Define write function
+window.os.fs.write = function(path, content) {
+    if (path[0] === '/') { path = path.substring(1); } // remove leading '/' if exists
+    let pathArray = path.split('/');
+    let current = filesystem;
+    for (let i = 0; i < pathArray.length - 1; i++) { // skip last element (file name)
+        if (current[pathArray[i]] === undefined) { current[pathArray[i]] = {}; } // create path if it doesn't exist
+        current = current[pathArray[i]];
+    }
+    current[pathArray[pathArray.length - 1]] = content; // set content of file at path
+    this.sync(); // save changes to filesystem
+}
+
+// Define ls function
+window.os.fs.ls = function(path = '') {
+    if (path[0] === '/') { path = path.substring(1); } // remove leading '/' if exists
+    let current = this.readPath(path) || filesystem; // get directory at path or root if path is empty or not found
+    return Object.keys(current); // return list of entries in directory
+}
+
+// Define mkdir function
+window.os.fs.mkdir = function(path) {
+    if (path[0] === '/') { path = path.substring(1); } // remove leading '/' if exists
+    let pathArray = path.split('/');
+    let current = filesystem;
+    for (let i = 0; i < pathArray.length - 1; i++) { // skip last element (directory name)
+        if (current[pathArray[i]] === undefined) { current[pathArray[i]] = {}; } // create path if it doesn't exist
+        current = current[pathArray[i]];
+    }
+    current[pathArray[pathArray.length - 1]] = {}; // create directory at path
+    this.sync(); // save changes to filesystem
+}
+
+// Define rm function
+window.os.fs.rm = function(path) {
+    if (path[0] === '/') { path = path.substring(1); } // remove leading '/' if exists
+    let pathArray = path.split('/');
+    let current = filesystem;
+    for (let i = 0; i < pathArray.length - 1; i++) { // skip last element (file name)
+        if (current[pathArray[i]] === undefined) { return; } // path not found
+        current = current[pathArray[i]];
+    }
+    delete current[pathArray[pathArray.length - 1]]; // remove file at path
+    this.sync(); // save changes to filesystem
+}
+
+// Define isFile function
+window.os.fs.isFile = function(path) {
+    if (path[0] === '/') { path = path.substring(1); } // remove leading '/' if exists
+    let value = this.readPath(path); // get value at path
+    return typeof value === 'string'; // return true if value is string (file)
+}
+```
+### Response:

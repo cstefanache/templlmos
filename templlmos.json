@@ -3,25 +3,27 @@
         {
             "repository": "TheBloke/deepseek-coder-6.7B-instruct-GGUF",
             "model": "deepseek-coder-6.7b-instruct.Q5_K_M.gguf",
-            "prefix": "### Instruction:\n",
-            "suffix": "\n### Response:\n"
+            "depsPrefix": "Given the following examples:\n",
+            "prefix": "You are a frontend web developer, do not use jquery that writes only browser JS, JavaScript, HTML and CSS\n### Instruction:\n{deps}\n\n",
+            "suffix": "\n### Response:\n",
+            "libraryPrefix": "### Instruction:\nYou are a javascript developer that documents all the declared functions by providing sample usage.\n```\n",
+            "librarySuffix": "\n```\n### Response:\n",
+            "stop": "```\n"
         }
     ],
-    "defaults": {
-        "model": "deepseek-coder-6.7b-instruct.Q5_K_M.gguf",
-        "prefix": "### Instruction:\n",
-        "suffix": "\n### Response:\n"
-    },
     "partials": [
         "os.json",
-        "gui.json",
+        "filesystem.json",
         "desktop.json",
-        "apps.json",
-        "ide.json",
-        "browser.json",
-        "games.json"
+        "output.json",
+        "gui.json",
+        "registry.json",
+        "apps.json"
+        
     ],
     "skip": [
+        
+        "app.json"
     ],
     "definition": {}
 }

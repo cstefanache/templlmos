@@ -1,51 +1,131 @@
 {
-    "definition": {
-        "head": {
-            "style": {
-                "_defaults": {
-                    "prefix": "Generate css code without the use of any library or framework.\n### Instruction:\n"
-                },
-                "_generate": []
-            },
-            "script": {
-                "_defaults": {
-                    "prefix": "Generate JS code using `let` instead of `var`. All the `os` functions are already defined.\n### Instruction:\n"
-                },
-                "_generate": [
-                    {
-                        "id": "editor-app",
-                        "disabled": false,
-                        "instructions": [
-                            "Create a self executing function that defines a function called `editor` on the `window.os.apps` object that takes a parameter `path` and having the following functionality:",
-                            "* creates a root dom element with the class `editor`",
-                            "* call `os.gui.createWindow` with the following parameters: `'📄 Text Editor' {path || ''}`, created root DOM element, `700`, `500` and store the returned value to constant `win`",
-                            "* call `os.gui.toolbar(win)` and store the returned value to constant `toolbar`",
-                            "* call `toolbar.addButton` with parameters '💾' and `() => save()`",
-                            "* add a `textarea` element to the root dom element, 100% width and height and nowrap for white-space",
-                            "* if the path is not empty, store result of executiing `os.fs.readPath` into `content` constant and set it to the `textarea`",
-                            "* create an internal function `save` that:",
-                            " - if the path is not empty, store the value of the `textarea` to the `content` constant and call `os.fs.write` with the `path` and `textarea` value",
-                            " - if the path is empty, call `os.gui.createPrompt` with the following parameters: `'Save File'` and `os.gui.createPrompt('Enter folder name', path => os.fs.write(path, textarea.value))`"
-                        ]
-                    }
+    "apps": {
+        "styles": {
+            "disabled": false,
+            "rebuild": false,
+            "to": "head",
+            "tag": "style",
+            "dependencies": [],
+            "instructions": [
+                [
+                    "style .browser class to have display flex and flex-wrap wrap"
                 ]
-            }
+            ]
         },
-        "body": {
-            "script": {
-                "_defaults": {
-                    "prefix": "Generate browser vanilla JS code without the use of any library or framework. All the `os` functions are already defined.\n### Instruction:\n"
-                },
-                "_generate": [
-                    {
-                        "id": "editor-desktop-icon",
-                        "disabled": false,
-                        "instructions": [
-                            "Create a self executing function that executes `os.gui.addIcon('Text Editor', '📄', () => os.apps.editor(), document.body)`"
-                        ]
-                    }
+        "editor": {
+            "disabled": false,
+            "rebuild": false,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "filesystem",
+                "toolbar",
+                "registry"
+            ],
+            "instructions": [
+                [
+                    "Create a `editor` function that takes a window and path parameter:",
+                    " - create a dom element with class `editor`",
+                    " - add a textarea element to the previously created element 100% width and 400px height",
+                    " - save reference to the textarea element",
+                    " - create toolbar on the `window` parameter",
+                    " - if path is not empty, read the file content and set it to the textarea",
+                    " - add button on the toolbar with `💾` text save textarea content to the path if path is defined, prompt for the path otherwise",
+                    " - return  dom element",
+                    "",
+                    "call register application with 'Editor' title, ✍️ as emoji, `editor` function reference and 400x450 size for [txt,doc] extensions"
                 ]
-            }
+            ]
+        },
+        "browser": {
+            "disabled": false,
+            "rebuild": false,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "filesystem",
+                "toolbar",
+                "registry",
+                "app-icon"
+            ],
+            "instructions": [
+                [
+                    "Create a `browser` function that takes a parent and path parameter:",
+                    " - create a root dom element with class `browser`",
+                    " - set browserPath variable to `''`",
+                    " - generate internal load function that takes path parameter:",
+                    "   - set browserPath to the path",
+                    "   - removes all children of the root element",
+                    "   - if path is not empty, create a new `div` with class icon, inner element `.emoji` with internal span element having content '🔙'  and class `emoji` and on click call load with `path.split('/').slice(0, -1).join('/')`",
+                    "   - lists all files in the path and for each item call `getOsIcon` with item and load function as callback",
+                    " - execute load on browserPath variable",
+                    " - create toolbar on the `parent` parameter",
+                    " - add button on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name",
+                    " - add button on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and '' as content",
+                    " - return root dom element",
+                    "",
+                    "",
+                    "register application with 'Browser' title, 📂 as emoji, browser and 400x400 size"
+                ]
+            ]
+        },
+       
+        "run": {
+            "disabled": false,
+            "rebuld": false,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "registry"
+            ],
+
+            "instructions": [
+                [
+                    "Create an `application` function that takes a parent parameter having the following functionality:",
+                    " - create a root dom element with class `chat`",
+                    " - create an input element with 100% width with keyup event listener that on enter key press:",
+                    "   - save the input value to instruction variable and clear the input",
+                    "   - POST the json having instruction and full as false to `http://localhost:8080`, on response add a script tag to the body with id `run-script` and add the response text content to the script tag",
+                    " - return dom element",
+                    "call register application with 'Run' title, ▶️ as emoji, already defined `application` function reference and 400x70 size"
+                ]
+            ]
+        },
+        "assistant-styles": {
+            "disabled": false,
+            "rebuild": false,
+            "to": "head",
+            "tag": "style",
+            "dependencies": [],
+            "instructions": [
+                [
+                    "style .chat class to have display flex and flex-direction column",
+                    "style .results class to have 100% width and 300px height, overflow-y scroll and margin 10px",
+                    "style .results pre to have white-space pre-wrap"
+                ]
+            ]
+        },
+        "assistant": {
+            "disabled": false,
+            "rebuld": false,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "registry"
+            ],
+            "instructions": [
+                [
+                    "Create a `assistant` function that takes a parent parameter:",
+                    " - create a root dom element with class `chat`",
+                    " - create a div element with 100% width and 300px height with class `results`",
+                    " - create an input element with 100% width",
+                    " - add a button with `➡️` text and on click:",
+                    "   - save the input value to instruction variable and clear the input",
+                    "   - POST the json having instruction and full as true to `http://localhost:8080`, on response add pre tag with the response text content to the results",
+                    " return dom element",
+                    "call register application with 'Assistant' title, 👨🏽‍⚕️ as emoji, already defined `assistant` function reference and 400x400 size"
+                ]
+            ]
         }
     }
 }

@@ -1,0 +1,9 @@
+{
+    "crc": 1933476257,
+    "compiled_instruction": [
+        "You are a frontend web developer, do not use jquery that writes only browser JS, JavaScript, HTML and CSS\n### Instruction:\n\n\n Create a new empty object `os` on the window global object \n### Response:\n"
+    ],
+    "output": [
+        "```javascript\nwindow.os = {};\n\n```"
+    ]
+}

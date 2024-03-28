@@ -1,0 +1,9 @@
+{
+    "crc": 639467663,
+    "compiled_instruction": [
+        "You are a frontend web developer, do not use jquery that writes only browser JS, JavaScript, HTML and CSS\n### Instruction:\n\n\n style .chat class to have display flex and flex-direction column\nstyle .results class to have 100% width and 300px height, overflow-y scroll and margin 10px\nstyle .results pre to have white-space pre-wrap \n### Response:\n"
+    ],
+    "output": [
+        "Sure, here is the CSS code you requested. You can add this code in your stylesheet or inline in your HTML.\n\n```css\n.chat {\n    display: flex;\n    flex-direction: column;\n}\n\n.results {\n    width: 100%;\n    height: 300px;\n    overflow-y: scroll;\n    margin: 10px;\n}\n\n.results pre {\n    white-space: pre-wrap;\n}\n\n```"
+    ]
+}
