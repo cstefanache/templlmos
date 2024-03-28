@@ -3,18 +3,24 @@
 <pre style='text-wrap: wrap'>### Instruction:
 You are a javascript developer that documents all the declared functions by providing sample usage.
 ```
- // Define the registerApplication function on window.os
-window.os.registerApplication = function(title, emoji, callback, width=400, height=400) {
-  // Define an internal execute function
-  const execute = function(...params) {
-    // Create a new window instance with the title, emoji, width and height
+ // Define new function on window.os object
+window.os.registerApplication = function(title, emoji, callback, width=400, height=400, extensions=undefined) {
+  // Define internal execute function
+  const execute = (...params) => {
+    // Create new window instance with title, emoji, width and height
     const windowInstance = window.os.gui.createWindow(emoji, title, width, height);
-    
-    // Attach to window the result of calling the callback with the window instance and spread params
+    // Attach to window the result of calling callback with windowInstance and spread params
     window.os.gui.attachToWindow(windowInstance, callback(windowInstance, ...params));
   };
   
-  // Call addApp with the title, emoji, execute function 
+  // If extensions is defined, call registerExtension for each extension with emoji and execute function
+  if (extensions) {
+    extensions.forEach(extension => {
+      window.os.registerExtension(extension, emoji, execute);
+    });
+  }
+  
+  // Call addApp with emoji, title and execute function
   window.os.addApp(emoji, title, execute);
 };
 
@@ -22,27 +28,34 @@ window.os.registerApplication = function(title, emoji, callback, width=400, heig
 ```
 ### Response:
 </pre>
-<pre style='text-wrap: wrap'>This JavaScript code defines a `registerApplication` function on `window.os` object. This function takes four arguments `title`, `emoji`, `callback` and an optional `width` and `height` arguments with default values of 400. 
-
-Here's how you can use this `registerApplication` function:
+<pre style='text-wrap: wrap'>This JavaScript code defines a function `registerApplication` which is used to register an application with certain properties and behaviors in an operating system-like environment. Here's how you can use it:
 
 ```javascript
-// Assuming you have defined `addApp` and `gui` objects and `createWindow` and `attachToWindow` methods in your code
-// Also assuming `callback` is a function that takes `windowInstance` and some parameters and returns an object to be attached to the window
+// Assume os and gui objects and registerExtension and addApp methods have been defined elsewhere in your code
+// Also assume you have an array of extensions ready to be registered with this application
+const extensions = ['ext1', 'ext2', 'ext3']; 
 
-// Register an application with title "My App", emoji "🚀", callback to handle application logic and optional dimensions 600x600
-window.os.registerApplication("My App", "🚀", (winInstance, param1, param2) => {
-  // Your application logic here using winInstance and param1 and param2
-  return { /* some object to be attached to the window */ };
-}, 600, 600);
+// Define your application's title, emoji, and callback function
+const title = 'My App';
+const emoji = '🚀';
+const callback = (winInstance, param1, param2) => {
+  console.log('Callback called with params', param1, param2);
+  return 'Some result';  // This will be attached to the window instance and returned from execute function
+};
+
+// Register your application with optional parameters for width and height (default is 400)
+// and an optional array of extensions (default is undefined)
+window.os.registerApplication(title, emoji, callback, 600, 600, extensions); 
 ```
-In this example, `callback` is a function that takes `winInstance` and `param1` and `param2` as parameters and returns an object to be attached to the window. The `winInstance` is an instance of the created window and `param1` and `param2` are additional parameters passed when calling `execute` function. 
+In this example, `callback` is a function that will be called when your application is executed (i.e., when its icon is clicked in the operating system). It receives two parameters (`param1` and `param2`) which can be any values you choose when calling `execute` (the `execute` function is defined inside `registerApplication` and is called when your application is registered). The `callback` function should return something that will be attached to the window instance and returned from `execute`. 
 
-The `execute` function creates a new window instance with the provided `emoji` and `title`, and `width` and `height` (default to 400 if not provided). It then attaches to this window instance the result of calling `callback` with `winInstance` and `param1` and `param2` as parameters. 
+The `width` and `height` parameters (default is 400) specify the initial size of your application's window when it's first created. 
 
-Finally, `registerApplication` calls `addApp` with `emoji`, `title` and `execute` function to add this application to the list of registered applications in `os` object. 
+The `extensions` parameter (default is undefined) is an array of extension names to be registered with your application. Each extension will be registered with your application's `emoji` and `execute` function. 
 
-This way, you can easily document this `registerApplication` function and its usage in your codebase.
+Finally, `addApp` is called with your application's `emoji`, `title` and `execute` function to add your application to the list of available applications in the operating system. 
+
+This is just an example of how you might use this `registerApplication` function in your code. The actual behavior and requirements of your operating system and its applications would depend on how these methods and objects have been defined elsewhere in your code.
 
 ```</pre>
 ### Instruction: 1
@@ -92,31 +105,57 @@ In this example, `emoji` is '🚀', `title` is 'My App', and `callback` is an an
 
 Please note that this is just an example and you may need to adjust this code to fit your specific needs or environment.
 
+```This JavaScript function `window.os.getOSIcon` is used to create an icon for a file or directory at a given path. The icon includes an emoji indicating whether it is a file or directory, a title showing the name of the file or directory, and an optional emoji from an application registry if the file has an associated extension. 
+
+The function takes two parameters: `path` (a string representing the file or directory path), and `callback` (a function to be called when the icon is clicked). 
+
+Here is an example of how to use this function:
+
+```javascript
+const iconDiv = window.os.getOSIcon('/home/user/documents/myfile.txt', (path) => {
+  console.log('File clicked:', path);
+});
+document.body.appendChild(iconDiv);
 ```
 
- create a new function `registerApplication` on the `window.os` object that takes a title, emoji, callback, width=400 and height = 400 having the following functionality:
+In this example, `/home/user/documents/myfile.txt` is passed as the `path` parameter and an anonymous function is passed as the `callback` parameter. The anonymous function logs to the console when the icon is clicked. The returned `iconDiv` is then appended to the body of the HTML document. 
+
+Please note that this code assumes that `window.os.fs.isFile` and `window.os.registry` exist and work as expected. The `isFile` method checks if the path is for a file and `registry` is an object where file extensions can be mapped to emojis and callbacks. If an extension is found in `registry`, an additional emoji and callback will be added to the icon. 
+
+Also note that this code assumes Unix-style paths (i.e., paths separated by slashes), and it uses the last part of the path as the title (i.e., the filename). If your paths use different conventions, you may need to adjust this code accordingly.
+
+```
+
+ create a new function `registerApplication` on the `window.os` object that takes a title, emoji, callback, width=400 and height = 400 and a an array of extensions being undefined by default having the following functionality:
 - define an internal `execute` that takes a spread params:
   - creates a new window instance with the title, emoji, width and height and saves it to a constant
   - attach to window the result of calling the callback with the window instance and spread params
-- call addApp with the title, emoji, execute function 
+- if extensions is defined, call `registerExtension` for each extension with the emoji and the execute function
+- call addApp with the emoji, title and execute function 
 ### Response:
 </pre>
 #### Output: 0
-<pre style='text-wrap: wrap'>Here's an example of how you could implement this function:
+<pre style='text-wrap: wrap'>Here's an example of how to implement this new function on the `window.os` object:
 
 ```javascript
-// Define the registerApplication function on window.os
-window.os.registerApplication = function(title, emoji, callback, width=400, height=400) {
-  // Define an internal execute function
-  const execute = function(...params) {
-    // Create a new window instance with the title, emoji, width and height
+// Define new function on window.os object
+window.os.registerApplication = function(title, emoji, callback, width=400, height=400, extensions=undefined) {
+  // Define internal execute function
+  const execute = (...params) => {
+    // Create new window instance with title, emoji, width and height
     const windowInstance = window.os.gui.createWindow(emoji, title, width, height);
-    
-    // Attach to window the result of calling the callback with the window instance and spread params
+    // Attach to window the result of calling callback with windowInstance and spread params
     window.os.gui.attachToWindow(windowInstance, callback(windowInstance, ...params));
   };
   
-  // Call addApp with the title, emoji, execute function 
+  // If extensions is defined, call registerExtension for each extension with emoji and execute function
+  if (extensions) {
+    extensions.forEach(extension => {
+      window.os.registerExtension(extension, emoji, execute);
+    });
+  }
+  
+  // Call addApp with emoji, title and execute function
   window.os.addApp(emoji, title, execute);
 };
 

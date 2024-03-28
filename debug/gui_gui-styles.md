@@ -49,6 +49,7 @@
 
  css style for a .window class to follow the following rules:
 - white background color and a padding of 1px
+- disable text selection
 - a border of 2px solid black
 - a border-radius of 8px
 - no padding
@@ -68,14 +69,12 @@
     position: absolute;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    box-shadow: 4px 4px 0 0 rgba(0,0,0,0.5);
-    border-radius: 8px;
-    border: 2px solid black;
     background-color: white;
+    border: 2px solid black;
+    border-radius: 8px;
+    box-shadow: 4px 4px 0 0 rgba(0,0,0,0.5);
+    overflow: hidden;
     padding: 0;
-    width: /* specify your width */;
-    height: /* specify your height */;
 }
 
 .contentPlaceholder {

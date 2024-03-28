@@ -3,36 +3,7 @@
 <pre style='text-wrap: wrap'>You are a frontend web developer, do not use jquery that writes only browser JS, JavaScript, HTML and CSS
 ### Instruction:
 Given the following examples:
- This JavaScript code is defining a `registerApplication` function on `window.os` object, which is used to register an application with an operating system. The application is defined by its title, emoji, and a callback function which is called when the application is initialized. The width and height of the application window can also be specified, with default values of 400 if not provided. 
-
-Here is how you can use this code:
-
-```javascript
-// Define your emoji, title and callback function
-var emoji = '🚀';
-var title = 'My App';
-var width = 600; 
-var height = 400; 
-var callback = () => { 
-  var rootElement = document.createElement('div'); 
-  rootElement.innerHTML = 'Hello, World 🌍'; 
-  return rootElement; 
-}; 
-
-// Call registerApplication with emoji, title, callback, width and height 
-window.os.registerApplication(title, emoji, callback, width, height); 
-```
-In this example, we define an emoji, title, and width/height for our application, and provide a callback function which creates and returns an HTML element with "Hello, World 🌍" as its content. We then call `registerApplication` with these parameters to register our application with the operating system. 
-
-Please note, this code assumes `window.os` and `window.os.gui` objects exist and `window.os.addApp` method is defined somewhere else in your codebase, as it is not provided in this snippet. 
-
-Also, please note that this code is using ES6 syntax, so it will not work in older browsers unless they support ES6 features. 
-
-This code is also assuming that `window.os` is an object with `gui` and `addApp` methods, and `registerApplication` is a method on `window.os` object which takes title, emoji, callback, width and height as arguments and returns null. 
-
-Please replace `window.os` with actual object and methods if they are different in your codebase.
-
-```Sure, here is how you can use these functions:
+ Sure, here is how you can use these functions:
 
 1. `window.os.fs.sync()` - This function will save the current state of your `filesystem` object to `localStorage`. This is useful when you want to persist your data across page reloads or even browser sessions. 
 
@@ -81,101 +52,150 @@ Please replace `window.os` with actual object and methods if they are different 
     ```
 These functions provide a simple file system interface for JavaScript, allowing you to manipulate files and directories in your `filesystem` object using standard file system operations like `read`, `write`, `list`, `create directory`, and `delete`. The `sync` function is used to persist changes to `localStorage`, allowing your data to be saved across page reloads or even browser sessions.
 
-```This JavaScript code defines a function `createToolbar` which creates and returns an object with one method `addButton`. The `createToolbar` function takes one parameter `parent` which should be a DOM element. It creates a new `div` element with class `toolbar` and appends it to `.toolbarPlaceholder` inside `parent`. The `addButton` method creates a new `button` element with text content set to `text` parameter and appends it to `toolbar`. It also adds an event listener to `button` which calls `callback` function when `button` is clicked. 
+```This JavaScript function creates a toolbar with buttons and attaches them to a specified HTML element. The toolbar and buttons are created using DOM manipulation methods provided by JavaScript. The function returns an object with a method `addButton`, which allows you to add buttons to the toolbar with custom text and click event callbacks. 
 
 Here's how you can use this function in your code:
 
 ```javascript
-var toolbarManager = window.os.gui.createToolbar(document.body);  // create toolbar and return its manager
-toolbarManager.addButton('Button 1', function() {  // add first button with text "Button 1" and callback function
-    console.log('Button 1 clicked');  // this will be logged to console when button is clicked
+// Assume you have a reference to your window or iframe here
+var myWindow = ...; 
+
+// Create toolbar instance
+var toolbarInstance = os.gui.createToolbar(myWindow); 
+
+// Add buttons to toolbar
+toolbarInstance.addButton('Button 1', function() {
+    console.log('Button 1 clicked');
 });
-toolbarManager.addButton('Button 2', function() {  // add second button with text "Button 2" and callback function
-    console.log('Button 2 clicked');  // this will be logged to console when button is clicked
+toolbarInstance.addButton('Button 2', function() {
+    console.log('Button 2 clicked');
+});
+toolbarInstance.addButton('Button 3', function() {
+    console.log('Button 3 clicked');
 });
 ```
-In this example, `createToolbar` function creates a toolbar and returns its manager which can be used to add buttons to it. The `addButton` method of `toolbarManager` adds buttons to toolbar with specified text and callback function which will be called when button is clicked. In this case, when "Button 1" or "Button 2" is clicked, corresponding message will be logged to console.
+In this example, we first create a toolbar instance using `os.gui.createToolbar` and pass in our target window or iframe reference `myWindow`. Then we add three buttons to the toolbar with custom text and click event callbacks. The callbacks will be executed when their respective buttons are clicked, and will log a message to the console indicating which button was clicked. 
 
-```This JavaScript code is creating two global objects and two global functions under `window.os` namespace. The objects created are `appRegistry` and `registerExtension`, and the functions created are `registerExtension` and `appIcon`. Here's how you can use them:
+Please replace `myWindow` with your actual reference to your HTML element where you want to add the toolbar.
 
-1. `registerExtension` function: This function is used to register extensions and their corresponding emojis and callbacks in `appRegistry` object. It takes three parameters - `extension`, `emoji`, and `callback`. Here's how you can use it:
-    ```javascript
-    os.registerExtension('sript', '⚙️', (path) => alert(`open ${path}`));
-    ```
-    This will register 'script' extension with emoji '⚙️' and callback function which will alert with path when clicked.
+```This JavaScript code defines a function `registerApplication` which is used to register an application with certain properties and behaviors in an operating system-like environment. Here's how you can use it:
 
-2. `appIcon` function: This function is used to create and return a DOM element representing an application icon. It takes four parameters - `isFile`, `path`, `name`, and `callback`. Here's how you can use it:
-    ```javascript
-    const iconElement = os.appIcon(true, '/path/to/file', 'file.txt', (path) => alert(`open ${path}`));
-    document.body.appendChild(iconElement);
-    ```
-    This will create an application icon for 'file.txt' located at '/path/to/file'. If this is a file and no extension is registered, it will alert with path when clicked. The icon element will be appended to the body of your HTML document.
+```javascript
+// Assume os and gui objects and registerExtension and addApp methods have been defined elsewhere in your code
+// Also assume you have an array of extensions ready to be registered with this application
+const extensions = ['ext1', 'ext2', 'ext3']; 
 
-Please note, this code assumes `window.os` exists and `registerExtension` is a method of it, so it includes a check for this before using these methods. If `window.os` or `registerExtension` is undefined or not a function, it will log an error message to the console.
+// Define your application's title, emoji, and callback function
+const title = 'My App';
+const emoji = '🚀';
+const callback = (winInstance, param1, param2) => {
+  console.log('Callback called with params', param1, param2);
+  return 'Some result';  // This will be attached to the window instance and returned from execute function
+};
+
+// Register your application with optional parameters for width and height (default is 400)
+// and an optional array of extensions (default is undefined)
+window.os.registerApplication(title, emoji, callback, 600, 600, extensions); 
+```
+In this example, `callback` is a function that will be called when your application is executed (i.e., when its icon is clicked in the operating system). It receives two parameters (`param1` and `param2`) which can be any values you choose when calling `execute` (the `execute` function is defined inside `registerApplication` and is called when your application is registered). The `callback` function should return something that will be attached to the window instance and returned from `execute`. 
+
+The `width` and `height` parameters (default is 400) specify the initial size of your application's window when it's first created. 
+
+The `extensions` parameter (default is undefined) is an array of extension names to be registered with your application. Each extension will be registered with your application's `emoji` and `execute` function. 
+
+Finally, `addApp` is called with your application's `emoji`, `title` and `execute` function to add your application to the list of available applications in the operating system. 
+
+This is just an example of how you might use this `registerApplication` function in your code. The actual behavior and requirements of your operating system and its applications would depend on how these methods and objects have been defined elsewhere in your code.
+
+```This JavaScript function `window.os.getOSIcon` is used to create an icon for a file or directory at a given path. The icon includes an emoji indicating whether it is a file or directory, a title showing the name of the file or directory, and an optional emoji from an application registry if the file has an associated extension. 
+
+The function takes two parameters: `path` (a string representing the file or directory path), and `callback` (a function to be called when the icon is clicked). 
+
+Here is an example of how to use this function:
+
+```javascript
+const iconDiv = window.os.getOSIcon('/home/user/documents/myfile.txt', (path) => {
+  console.log('File clicked:', path);
+});
+document.body.appendChild(iconDiv);
+```
+
+In this example, `/home/user/documents/myfile.txt` is passed as the `path` parameter and an anonymous function is passed as the `callback` parameter. The anonymous function logs to the console when the icon is clicked. The returned `iconDiv` is then appended to the body of the HTML document. 
+
+Please note that this code assumes that `window.os.fs.isFile` and `window.os.registry` exist and work as expected. The `isFile` method checks if the path is for a file and `registry` is an object where file extensions can be mapped to emojis and callbacks. If an extension is found in `registry`, an additional emoji and callback will be added to the icon. 
+
+Also note that this code assumes Unix-style paths (i.e., paths separated by slashes), and it uses the last part of the path as the title (i.e., the filename). If your paths use different conventions, you may need to adjust this code accordingly.
 
 ```
 
- Create a function `browser` that takes a `parent` parameter with the following functionality:
+ Create a `browser` function that takes a parent and path parameter:
  - create a root dom element with class `browser`
  - set browserPath variable to `''`
  - generate internal load function that takes path parameter:
    - set browserPath to the path
    - removes all children of the root element
-   - if path is not empty, create a new `div` element with text `..` and on click call load with `path.split('/').slice(0, -1).join('/')`
-   - lists all files in the path that saves isFile to a constant and appends child to the root element the result of calling appIcon with isFile, path, name and load as callback
+   - if path is not empty, create a new `div` with class icon, inner element `.emoji` with internal span element having content '🔙'  and class `emoji` and on click call load with `path.split('/').slice(0, -1).join('/')`
+   - lists all files in the path and for each item call `getOsIcon` with item and load function as callback
  - execute load on browserPath variable
  - create toolbar on the `parent` parameter
  - add button on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name
  - add button on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and '' as content
  - return root dom element
-after function is defined, register application with 'Browser' title, 📂 as emoji, already defined `browser` function and 400x400 size 
+
+
+register application with 'Browser' title, 📂 as emoji, browser and 400x400 size 
 ### Response:
 </pre>
 #### Output: 0
-<pre style='text-wrap: wrap'>Here's how you can define this functionality in JavaScript:
+<pre style='text-wrap: wrap'>Here's an example of how you might implement this in JavaScript:
 
 ```javascript
-function browser(parent) {
-    const root = document.createElement('div');
-    root.className = 'browser';
-    let browserPath = '';
-    const load = (path) => {
-        browserPath = path;
-        root.innerHTML = '';
-        if (path !== '') {
-            const upButton = document.createElement('div');
-            upButton.innerHTML = '..';
-            upButton.onclick = () => load(path.split('/').slice(0, -1).join('/'));
-            root.appendChild(upButton);
-        }
-        const files = window.os.fs.ls(path);
-        files.forEach(name => {
-            const isFile = window.os.fs.isFile(path + '/' + name);
-            const element = window.os.appIcon(isFile, path + '/' + name, name, () => load(path + '/' + name));
-            root.appendChild(element);
-        });
-    };
-    load(browserPath);
-    const toolbarManager = window.os.gui.createToolbar(parent);
-    toolbarManager.addButton('📁', () => {
-        const name = prompt('Enter directory name');
-        window.os.fs.mkdir(browserPath + '/' + name);
-        load(browserPath);
+function createBrowser(parent) {
+  const root = document.createElement('div');
+  root.classList.add('browser');
+  let browserPath = '';
+  
+  const load = (path) => {
+    browserPath = path;
+    root.innerHTML = '';
+    if (browserPath !== '') {
+      const backButton = document.createElement('div');
+      backButton.classList.add('icon');
+      const backEmoji = document.createElement('span');
+      backEmoji.classList.add('emoji');
+      backEmoji.textContent = '🔙';
+      backButton.appendChild(backEmoji);
+      backButton.onclick = () => load(browserPath.split('/').slice(0, -1).join('/'));
+      root.appendChild(backButton);
+    }
+    window.os.fs.ls(browserPath).forEach(item => {
+      const iconDiv = window.os.getOSIcon(browserPath + '/' + item, () => load(browserPath + '/' + item));
+      root.appendChild(iconDiv);
     });
-    toolbarManager.addButton('📄', () => {
-        const name = prompt('Enter file name');
-        window.os.fs.write(browserPath + '/' + name, '');
-        load(browserPath);
-    });
-    return root;
+  };
+  
+  const toolbar = window.os.gui.createToolbar(parent);
+  toolbar.addButton('📁', () => {
+    const name = prompt('Enter directory name');
+    if (name) {
+      window.os.fs.mkdir(browserPath + '/' + name);
+      load(browserPath);
+    }
+  });
+  toolbar.addButton('📄', () => {
+    const name = prompt('Enter file name');
+    if (name) {
+      window.os.fs.write(browserPath + '/' + name, '');
+      load(browserPath);
+    }
+  });
+  
+  load(browserPath);
+  
+  return root;
 }
 
-// Register application
-const emoji = '📂';
-const title = 'Browser';
-const width = 400;
-const height = 400;
-const callback = (parent) => browser(parent);
-window.os.registerApplication(title, emoji, callback, width, height);
+// Register application with 'Browser' title, 📂 as emoji, createBrowser function as callback and 400x400 size 
+window.os.registerApplication('Browser', '📂', createBrowser, 400, 400); 
 
 ```</pre>

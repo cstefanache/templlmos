@@ -8,26 +8,26 @@ if (typeof window.os === 'undefined') window.os = {};
 if (typeof window.os.gui === 'undefined') window.os.gui = {};
 
 // Function to create toolbar
-window.os.gui.createToolbar = function(parent) {
+window.os.gui.createToolbar = function(win) {
     // Create root DOM element with class .toolbar
     var toolbar = document.createElement('div');
     toolbar.className = 'toolbar';
     
-    // Append root DOM element to .toolbarPlaceholder from passed parent as parameter
-    parent.querySelector('.toolbarPlaceholder').appendChild(toolbar);
+    // Append root DOM element to .toolbarPlaceholder from win parameter
+    win.querySelector('.toolbarPlaceholder').appendChild(toolbar);
     
     // Return an object with addButton function
     return {
         addButton: function(text, callback) {
-            // Create button DOM element with text parameter
+            // Create button element
             var button = document.createElement('button');
             button.textContent = text;
             
-            // Append button DOM element to toolbar DOM element
-            toolbar.appendChild(button);
-            
-            // Add event listener to button to call callback when clicked
+            // Add click event listener to button
             button.addEventListener('click', callback);
+            
+            // Append button to toolbar
+            toolbar.appendChild(button);
         }
     };
 };
@@ -36,20 +36,31 @@ window.os.gui.createToolbar = function(parent) {
 ```
 ### Response:
 </pre>
-<pre style='text-wrap: wrap'>This JavaScript code defines a function `createToolbar` which creates and returns an object with one method `addButton`. The `createToolbar` function takes one parameter `parent` which should be a DOM element. It creates a new `div` element with class `toolbar` and appends it to `.toolbarPlaceholder` inside `parent`. The `addButton` method creates a new `button` element with text content set to `text` parameter and appends it to `toolbar`. It also adds an event listener to `button` which calls `callback` function when `button` is clicked. 
+<pre style='text-wrap: wrap'>This JavaScript function creates a toolbar with buttons and attaches them to a specified HTML element. The toolbar and buttons are created using DOM manipulation methods provided by JavaScript. The function returns an object with a method `addButton`, which allows you to add buttons to the toolbar with custom text and click event callbacks. 
 
 Here's how you can use this function in your code:
 
 ```javascript
-var toolbarManager = window.os.gui.createToolbar(document.body);  // create toolbar and return its manager
-toolbarManager.addButton('Button 1', function() {  // add first button with text "Button 1" and callback function
-    console.log('Button 1 clicked');  // this will be logged to console when button is clicked
+// Assume you have a reference to your window or iframe here
+var myWindow = ...; 
+
+// Create toolbar instance
+var toolbarInstance = os.gui.createToolbar(myWindow); 
+
+// Add buttons to toolbar
+toolbarInstance.addButton('Button 1', function() {
+    console.log('Button 1 clicked');
 });
-toolbarManager.addButton('Button 2', function() {  // add second button with text "Button 2" and callback function
-    console.log('Button 2 clicked');  // this will be logged to console when button is clicked
+toolbarInstance.addButton('Button 2', function() {
+    console.log('Button 2 clicked');
+});
+toolbarInstance.addButton('Button 3', function() {
+    console.log('Button 3 clicked');
 });
 ```
-In this example, `createToolbar` function creates a toolbar and returns its manager which can be used to add buttons to it. The `addButton` method of `toolbarManager` adds buttons to toolbar with specified text and callback function which will be called when button is clicked. In this case, when "Button 1" or "Button 2" is clicked, corresponding message will be logged to console.
+In this example, we first create a toolbar instance using `os.gui.createToolbar` and pass in our target window or iframe reference `myWindow`. Then we add three buttons to the toolbar with custom text and click event callbacks. The callbacks will be executed when their respective buttons are clicked, and will log a message to the console indicating which button was clicked. 
+
+Please replace `myWindow` with your actual reference to your HTML element where you want to add the toolbar.
 
 ```</pre>
 ### Instruction: 1
@@ -57,9 +68,9 @@ In this example, `createToolbar` function creates a toolbar and returns its mana
 ### Instruction:
 
 
- Define a function called `createToolbar` on the `window.os.gui` object that takes one parameter `parent`
+ Define a function called `createToolbar` on the `window.os.gui` object that takes one parameter `win`
 - create a root DOM element with the class `.toolbar`
-- append the root DOM element to the `.toolbarPlaceholder` from passed `parent` as parameter
+- append the root DOM element to the `.toolbarPlaceholder` from `win` parameter
 - return an object with the following functions:
   - addButton(text, callback) - add a button to the root DOM element with the text parameter and call the callback when the button is clicked 
 ### Response:
@@ -73,26 +84,26 @@ if (typeof window.os === 'undefined') window.os = {};
 if (typeof window.os.gui === 'undefined') window.os.gui = {};
 
 // Function to create toolbar
-window.os.gui.createToolbar = function(parent) {
+window.os.gui.createToolbar = function(win) {
     // Create root DOM element with class .toolbar
     var toolbar = document.createElement('div');
     toolbar.className = 'toolbar';
     
-    // Append root DOM element to .toolbarPlaceholder from passed parent as parameter
-    parent.querySelector('.toolbarPlaceholder').appendChild(toolbar);
+    // Append root DOM element to .toolbarPlaceholder from win parameter
+    win.querySelector('.toolbarPlaceholder').appendChild(toolbar);
     
     // Return an object with addButton function
     return {
         addButton: function(text, callback) {
-            // Create button DOM element with text parameter
+            // Create button element
             var button = document.createElement('button');
             button.textContent = text;
             
-            // Append button DOM element to toolbar DOM element
-            toolbar.appendChild(button);
-            
-            // Add event listener to button to call callback when clicked
+            // Add click event listener to button
             button.addEventListener('click', callback);
+            
+            // Append button to toolbar
+            toolbar.appendChild(button);
         }
     };
 };

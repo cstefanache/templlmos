@@ -3,27 +3,34 @@
 <pre style='text-wrap: wrap'>You are a frontend web developer, do not use jquery that writes only browser JS, JavaScript, HTML and CSS
 ### Instruction:
 Given the following examples:
- This JavaScript code defines a `registerApplication` function on `window.os` object. This function takes four arguments `title`, `emoji`, `callback` and an optional `width` and `height` arguments with default values of 400. 
-
-Here's how you can use this `registerApplication` function:
+ This JavaScript code defines a function `registerApplication` which is used to register an application with certain properties and behaviors in an operating system-like environment. Here's how you can use it:
 
 ```javascript
-// Assuming you have defined `addApp` and `gui` objects and `createWindow` and `attachToWindow` methods in your code
-// Also assuming `callback` is a function that takes `windowInstance` and some parameters and returns an object to be attached to the window
+// Assume os and gui objects and registerExtension and addApp methods have been defined elsewhere in your code
+// Also assume you have an array of extensions ready to be registered with this application
+const extensions = ['ext1', 'ext2', 'ext3']; 
 
-// Register an application with title "My App", emoji "🚀", callback to handle application logic and optional dimensions 600x600
-window.os.registerApplication("My App", "🚀", (winInstance, param1, param2) => {
-  // Your application logic here using winInstance and param1 and param2
-  return { /* some object to be attached to the window */ };
-}, 600, 600);
+// Define your application's title, emoji, and callback function
+const title = 'My App';
+const emoji = '🚀';
+const callback = (winInstance, param1, param2) => {
+  console.log('Callback called with params', param1, param2);
+  return 'Some result';  // This will be attached to the window instance and returned from execute function
+};
+
+// Register your application with optional parameters for width and height (default is 400)
+// and an optional array of extensions (default is undefined)
+window.os.registerApplication(title, emoji, callback, 600, 600, extensions); 
 ```
-In this example, `callback` is a function that takes `winInstance` and `param1` and `param2` as parameters and returns an object to be attached to the window. The `winInstance` is an instance of the created window and `param1` and `param2` are additional parameters passed when calling `execute` function. 
+In this example, `callback` is a function that will be called when your application is executed (i.e., when its icon is clicked in the operating system). It receives two parameters (`param1` and `param2`) which can be any values you choose when calling `execute` (the `execute` function is defined inside `registerApplication` and is called when your application is registered). The `callback` function should return something that will be attached to the window instance and returned from `execute`. 
 
-The `execute` function creates a new window instance with the provided `emoji` and `title`, and `width` and `height` (default to 400 if not provided). It then attaches to this window instance the result of calling `callback` with `winInstance` and `param1` and `param2` as parameters. 
+The `width` and `height` parameters (default is 400) specify the initial size of your application's window when it's first created. 
 
-Finally, `registerApplication` calls `addApp` with `emoji`, `title` and `execute` function to add this application to the list of registered applications in `os` object. 
+The `extensions` parameter (default is undefined) is an array of extension names to be registered with your application. Each extension will be registered with your application's `emoji` and `execute` function. 
 
-This way, you can easily document this `registerApplication` function and its usage in your codebase.
+Finally, `addApp` is called with your application's `emoji`, `title` and `execute` function to add your application to the list of available applications in the operating system. 
+
+This is just an example of how you might use this `registerApplication` function in your code. The actual behavior and requirements of your operating system and its applications would depend on how these methods and objects have been defined elsewhere in your code.
 
 ```Sure, here is how you can use these functions:
 
@@ -84,30 +91,32 @@ after definition, register application with 'hello world' title, 👋 as emoji, 
 ### Response:
 </pre>
 #### Output: 0
-<pre style='text-wrap: wrap'>Here is how you can define your `helloWorld` function and register an application with it:
+<pre style='text-wrap: wrap'>Here's how you can define your `helloWorld` function and then register your application using it. 
 
 ```javascript
+// Define your helloWorld function
 function helloWorld(parent, path) {
   // Create root div element
-  let root = document.createElement('div');
+  const root = document.createElement('div');
   parent.appendChild(root);
   
-  // Create h1 element with 'Hello World' text
-  let h1 = document.createElement('h1');
+  // Create h1 element
+  const h1 = document.createElement('h1');
   h1.textContent = 'Hello World';
   root.appendChild(h1);
   
-  // If path is defined, append pre element containing content of file at path
+  // If path is defined, create pre element containing content of file at path
   if (path) {
-    let pre = document.createElement('pre');
+    const pre = document.createElement('pre');
     pre.textContent = window.os.fs.readPath(path);
     root.appendChild(pre);
   }
   
+  // Return root element
   return root;
 }
 
-// Register application with 'hello world' title, 👋 as emoji, helloWorld function and 300x200 size
-window.os.registerApplication("Hello World", "👋", helloWorld, 300, 200);
+// Register your application
+window.os.registerApplication('Hello World', '👋', helloWorld, 300, 200);
 
 ```</pre>

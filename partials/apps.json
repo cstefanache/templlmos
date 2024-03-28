@@ -1,0 +1,73 @@
+{
+    "apps": {
+        "styles": {
+            "disabled": false,
+            "rebuild": false,
+            "to": "head",
+            "tag": "style",
+            "dependencies": [],
+            "instructions": [
+                [
+                    "style .browser class to have display flex and flex-wrap wrap"
+                ]
+            ]
+        },
+        "editor": {
+            "disabled": false,
+            "rebuild": false,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "filesystem",
+                "toolbar",
+                "registry"
+            ],
+            "instructions": [
+                [
+                    "Create a `editor` function that takes a window and path parameter:",
+                    " - create a dom element with class `editor`",
+                    " - add a textarea element to the previously created element 100% width and 400px height",
+                    " - save reference to the textarea element",
+                    " - create toolbar on the `window` parameter",
+                    " - if path is not empty, read the file content and set it to the textarea",
+                    " - add button on the toolbar with `💾` text save textarea content to the path if path is defined, prompt for the path otherwise",
+                    " - return  dom element",
+                    "",
+                    "call register application with 'Editor' title, ✍️ as emoji, `editor` function reference and 400x450 size for [txt,doc] extensions"
+                ]
+            ]
+        },
+        "browser": {
+            "disabled": false,
+            "rebuild": false,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "filesystem",
+                "toolbar",
+                "registry",
+                "app-icon"
+            ],
+            "instructions": [
+                [
+                    "Create a `browser` function that takes a parent and path parameter:",
+                    " - create a root dom element with class `browser`",
+                    " - set browserPath variable to `''`",
+                    " - generate internal load function that takes path parameter:",
+                    "   - set browserPath to the path",
+                    "   - removes all children of the root element",
+                    "   - if path is not empty, create a new `div` with class icon, inner element `.emoji` with internal span element having content '🔙'  and class `emoji` and on click call load with `path.split('/').slice(0, -1).join('/')`",
+                    "   - lists all files in the path and for each item call `getOsIcon` with item and load function as callback",
+                    " - execute load on browserPath variable",
+                    " - create toolbar on the `parent` parameter",
+                    " - add button on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name",
+                    " - add button on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and '' as content",
+                    " - return root dom element",
+                    "",
+                    "",
+                    "register application with 'Browser' title, 📂 as emoji, browser and 400x400 size"
+                ]
+            ]
+        }
+    }
+}

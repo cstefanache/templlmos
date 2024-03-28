@@ -16,9 +16,12 @@
         "filesystem.json",
         "desktop.json",
         "gui.json",
-        "registry.json"
+        "registry.json",
+        "apps.json"
+        
     ],
     "skip": [
+        
         "app.json"
     ],
     "definition": {}
