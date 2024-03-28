@@ -26,7 +26,7 @@ There are two working modes for the experimental os: Static runtime where the pr
 
 - [Static Runtime on GitHub pages](https://cstefanache.github.io/templlmos/templlmos.html)
 - Static Runtime: Just open the `templllmos.html` file
-- Realtime Compiler: `python3 templlmos.py` and open `http://localhost:8080` in a browser 
+- Realtime Compiler: `python3 templlmos.py --serve --listen` and open `http://localhost:8080` in a browser 
 
 For runtime compiler you need to install dependencies:
 
@@ -55,10 +55,10 @@ CMAKE_ARGS="-DLLAMA_METAL=on" python3 -m pip install llama-cpp-python --upgrade 
 
 - [x] Runtime Compiler
 - [x] IDE
-- [ ] Restructure code descriptors
-- [ ] Better Low-Level APIs
+- [x] Restructure code descriptors
+- [x] Better Low-Level APIs
 - [ ] Improved FS
-- [ ] Remove dependency of API code calls `os.gui.createWindow` by injecting low-level APIs into context
+- [x] Remove dependency of API code calls `os.gui.createWindow` by injecting low-level APIs into context
 
 
 ## Structure
