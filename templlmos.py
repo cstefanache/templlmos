@@ -1,6 +1,7 @@
 import shutil
 import argparse
 import json
+import time
 import re
 
 from src.llm import LLM
@@ -35,8 +36,8 @@ if recompile:
 compiler = Compiler(llm, data, recompile)
 
 
-def rebuild():
-    html_content = compiler.build()
+def rebuild(update_response=None):
+    html_content = compiler.build(update_response=update_response)
     output_filename = re.sub(r"\.json", ".html", descriptor)
     with open(output_filename, "w") as file:
         file.write(html_content)
@@ -99,7 +100,7 @@ class Server(BaseHTTPRequestHandler):
         self.send_header("Content-type", "application/text")
         self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
-        self.wfile.write(bytes(result, "utf-8"))
+        self.wfile.write(bytes("(() => {\n" + result + "\n})()", "utf-8"))
 
     def serve_compiled(self):
         self.send_response(200)
@@ -125,7 +126,11 @@ class OSSourcesHandler(FileSystemEventHandler):
         ):
             print("OS source file changed, recompiling...", event.src_path)
             try:
-                rebuild()
+                global response
+                response = "Recompiling ..."
+                start_time = time.time()
+                rebuild(update_response)
+                response += f"\nCompleted in {time.time() - start_time} seconds.\n"
             except Exception as e:
                 print(f"Error recompiling: {e}")
 

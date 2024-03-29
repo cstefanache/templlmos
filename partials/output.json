@@ -1,22 +1,23 @@
 {
-    "debug": {
-        "styles": {
-            "disabled": false,
-            "rebuild": false,
+    "output": {
+        "output-styles": {
             "to": "head",
             "tag": "style",
-            "dependencies": [],
             "instructions": [
                 [
-                    "style .debug class having a fixed position having top and right to 0 and width 300px and 100% height of the screen having:",
+                    "style .output-wrapper class having a fixed position having top and right to 0 and width 300px and 100% height of the screen",
+                    "style .output class having:",
+                    " - 100% width and height",
                     " - a semi-transparent black background",
                     " - white text",
                     " - text wrap",
-                    " - padding of 10px and 0 margins"
+                    " - font size of 9px",
+                    " - padding of 10px and 0 margins",
+                    " - overflow auto"
                 ]
             ]
         },
-        "debug-window": {
+        "output-window": {
             "disabled": false,
             "rebuild": false,
             "to": "body",
@@ -24,8 +25,9 @@
             "dependencies": [],
             "instructions": [
                 [
-                    "create and append to body a pre element having the class `debug` and id `debug`",
-                    "create an internal function that fetches the content from 'http://localhost:8080/output' and sets the innerHTML of the debug div to the fetched content",
+                    "crate a root container div element having the class `output-wrapper` and id `output-wrapper`",
+                    "create and append to root container a pre element having the class `output` and id `output`",
+                    "create an internal function that fetches the content from 'http://localhost:8080/output' and sets the innerHTML of the output div to the fetched content",
                     "calls http://localhost:8080/ping and if the response is 200 then set an interval to call the internal function every 1000ms"
                 ]
             ]

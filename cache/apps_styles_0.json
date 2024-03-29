@@ -1,0 +1,9 @@
+{
+    "crc": 1945116035,
+    "compiled_instruction": [
+        "You are a frontend web developer, do not use jquery that writes only browser JS, JavaScript, HTML and CSS\n### Instruction:\n\n\n style .browser class to have display flex and flex-wrap wrap \n### Response:\n"
+    ],
+    "output": [
+        ".browser {\n    display: flex;\n    flex-wrap: wrap;\n}\n\n"
+    ]
+}

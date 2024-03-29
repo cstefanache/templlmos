@@ -48,7 +48,7 @@ class LLM:
                             do_sample=True,
                             num_return_sequences=1,
                             n_ctx=4096,
-                            n_gpu_layers=48,
+                            n_gpu_layers=128,
                             n_threads=8,
                         )
 
@@ -57,12 +57,12 @@ class LLM:
             return self.prompt_wrappers[model_name]
         else:
             return self.default_wrappers
-        
-    def call_default_llm(self, instruction, update_fn = None):
+
+    def call_default_llm(self, instruction, update_fn=None):
         (name, pre, suff, lib_pre, lib_suff, deps_prefix, stop) = self.default_wrappers
         output = self.runtime_models[name](
             pre + instruction + suff,
-            max_tokens=4096,
+            max_tokens=8096,
             top_k=40,
             seed=0,
             temperature=0.0,
@@ -81,12 +81,17 @@ class LLM:
             print(val, end="")
 
         result += "\n```"
-        update_fn("\n```")
+        if update_fn is not None:
+            update_fn("\n```")
         return result
 
-    def call_llm(self, model_name, instruction, include_stop = True):
+    def call_llm(
+        self, model_name, instruction, include_stop=True, update_response=None
+    ):
         model = self.runtime_models[model_name]
-        (name, pre, suff, lib_pre, lib_suff, deps_prefix, stop) = self.prompt_wrappers[model_name]
+        (name, pre, suff, lib_pre, lib_suff, deps_prefix, stop) = self.prompt_wrappers[
+            model_name
+        ]
         output = model(
             instruction,
             max_tokens=4096,
@@ -102,8 +107,12 @@ class LLM:
         result = ""
         for chunk in output:
             val = chunk["choices"][0]["text"]
+            if update_response is not None:
+                update_response(val)
             result += val
             print(val, end="")
 
         result += "\n```"
+        if update_response is not None:
+            update_response("\n```")
         return result

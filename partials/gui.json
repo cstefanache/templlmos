@@ -40,7 +40,7 @@
                     "- transform: rotate(0deg)"
                 ],
                 [
-                    "css style for a .toolbar class to follow the following rules:",
+                    "css style for `.toolbar` class to follow the following rules:",
                     "- a padding of 2px",
                     "- a background of antique white",
                     "- a margin-bottom of 2px",

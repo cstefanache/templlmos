@@ -1,0 +1,52 @@
+{
+    "development": {
+        "run-app": {
+            "disabled": false,
+            "to": "head",
+            "tag": "script",
+            "rebuild": false,
+            "library": true,
+            "dependencies": [
+                "window"
+            ],
+            "instructions": [
+                [
+                    "create a new function `runApp` on the `window.os` object that takes a callback, width and height defaulting to 500 and 400, having the following functionality:",
+                    "  - creates a new window instance with the `Development` title , 🔥 emoji, width and height and saves it to a constant",
+                    "  - attach to window the result of calling the callback with the window instance"
+                ]
+            ]
+        },
+        "ide": {
+            "disabled": false,
+            "rebuld": false,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "filesystem",
+                "registry",
+                "toolbar",
+                "ide-compile"
+            ],
+            "instructions": [
+                [
+                    "Create `compile` function that takes a source parameter and:",
+                    " - remove the script tag with id `run-script` if exists",
+                    " - fetch post  to `http://localhost:8080` with a json having {instruction: source}, and on response create a script tag with id `run-script` and add the response text content to the script tag",
+                    " - add end function comment"
+                ],
+                [
+                    "1. Create an `ide` function that takes a win and path parameter: ",
+                    " - create a root dom element with class `ide`",
+                    " - create a textarea element with 100% width and 500px height",
+                    " - if path is not empty, read the file content and set it to the textarea",
+                    " - create toolbar on win",
+                    " - add button on the toolbar with `▶️` text and on click execute `compile` function with textarea content",
+                    " - add button on the toolbar with `💾` text and on click fs.write textarea content to the path if path is defined, prompt for the path otherwise",
+                    " - return dom element",
+                    "2. Call register application with 'IDE' title, 🧠 as emoji, already defined `ide` function reference and 800x600 size and register for ['script'] extensions"
+                ]
+            ]
+        }
+    }
+}

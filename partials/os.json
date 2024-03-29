@@ -3,7 +3,6 @@
         "general-styles": {
             "to": "head",
             "tag": "style",
-            "prefix": "Generate CSS code\n### Instruction:\n",
             "instructions": [
                 [
                     "Apply a lite pink color to the body and overflow hidden"

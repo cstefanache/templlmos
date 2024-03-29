@@ -63,13 +63,11 @@
                     " - add button on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name",
                     " - add button on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and '' as content",
                     " - return root dom element",
-                    "",
-                    "",
+                    "add comment that the function is completed",
                     "register application with 'Browser' title, 📂 as emoji, browser and 400x400 size"
                 ]
             ]
         },
-       
         "run": {
             "disabled": false,
             "rebuld": false,
@@ -78,7 +76,6 @@
             "dependencies": [
                 "registry"
             ],
-
             "instructions": [
                 [
                     "Create an `application` function that takes a parent parameter having the following functionality:",
