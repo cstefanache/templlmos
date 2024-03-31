@@ -12,7 +12,7 @@
                     "- `.gmroot` is a flex container with column direction, centered content, margin of 2px, padding of 4px, background color of white",
                     "- `.row` is display flex with row direction, centered content",
                     "- `.cell` classes in `.gmroot` be the size of 22px by 22px, inline flex with content centered vertically and horizontally, 2px rounded dark grey border 1px width, margin of 1px, monospace font",
-                    "- `.cell.visited` class to have a background color of white, 2px white border",
+                    "- `.cell.visited` class to have a background color of white, 1px white border",
                     "- `.score` class to have a margin of 4px, monospace font, bold, centered text, background color of white, 2px rounded white border"
                 ]
             ]
@@ -27,7 +27,7 @@
             ],
             "instructions": [
                 [
-                    "1. Create a callback function `minesweeper` that:",
+                    "Create a callback function `minesweeper` that:",
                     " - creates a root dom element with the class `gmroot`",
                     " - generate a matrix of 8x8 with values 0",
                     " - pick a random of 10 cells and set their value to -40 and increase the number value of the neighbouring cells",
@@ -41,8 +41,10 @@
                     "   - if the div has am integer value smaller than 0 set the div content to `💣` and call `alert` with the message `Game Over` and the title `💣 minesweeper`",
                     "   - else decrease the score by 1 and update the score div content to `Discovered: ${score}`",
                     "   - if the div has an integer value of 0 call `reveal` for all the neighbouring cells",
-                    " - return root element",
-                    "2. Call register application with 'Minesweeper' title, 💣 as emoji, `minesweeper` callback function reference and 300x300 size"
+                    " - return root element"
+                ],
+                [
+                    "Call register application with 'Minesweeper' title, 💣 as emoji, `minesweeper` callback function reference and 300x300 size"
                 ]
             ]
         }

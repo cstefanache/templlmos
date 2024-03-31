@@ -1,7 +1,7 @@
 {
     "development": {
         "run-app": {
-            "disabled": false,
+            "disabled": true,
             "to": "head",
             "tag": "script",
             "rebuild": false,
@@ -11,14 +11,14 @@
             ],
             "instructions": [
                 [
-                    "create a new function `runApp` on the `window.os` object that takes a callback, width and height defaulting to 500 and 400, having the following functionality:",
+                    "create a new function `window.os.runApp` object that takes a callback, width and height defaulting to 500 and 400, having the following functionality:",
                     "  - creates a new window instance with the `Development` title , 🔥 emoji, width and height and saves it to a constant",
                     "  - attach to window the result of calling the callback with the window instance"
                 ]
             ]
         },
         "ide": {
-            "disabled": false,
+            "disabled": true,
             "rebuld": false,
             "to": "body",
             "tag": "script",

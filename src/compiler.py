@@ -36,6 +36,7 @@ class Compiler:
             model,
             model_prefix,
             model_suffix,
+            library_model,
             library_prefix,
             library_suffix,
             deps_prefix,
@@ -68,14 +69,11 @@ class Compiler:
                 compiled_dependencies = ""
                 for dependency in dependencies:
                     try:
-                        compiled_dependencies += api[dependency]
+                        compiled_dependencies += api[dependency] + "\n"
                     except KeyError:
                         print(f"Dependency not found: {dependency}")
 
-                if len(compiled_dependencies) > 0:
-                    compiled_dependencies = (
-                        f"{package_deps_prefix} {compiled_dependencies}"
-                    )
+                compiled_dependencies = f"{package_deps_prefix} {compiled_dependencies}"
 
                 to = package.get("to")
                 tag = package.get("tag")
@@ -92,20 +90,20 @@ class Compiler:
                         to_html[path] = {"_children_": []}
                     to_html = to_html[path]
 
-                compiled_instructions = []
-                output = []
-                self_api = ""
+                package_src = ""
+                package_api = ""
                 for index, instruction_set in enumerate(instructions):
+                    local_api = ""
                     instruction = "\n".join(instruction_set)
                     dep_prefix = prefix.replace("{deps}", compiled_dependencies)
                     compiled_instruction = f"{dep_prefix} {instruction} {suffix}"
-                   
-                    compiled_instructions.append(compiled_instruction)
+                    print(f"----------[ {app} {package_id} {index} ]----------")
+                    print(compiled_instruction)
 
                     cache_file_name = f"{CACHE}/{app}_{package_id}_{index}.json"
                     skip_compilation = False
 
-                    crc = binascii.crc32(instruction.encode())
+                    crc = binascii.crc32(compiled_instruction.encode())
                     if (
                         not rebuild
                         and not self.recompile
@@ -116,70 +114,59 @@ class Compiler:
                             if cache_data["crc"] == crc or preventRebuild:
                                 print(f"Using cache for {app}_{package_id}_{index}...")
                                 skip_compilation = True
-                                output = cache_data["output"]
+                                output_src = cache_data["output"]
+                                package_src += cache_data["output"]
 
                     if not skip_compilation:
-                        print("\n\n\n")
-                        print("-----------------------------------------------")
-                        print(compiled_instruction)
-
                         result = self.llm.call_llm(
                             model, compiled_instruction, update_response=update_response
                         )
                         output_src = self.process_output(result)
-                        output.append(output_src)
-
+                        package_src += output_src
                         cache_data = {
                             "crc": crc,
-                            "compiled_instruction": compiled_instructions,
-                            "output": output,
+                            "compiled_instruction": compiled_instruction,
+                            "output": output_src,
                         }
-                    
-                        compiled_dependencies += output_src
 
-                    if library:
-                        if (
-                            not preventRebuild
-                            and not skip_compilation
-                            or "library" not in cache_data
-                        ):
-                            libraryPrefix = package.get(
-                                "libraryPrefix", package_library_prefix
-                            )
-                            librarySuffix = package.get(
-                                "librarySuffix", package_library_suffix
-                            )
-                            self_api += self.llm.call_llm(
-                                model,
-                                f"{libraryPrefix} {output_src} {librarySuffix}",
-                                include_stop=False,
-                            )
-                            library_input = (
-                                f"{libraryPrefix} {output_src} {librarySuffix}"
-                            )
-                            # try:
-                            #     self_api = self.process_output(self_api, single_group=False)
-                            # except:  # noqa: E722
-                            #     print("Error processing API", package_id)
-                            cache_data["library"] = self_api
-                            cache_data["library_input"] = library_input
-                        else:
-                            self_api = cache_data["library"]
-                            library_input = cache_data["library_input"]
-                            print(">>> setting self_api from cache", package_id)
+                    if tag == "script":
+                        for line in output_src.split("\n"):
+                            if re.search(r"^ ?\/?\*", line):
+                                local_api += line + "\n"
+                            elif re.search(
+                                r"^[a-zA-Z.]+ = [function]", line
+                            ) or re.search(r"^function [a-z]", line):
+                                local_api += line + " ... }\n"
+
+                        compiled_dependencies += local_api
+                    cache_data["library"] = local_api
 
                     if not skip_compilation:
                         with open(cache_file_name, "w") as file:
                             json.dump(cache_data, file, indent=4)
 
+                    # write debug markdown file
+                    with open(f"{DEBUG}/{app}_{package_id}_{index}.md", "w") as file:
+                        file.write(f"## {app}_{package_id}_{index}\n")
+                        file.write("### API\n")
+                        file.write(f"<pre style='text-wrap: wrap'>{local_api}</pre>\n")
+
+                        file.write("### Instruction\n")
+                        file.write(
+                            f"<pre style='text-wrap: wrap'>{compiled_instruction}</pre>\n"
+                        )
+                        file.write("### Output\n")
+                        file.write(
+                            f"<pre style='text-wrap: wrap'>{package_src}</pre>\n"
+                        )
+
+                    package_api += local_api
+
+                api[package_id] = package_api
+
                 html_output = f"<{tag} id='{app}_{package_id}'>\n"
                 if tag == "script":
                     html_output += "(() => {\n"
-
-                package_src = ""
-                for res in output:
-                    package_src += res
-                    api[package_id] = self_api
 
                 if tag == "script":
                     html_output += package_src + "\n})()\n"
@@ -187,24 +174,6 @@ class Compiler:
                     html_output += package_src
 
                 html_output += f"</{tag}>"
-
-                # write debug markdown file
-                # with open(f"{DEBUG}/{app}_{package_id}.md", "w") as file:
-                #     file.write(f"## {app}_{package_id}\n")
-                #     if library:
-                #         file.write(f"### API\n")
-                #         file.write(
-                #             f"<pre style='text-wrap: wrap'>{library_input}</pre>\n"
-                #         )
-                #         file.write(f"<pre style='text-wrap: wrap'>{self_api}</pre>\n")
-
-                #     for i, res in enumerate(cache_data["compiled_instruction"]):
-                #         file.write(f"### Instruction: {i+1}\n")
-                #         instr = cache_data["compiled_instruction"][i]
-                #         out = cache_data["output"][i]
-                #         file.write(f"<pre style='text-wrap: wrap'>{instr}</pre>\n")
-                #         file.write(f"#### Output: {i}\n")
-                #         file.write(f"<pre style='text-wrap: wrap'>{out}</pre>\n")
 
                 to_html["_children_"].append(html_output)
 

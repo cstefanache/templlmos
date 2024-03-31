@@ -3,10 +3,10 @@
         {
             "repository": "TheBloke/deepseek-coder-6.7B-instruct-GGUF",
             "model": "deepseek-coder-6.7b-instruct.Q5_K_M.gguf",
-            "depsPrefix": "Given the following examples:\n",
-            "prefix": "You are a frontend web developer, do not use jquery that writes only browser JS, JavaScript, HTML and CSS\n### Instruction:\n{deps}\n\n",
+            "depsPrefix": "Given the following already defined functions:\n",
+            "prefix": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\n{deps}\n\n",
             "suffix": "\n### Response:\n",
-            "libraryPrefix": "### Instruction:\nYou are a javascript developer that documents all the declared functions by providing sample usage.\n```\n",
+            "libraryPrefix": "### Instruction:\nGenerate declared functions signature only using the following format `namespace.method = (params) // description`:\n```\n",
             "librarySuffix": "\n```\n### Response:\n",
             "stop": "```\n"
         }
@@ -14,16 +14,15 @@
     "partials": [
         "os.json",
         "filesystem.json",
-        "desktop.json",
         "output.json",
+        "desktop.json",
         "gui.json",
         "registry.json",
         "apps.json",
-        "development.json",
         "games.json"
     ],
     "skip": [
-        
+        "development.json"
     ],
     "definition": {}
 }

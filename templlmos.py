@@ -92,6 +92,10 @@ class Server(BaseHTTPRequestHandler):
         json_data = json.loads(post_data)
         # model = json_data["model"]
         instruction = json_data["instruction"]
+        
+        dependencies = re.findall(r"^# include: (\w+)", instruction, re.MULTILINE)
+        
+        
         response = instruction + "\n" + "-------------------------------" + "\n"
         result = compiler.llm.call_default_llm(instruction, update_fn=update_response)
         if json_data.get("full", False) is False:

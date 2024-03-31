@@ -1,9 +1,6 @@
 {
-    "crc": 227261235,
-    "compiled_instruction": [
-        "You are a frontend web developer, do not use jquery that writes only browser JS, JavaScript, HTML and CSS\n### Instruction:\n\n\n style .output-wrapper class having a fixed position having top and right to 0 and width 300px and 100% height of the screen\nstyle .output class having:\n - 100% width and height\n - a semi-transparent black background\n - white text\n - text wrap\n - font size of 9px\n - padding of 10px and 0 margins\n - overflow auto \n### Response:\n"
-    ],
-    "output": [
-        ".output-wrapper {\n    position: fixed;\n    top: 0;\n    right: 0;\n    width: 300px;\n    height: 100vh; /* viewport height */\n}\n\n.output {\n    width: 100%;\n    height: 100%;\n    background-color: rgba(0, 0, 0, 0.5); /* semi-transparent black */\n    color: white; /* white text */\n    white-space: pre-wrap; /* text wrap */\n    font-size: 9px;\n    padding: 10px; /* padding */\n    margin: 0; /* no margins */\n    overflow: auto; /* scroll if content overflows */\n}\n\n"
-    ]
+    "crc": 3397289784,
+    "compiled_instruction": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\nGiven the following already defined functions:\n \n\n style .output-wrapper class having a fixed position having top and right to 0 and width 300px and 100% height of the screen, z-index of -1\nstyle .output class having:\n - 100% width and height\n - a semi-transparent black background\n - white text\n - text wrap\n - font size of 9px\n - padding of 10px and 0 margins\n - overflow auto \n### Response:\n",
+    "output": ".output-wrapper {\n    position: fixed;\n    top: 0;\n    right: 0;\n    width: 300px;\n    height: 100vh; /* viewport height */\n    z-index: -1;\n}\n\n.output {\n    width: 100%;\n    height: 100%;\n    background-color: rgba(0, 0, 0, 0.5); /* semi-transparent black */\n    color: white; /* white text */\n    white-space: pre-wrap; /* text wrap */\n    font-size: 9px; /* font size of 9px */\n    padding: 10px; /* padding of 10px */\n    margin: 0; /* no margins */\n    overflow: auto; /* overflow auto */\n}\n\n",
+    "library": ""
 }

@@ -30,7 +30,8 @@ def process_output(output, single_group = True):
 
 with open("test.txt", "r") as read_file:
     data = read_file.read()
-    result = llm.call_llm("deepseek-coder-6.7b-instruct.Q5_K_M.gguf", data, include_stop=False)
+    # result = llm.call_llm("deepseek-coder-6.7b-instruct.Q5_K_M.gguf", data, include_stop=False)
+    result = llm.call_llm("codellama-13b-instruct.Q5_K_M.gguf", data, include_stop=False)
 
     print(process_output(result, single_group=False))
 

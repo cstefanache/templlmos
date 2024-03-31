@@ -1,9 +1,6 @@
 {
-    "crc": 1153540123,
-    "compiled_instruction": [
-        "You are a frontend web developer, do not use jquery that writes only browser JS, JavaScript, HTML and CSS\n### Instruction:\n\n\n Apply a lite pink color to the body and overflow hidden \n### Response:\n"
-    ],
-    "output": [
-        "body {\n    background-color: #ffe4e1; /* This is a light pink color */\n    overflow: hidden; /* This will hide any content that goes beyond the visible area */\n}\n\n"
-    ]
+    "crc": 3407079559,
+    "compiled_instruction": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\nGiven the following already defined functions:\n \n\n css to apply a lite pink color to the body and overflow hidden \n### Response:\n",
+    "output": "body {\n    background-color: #f8d0e8; /* Lite Pink */\n    overflow: hidden; /* Hidden Overflow */\n}\n\n",
+    "library": ""
 }

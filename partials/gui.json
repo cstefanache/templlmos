@@ -1,5 +1,106 @@
 {
     "gui": {
+        "draggable": {
+            "disabled": false,
+            "to": "head",
+            "tag": "script",
+            "rebuild": false,
+            "library": true,
+            "instructions": [
+                [
+                    "Implement `makeDraggable` on `window.os.gui` object that takes two parameters root and dragHandleHTMLElement with the following functionality:",
+                    " - change absolute position of root by dragging the dragHandleHTMLElement"
+                ],
+                [
+                    "Implement `makeResizable` on `window.os.gui` object  that takes two parameters: root, resizeHandleHTMLElement with the following functionality:` ",
+                    " - resize (both width and height) the root HTMLElement element by dragging the resizeHandle DOM element.",
+                    " - update starting width and height on mouseup"
+                ],
+                [
+                    "Implement `bringToFront` on `window.os.gui` object that taskes a single parameter: rootDOMNode  with the following functionality:",
+                    "- creates an internal function that:",
+                    "  * takes all elements with the same class as rootDomNode",
+                    "  * iterate through them and sets the z-index to 0 and at the end sets the z-index of rootDOMNode to 1",
+                    "- adds a mousedown event listener to rootDOMNode that calls the internal function",
+                    "- call the internal function"
+                ]
+            ]
+        },
+        "gui-tests": {
+            "to": "body",
+            "tag": "script",
+            "disabled": true,
+            "dependencies": [],
+            "preventRebuild": false,
+            "instructions": []
+        },
+        "titleBar": {
+            "disabled": false,
+            "to": "head",
+            "tag": "script",
+            "rebuild": false,
+            "library": true,
+            "instructions": [
+                [
+                    "Define a function `titleBar` on the `window.os.gui` object that takes two parameter: parentElement (DOM element), title (string), and a callback `close` and has the following functionality:",
+                    "- create a root DOM element with the class `.titleBar`",
+                    "- add to the root DOM element a `span` containing the title parameter",
+                    "- add to the root DOM element a `button` with the text `❌` and class `close` that calls the close callback",
+                    "- append the root DOM element to parentElement"
+                ]
+            ]
+        },
+        "toolbar": {
+            "disabled": false,
+            "to": "head",
+            "tag": "script",
+            "rebuild": false,
+            "dependencies": [],
+            "library": true,
+            "instructions": [
+                [
+                    "create function `createToolbar` on the `window.os.gui` object and generate jsdoc that takes one HTMLElement parameter `win`",
+                    "- create a root DOM element with the class `.toolbar`",
+                    "- append the root DOM element to the `.toolbarPlaceholder` from `win` HTML element",
+                    "- create internal function `addButton` that takes two parameters: text and callback that adds a button to the root DOM element with the text parameter and call the callback when the button is clicked",
+                    "- return internal addButton function"
+                ]
+            ]
+        },
+        "window": {
+            "disabled": false,
+            "to": "head",
+            "tag": "script",
+            "rebuild": false,
+            "preventRebuild": false,
+            "library": true,
+            "dependencies": [
+                "titleBar",
+                "draggable",
+                "gui-tests"
+            ],
+            "instructions": [
+                [
+                    "Define a function `createWindow` on the `window.os.gui` object that takes four parameters: emoji, title, width and height that are defaulting to 400 and 300, respectively if not passed and have the following functionality:",
+                    "- create a root DOM element with the class `.window`, set the width and height only, and add it to document body in the middle of the document",
+                    "- call bringToFront on the root element",
+                    "- add and empty div with class `titlePlaceholder` to the root DOM element",
+                    "- add and empty div with class `toolbarPlaceholder` to the root DOM element",
+                    "- add and empty div with class `contentPlaceholder` to the root DOM element",
+                    "- add and empty div with class `statusPlaceholder` to the root DOM element",
+                    "- add a resize handle to the root DOM element with class `resizeHandle`",
+                    "- add titleBar to `.titlePlaceholder` having the text `emoji + title` and close callback removes root DOM element from the document body",
+                    "- make root element draggable by the `.titlePlaceholder` element",
+                    "- make root element resizable by the `resizeHandle` element",
+                    "- set root DOM element left position document width divided by 2 minus width divided by 2",
+                    "- set root DOM element top position document height divided by 2 minus height divided by 2",
+                    "- return root DOM element"
+                ],
+                [
+                    "Define a function called `attachToWindow` on the `window.os.gui` object that takes two parameters: windowElement and contentElement that takes the contentElement and appends it to the `.contentPlaceholder` of the windowElement"
+                ]
+            ]
+        },
         "gui-styles": {
             "to": "head",
             "tag": "style",
@@ -9,18 +110,17 @@
                     "- orange background color, a black bottom border of 1px solid",
                     "- display of flex, a justify-content of space-between, an align-items of center",
                     "- monospaced black small text",
-                    "- internal padding of 5px",
+                    "- 5px horizontal padding, 0 vertical padding",
                     "- 2px black border bottom",
-                    "- render buttons flat, no border, no background, a cursor of pointer, font size of 6, no padding",
+                    "- render buttons flat, no border, no background, a cursor of pointer, font size of 6, 5px padding",
                     "- do not allow text selection"
                 ],
                 [
                     "css style for a .window class to follow the following rules:",
-                    "- white background color and a padding of 1px",
+                    "- white background color",
                     "- disable text selection",
                     "- a border of 2px solid black",
                     "- a border-radius of 8px",
-                    "- no padding",
                     "- hidden overflow",
                     "- a box-shadow of 4px 4px 0 0 rgba(0,0,0,0.5)",
                     "- absolute position",
@@ -54,119 +154,25 @@
                 ]
             ]
         },
-        "draggable": {
-            "disabled": false,
-            "to": "head",
-            "tag": "script",
-            "rebuild": false,
-            "library": true,
-            "instructions": [
-                [
-                    "Implement the following functions on the `window.os` object under `gui` key:",
-                    "- `makeDraggable(root, dragHandleHTMLElement)` - when user is dragging the dragHandleHTMLElement, move the root HTMLElement"
-                ],
-                [
-                    "Implement the following functions on the `window.os` object under `gui` key:",
-                    "`makeResizable(root, resizeHandleHTMLElement) that:` ",
-                    " - resize (both width and height) the root HTMLElement element by dragging the resizeHandle DOM element.",
-                    " - update starting width and height on mouseup"
-                ],
-                [
-                    "Implement `bringToFront(rootDOMNode)` on the `window.os.gui` that:",
-                    "- creates an internal function that:",
-                    "  * takes all elements with the same class as rootDomNode",
-                    "  * iterate through them and sets the z-index to 0",
-                    "  * sets the z-index of rootDOMNode to 1",
-                    "- adds a mousedown event listener to rootDOMNode that calls the internal function"
-                ]
-            ]
-        },
-        "gui-tests": {
-            "to": "body",
-            "tag": "script",
-            "disabled": true,
-            "dependencies": [],
-            "preventRebuild": false,
-            "instructions": []
-        },
-        "titleBar": {
-            "disabled": false,
-            "to": "head",
-            "tag": "script",
-            "rebuild": false,
-            "library": true,
-            "instructions": [
-                [
-                    "Define a function called `titleBar` object on `window.os.gui` that takes two parameter: parentElement (DOM element), title (string), and a callback `close` and has the following functionality:",
-                    "- create a root DOM element with the class `.titleBar`",
-                    "- add to the root DOM element a `span` containing the title parameter",
-                    "- add to the root DOM element a `button` with the text `❌` and class `close` that calls the close callback",
-                    "- append the root DOM element to parentElement"
-                ]
-            ]
-        },
-        "toolbar": {
-            "disabled": false,
-            "to": "head",
-            "tag": "script",
-            "rebuild": false,
-            "dependencies": [],
-            "library": true,
-            "instructions": [
-                [
-                    "Define a function called `createToolbar` on the `window.os.gui` object that takes one parameter `win`",
-                    "- create a root DOM element with the class `.toolbar`",
-                    "- append the root DOM element to the `.toolbarPlaceholder` from `win` parameter",
-                    "- return an object with the following functions:",
-                    "  - addButton(text, callback) - add a button to the root DOM element with the text parameter and call the callback when the button is clicked"
-                ]
-            ]
-        },
-        "window": {
-            "disabled": false,
-            "to": "head",
-            "tag": "script",
-            "rebuild": false,
-            "preventRebuild": false,
-            "library": true,
-            "dependencies": [
-                "titleBar",
-                "draggable",
-                "gui-tests"
-            ],
-            "instructions": [
-                [
-                    "Define a function called `createWindow` on the `window.os.gui` object that takes four parameters: emoji, title, width and height that are defaulting to 400 and 300, respectively if not passed and have the following functionality:",
-                    "- create a root DOM element with the class `.window`, set the width and height only, and add it to document body in the middle of the document",
-                    "- call bringToFront on the root element",
-                    "- add and empty div with class `titlePlaceholder` to the root DOM element",
-                    "- add and empty div with class `toolbarPlaceholder` to the root DOM element",
-                    "- add and empty div with class `contentPlaceholder` to the root DOM element",
-                    "- add and empty div with class `statusPlaceholder` to the root DOM element",
-                    "- add a resize handle to the root DOM element with class `resizeHandle`",
-                    "- add titleBar to `.titlePlaceholder` having the text `emoji + title` and close callback removes root DOM element from the document body",
-                    "- make root element draggable by the `.titlePlaceholder` element",
-                    "- make root element resizable by the `resizeHandle` element",
-                    "- set root DOM element left position document width divided by 2 minus width divided by 2",
-                    "- set root DOM element top position document height divided by 2 minus height divided by 2",
-                    "- return root DOM element"
-                ],
-                [
-                    "Define a function called `attachToWindow` on the `window.os.gui` object that takes two parameters: windowElement and contentElement that takes the contentElement and appends it to the `.contentPlaceholder` of the windowElement"
-                ]
-            ]
-        },
         "tests": {
             "disabled": true,
             "to": "body",
             "tag": "script",
             "preventRebuild": false,
             "dependencies": [
-                "window"
+                "window",
+                "toolbar"
             ],
             "instructions": [
                 [
-                    "create an element h1 with text `hello world!` and attach to a window with title `Hello World` and emoji `🌍` having 300x200 size"
+                    "create an element h1 with text `hello world!` and attach to a window with title `Hello World` and emoji `🌍` having 300x200 size",
+                    "create an element h1 with text `good bye world!` and attach to a window with title `Good Bye` and emoji `👋` having 300x200 size"
+                ],
+                [
+                    "create a h3 element with the text 'here",
+                    "create a window with title `Toolbar` and emoji `🛠`",
+                    "create a toolbar on window and add button with text `👋` that alerts `clicked` on callback",
+                    "attach the h3 element to the window"
                 ]
             ]
         }

@@ -1,0 +1,6 @@
+{
+    "crc": 1016468938,
+    "compiled_instruction": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\nGiven the following already defined functions:\n /**\n * Register an application on the desktop.\n * \n * @param {string} title - The tooltip text to display when hovering over this application's icon.\n * @param {string} emoji - The emoji to display in this application's icon.\n * @param {function} callback - The callback to call when this application's icon is clicked.\n * @param {number} [width=400] - The width of the application's window in pixels.\n * @param {number} [height=400] - The height of the application's window in pixels.\n * @param {Array<string>} [extensions] - The file extensions this application can handle.\n */\nwindow.os.registerApplication = function(title, emoji, callback, width = 400, height = 400, extensions) { ... }\n\nfunction minesweeper() { ... }\n\n\n Call register application with 'Minesweeper' title, \ud83d\udca3 as emoji, `minesweeper` callback function reference and 300x300 size \n### Response:\n",
+    "output": "window.os.registerApplication('Minesweeper', '\ud83d\udca3', minesweeper, 300, 300);\n\n",
+    "library": ""
+}

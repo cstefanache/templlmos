@@ -1,0 +1,6 @@
+{
+    "crc": 3901193363,
+    "compiled_instruction": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\nGiven the following already defined functions:\n /**\n * Returns information about the operating system.\n * @return {string} Information about the operating system.\n */\nwindow.os.about = function() { ... }\n\n\n - Define the `window.os.log` that takes a single parameter and calls console.log function \n### Response:\n",
+    "output": "/**\n * Logs a message to the console.\n * @param {string} message - The message to be logged.\n */\nwindow.os.log = function(message) {\n    console.log(message);\n};\n\n",
+    "library": "/**\n * Logs a message to the console.\n * @param {string} message - The message to be logged.\n */\nwindow.os.log = function(message) { ... }\n"
+}

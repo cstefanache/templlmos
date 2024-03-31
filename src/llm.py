@@ -20,6 +20,7 @@ class LLM:
                     model["model"],
                     model["prefix"],
                     model["suffix"],
+                    model["model"],
                     model["libraryPrefix"],
                     model["librarySuffix"],
                     model["depsPrefix"],
@@ -30,11 +31,24 @@ class LLM:
                 model["model"],
                 model["prefix"],
                 model["suffix"],
+                model["model"],
                 model["libraryPrefix"],
                 model["librarySuffix"],
                 model["depsPrefix"],
                 model.get("stop", None),
             )
+
+            if model.get("library", False) is True:
+                self.default_wrappers = (
+                    self.default_wrappers[0],
+                    self.default_wrappers[1],
+                    self.default_wrappers[2],
+                    model["model"],
+                    model["libraryPrefix"],
+                    model["librarySuffix"],
+                    self.default_wrappers[5],
+                    self.default_wrappers[6]
+                )
 
         hf_cache_info = scan_cache_dir("./models")
         for repo in hf_cache_info.repos:
@@ -59,7 +73,7 @@ class LLM:
             return self.default_wrappers
 
     def call_default_llm(self, instruction, update_fn=None):
-        (name, pre, suff, lib_pre, lib_suff, deps_prefix, stop) = self.default_wrappers
+        (name, pre, suff, lib_mode, lib_pre, lib_suff, deps_prefix, stop) = self.default_wrappers
         output = self.runtime_models[name](
             pre + instruction + suff,
             max_tokens=8096,
@@ -89,7 +103,7 @@ class LLM:
         self, model_name, instruction, include_stop=True, update_response=None
     ):
         model = self.runtime_models[model_name]
-        (name, pre, suff, lib_pre, lib_suff, deps_prefix, stop) = self.prompt_wrappers[
+        (name, pre, suff, limb_model, lib_pre, lib_suff, deps_prefix, stop) = self.prompt_wrappers[
             model_name
         ]
         output = model(

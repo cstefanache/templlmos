@@ -1,9 +1,6 @@
 {
-    "crc": 521624374,
-    "compiled_instruction": [
-        "You are a frontend web developer, do not use jquery that writes only browser JS, JavaScript, HTML and CSS\n### Instruction:\n\n\n css style for a .titleBar class to follow the following rules:\n- orange background color, a black bottom border of 1px solid\n- display of flex, a justify-content of space-between, an align-items of center\n- monospaced black small text\n- internal padding of 5px\n- 2px black border bottom\n- render buttons flat, no border, no background, a cursor of pointer, font size of 6, no padding\n- do not allow text selection \n### Response:\n"
-    ],
-    "output": [
-        ".titleBar {\n    background-color: orange;\n    border-bottom: 1px solid black;\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n    font-family: monospace;\n    font-size: small;\n    padding: 5px;\n    border-bottom: 2px solid black;\n}\n\n.titleBar button {\n    border: none;\n    background: none;\n    cursor: pointer;\n    font-size: 6;\n    padding: 0;\n    -webkit-user-select: none; /* Safari */\n    -ms-user-select: none; /* IE 10+ */\n    user-select: none; /* Standard syntax */\n}\n\n"
-    ]
+    "crc": 4289633460,
+    "compiled_instruction": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\nGiven the following already defined functions:\n \n\n css style for a .titleBar class to follow the following rules:\n- orange background color, a black bottom border of 1px solid\n- display of flex, a justify-content of space-between, an align-items of center\n- monospaced black small text\n- 5px horizontal padding, 0 vertical padding\n- 2px black border bottom\n- render buttons flat, no border, no background, a cursor of pointer, font size of 6, 5px padding\n- do not allow text selection \n### Response:\n",
+    "output": "/* Define styles for .titleBar */\n.titleBar {\n    background-color: orange;\n    border-bottom: 1px solid black;\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n    font-family: monospace;\n    font-size: small;\n    padding: 0px 5px;\n    border-bottom: 2px solid black;\n    user-select: none; /* Prevent text selection */\n}\n\n/* Define styles for buttons */\n.titleBar button {\n    border: none;\n    background: none;\n    cursor: pointer;\n    font-size: 6px;\n    padding: 5px;\n}\n\n",
+    "library": ""
 }

@@ -8,7 +8,7 @@
             "dependencies": [],
             "instructions": [
                 [
-                    "style .browser class to have display flex and flex-wrap wrap"
+                    "css to style .browser class to have display flex and flex-wrap wrap"
                 ]
             ]
         },
@@ -50,23 +50,25 @@
             ],
             "instructions": [
                 [
-                    "Create a `browser` function that takes a parent and path parameter:",
-                    " - create a root dom element with class `browser`",
-                    " - set browserPath variable to `''`",
+                    "1. Create a `browser` function that takes a win and path defaulting to '' parameter:",
+                    " - create a container dom element with class `browser`",
+                    " - set browserPath to path or `''` if path is undefined or not string",
                     " - generate internal load function that takes path parameter:",
-                    "   - set browserPath to the path",
-                    "   - removes all children of the root element",
+                    "   - set browserPath to path",
+                    "   - removes all children of the container element",
                     "   - if path is not empty, create a new `div` with class icon, inner element `.emoji` with internal span element having content '🔙'  and class `emoji` and on click call load with `path.split('/').slice(0, -1).join('/')`",
-                    "   - lists all files in the path and for each item call `getOsIcon` with item and load function as callback",
+                    "   - ls all files in the path and for each item call `getOsIcon` with path+'/'+item and load function as callback",
                     " - execute load on browserPath variable",
-                    " - create toolbar on the `parent` parameter",
-                    " - add button on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name",
-                    " - add button on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and '' as content",
-                    " - return root dom element",
-                    "add comment that the function is completed",
-                    "register application with 'Browser' title, 📂 as emoji, browser and 400x400 size"
+                    " - create toolbar",
+                    " - call `addButton` on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name",
+                    " - call `addButton` on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and '' as content",
+                    " - return dom element"
+                ],
+                [
+                    "Call register application with 'Browser' title, 📂 as emoji, browser and 450x400 size"
                 ]
             ]
+            
         },
         "run": {
             "disabled": false,
@@ -83,13 +85,15 @@
                     " - create an input element with 100% width with keyup event listener that on enter key press:",
                     "   - save the input value to instruction variable and clear the input",
                     "   - POST the json having instruction and full as false to `http://localhost:8080`, on response add a script tag to the body with id `run-script` and add the response text content to the script tag",
-                    " - return dom element",
+                    " - return dom element"
+                ],
+                [
                     "call register application with 'Run' title, ▶️ as emoji, already defined `application` function reference and 400x70 size"
                 ]
             ]
         },
         "assistant-styles": {
-            "disabled": false,
+            "disabled": true,
             "rebuild": false,
             "to": "head",
             "tag": "style",
@@ -103,7 +107,7 @@
             ]
         },
         "assistant": {
-            "disabled": false,
+            "disabled": true,
             "rebuld": false,
             "to": "body",
             "tag": "script",

@@ -5,7 +5,7 @@
             "tag": "style",
             "instructions": [
                 [
-                    "Apply a lite pink color to the body and overflow hidden"
+                    "css to apply a lite pink color to the body and overflow hidden"
                 ]
             ]
         },
@@ -15,6 +15,35 @@
             "instructions": [
                 [
                     "Create a new empty object `os` on the window global object"
+                ]
+            ]
+        },
+        "about": {
+            "to": "head",
+            "tag": "script",
+            "rebuild": false,
+            "library": true,
+            "instructions": [
+                [
+                    "- Define the `window.os.about` function that returns 'TempLLMOS is an experimental WebOS controlled by a Large Language Model."
+                ],
+                [
+                    "- Define the `window.os.log` that takes a single parameter and calls console.log function"
+                ]
+            ]
+        },
+        "tests": {
+            "to": "body",
+            "tag": "script",
+            "disabled": false,
+            "rebuild": false,
+            "library": false,
+            "dependencies": [
+                "about"
+            ],
+            "instructions": [
+                [
+                    "execute log with the about message"
                 ]
             ]
         }

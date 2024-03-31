@@ -5,7 +5,7 @@
             "tag": "style",
             "instructions": [
                 [
-                    "style .output-wrapper class having a fixed position having top and right to 0 and width 300px and 100% height of the screen",
+                    "style .output-wrapper class having a fixed position having top and right to 0 and width 300px and 100% height of the screen, z-index of -1",
                     "style .output class having:",
                     " - 100% width and height",
                     " - a semi-transparent black background",

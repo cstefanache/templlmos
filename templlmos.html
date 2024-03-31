@@ -2,8 +2,8 @@
  <head>
   <style id="osbase_general-styles">
    body {
-    background-color: #ffe4e1; /* This is a light pink color */
-    overflow: hidden; /* This will hide any content that goes beyond the visible area */
+    background-color: #f8d0e8; /* Lite Pink */
+    overflow: hidden; /* Hidden Overflow */
 }
   </style>
   <script id="osbase_global-objects">
@@ -13,88 +13,176 @@ window.os = {};
 
 })()
   </script>
+  <script id="osbase_about">
+   (() => {
+/**
+ * Returns information about the operating system.
+ * @return {string} Information about the operating system.
+ */
+window.os.about = function() {
+    return "TempLLMOS is an experimental WebOS controlled by a Large Language Model.";
+};
+
+/**
+ * Logs a message to the console.
+ * @param {string} message - The message to be logged.
+ */
+window.os.log = function(message) {
+    console.log(message);
+};
+
+
+})()
+  </script>
   <script id="osbase_filesystem">
    (() => {
-// Load filesystem object from local storage if it exists
+// Load the filesystem object from localStorage
 let filesystem = JSON.parse(localStorage.getItem('filesystem')) || {};
 
-// Define window.os.fs object
-if (!window.os) { window.os = {}; }
-if (!window.os.fs) { window.os.fs = {}; }
+// Define window.os.fs
+if (!window.os) {
+    window.os = {};
+}
+if (!window.os.fs) {
+    window.os.fs = {};
+}
 
-// Define sync function
+/**
+ * Save the filesystem object to localStorage
+ */
 window.os.fs.sync = function() {
     localStorage.setItem('filesystem', JSON.stringify(filesystem));
 }
 
-// Define readPath function
-window.os.fs.readPath = function(path) {
-    if (path[0] === '/') { path = path.substring(1); } // remove leading '/' if exists
-    let pathArray = path.split('/');
+/**
+ * Get file content at given path
+ * @param {string} path - The path to the file
+ * @returns {string|undefined} - The content of the file or undefined if not found
+ */
+window.os.fs.getFileContentFromPath = function(path) {
+    path = path.replace(/^\/|\/$/g, '').split('/');
     let current = filesystem;
-    for (let i = 0; i < pathArray.length; i++) {
-        if (current[pathArray[i]] === undefined) { return undefined; } // path not found
-        current = current[pathArray[i]];
+    for (let dir of path) {
+        if (!current[dir]) {
+            return undefined;
+        }
+        current = current[dir];
     }
-    return current;
+    return typeof current === 'string' ? current : undefined;
 }
 
-// Define write function
+/**
+ * Write content to a file at given path
+ * @param {string} path - The path to the file
+ * @param {string} content - The content to write to the file
+ */
 window.os.fs.write = function(path, content) {
-    if (path[0] === '/') { path = path.substring(1); } // remove leading '/' if exists
-    let pathArray = path.split('/');
+    path = path.replace(/^\/|\/$/g, '').split('/');
     let current = filesystem;
-    for (let i = 0; i < pathArray.length - 1; i++) { // skip last element (file name)
-        if (current[pathArray[i]] === undefined) { current[pathArray[i]] = {}; } // create path if it doesn't exist
-        current = current[pathArray[i]];
+    for (let dir of path.slice(0, -1)) {
+        if (!current[dir]) {
+            current[dir] = {};
+        }
+        current = current[dir];
     }
-    current[pathArray[pathArray.length - 1]] = content; // set content of file at path
-    this.sync(); // save changes to filesystem
+    current[path[path.length - 1]] = content;
+    this.sync();
 }
 
-// Define ls function
+/**
+ * List entries at given path
+ * @param {string} path - The path to list entries at
+ * @returns {Array} - An array of entries at the path or root if path is not found
+ */
 window.os.fs.ls = function(path = '') {
-    if (path[0] === '/') { path = path.substring(1); } // remove leading '/' if exists
-    let current = this.readPath(path) || filesystem; // get directory at path or root if path is empty or not found
-    return Object.keys(current); // return list of entries in directory
+    path = path.replace(/^\/|\/$/g, '').split('/');
+    let current = filesystem;
+    for (let dir of path) {
+        if (!current[dir]) {
+            return Object.keys(filesystem);
+        }
+        current = current[dir];
+    }
+    return Object.keys(current);
 }
 
-// Define mkdir function
+/**
+ * Create a directory at given path
+ * @param {string} path - The path to create a directory at
+ */
 window.os.fs.mkdir = function(path) {
-    if (path[0] === '/') { path = path.substring(1); } // remove leading '/' if exists
-    let pathArray = path.split('/');
+    path = path.replace(/^\/|\/$/g, '').split('/');
     let current = filesystem;
-    for (let i = 0; i < pathArray.length - 1; i++) { // skip last element (directory name)
-        if (current[pathArray[i]] === undefined) { current[pathArray[i]] = {}; } // create path if it doesn't exist
-        current = current[pathArray[i]];
+    for (let dir of path) {
+        if (!current[dir]) {
+            current[dir] = {};
+        }
+        current = current[dir];
     }
-    current[pathArray[pathArray.length - 1]] = {}; // create directory at path
-    this.sync(); // save changes to filesystem
+    this.sync();
 }
 
-// Define rm function
+/**
+ * Remove a file or directory at given path
+ * @param {string} path - The path to remove at
+ */
 window.os.fs.rm = function(path) {
-    if (path[0] === '/') { path = path.substring(1); } // remove leading '/' if exists
-    let pathArray = path.split('/');
+    path = path.replace(/^\/|\/$/g, '').split('/');
     let current = filesystem;
-    for (let i = 0; i < pathArray.length - 1; i++) { // skip last element (file name)
-        if (current[pathArray[i]] === undefined) { return; } // path not found
-        current = current[pathArray[i]];
+    let parent = filesystem;
+    for (let dir of path.slice(0, -1)) {
+        if (!current[dir]) {
+            return; // Path not found
+        }
+        parent = current;
+        current = current[dir];
     }
-    delete current[pathArray[pathArray.length - 1]]; // remove file at path
-    this.sync(); // save changes to filesystem
+    delete parent[path[path.length - 1]];
+    this.sync();
 }
 
-// Define isFile function
+/**
+ * Check if a path is a file
+ * @param {string} path - The path to check
+ * @returns {boolean} - True if path is a file, false otherwise
+ */
 window.os.fs.isFile = function(path) {
-    if (path[0] === '/') { path = path.substring(1); } // remove leading '/' if exists
-    let value = this.readPath(path); // get value at path
-    return typeof value === 'string'; // return true if value is string (file)
+    path = path.replace(/^\/|\/$/g, '').split('/');
+    let current = filesystem;
+    for (let dir of path) {
+        if (!current[dir]) {
+            return false; // Path not found or not a file
+        }
+        current = current[dir];
+    }
+    return typeof current === 'string'; // Check if current is a string (file)
 }
 
 
 })()
   </script>
+  <style id="output_output-styles">
+   .output-wrapper {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100vh; /* viewport height */
+    z-index: -1;
+}
+
+.output {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* semi-transparent black */
+    color: white; /* white text */
+    white-space: pre-wrap; /* text wrap */
+    font-size: 9px; /* font size of 9px */
+    padding: 10px; /* padding of 10px */
+    margin: 0; /* no margins */
+    overflow: auto; /* overflow auto */
+}
+  </style>
   <style id="desktop_content-style">
    #desktop_content {
     position: absolute;
@@ -123,7 +211,7 @@ window.os.fs.isFile = function(path) {
 .emoji {
     display: block;
     font-size: 30px;
-    inline-block;
+    display: inline-block;
     position: relative;
 }
 
@@ -152,72 +240,328 @@ if (!window.os) {
     window.os = {};
 }
 
-// Function to create icon
+/**
+ * Create an icon element with an emoji and a tooltip.
+ * @param {HTMLElement} parent - The parent element to append this icon to.
+ * @param {string} emoji - The emoji to display in this icon.
+ * @param {string} title - The tooltip text to display when hovering over this icon.
+ * @param {function} callback - The callback to call when this icon is clicked.
+ */
 window.os.icon = function(parent, emoji, title, callback) {
     // Create root DOM element with class .icon
     var icon = document.createElement('div');
-    icon.className = 'icon';
+    icon.classList.add('icon');
     
     // Create span with class .emoji and add it to icon
     var emojiSpan = document.createElement('span');
-    emojiSpan.className = 'emoji';
+    emojiSpan.classList.add('emoji');
     emojiSpan.textContent = emoji;
     icon.appendChild(emojiSpan);
     
     // Create span with class .title and add it to icon
     var titleSpan = document.createElement('span');
-    titleSpan.className = 'title';
+    titleSpan.classList.add('title');
     titleSpan.textContent = title;
     icon.appendChild(titleSpan);
     
     // Add click event listener to icon
-    icon.addEventListener('click', function() {
-        // Call the callback when the icon is clicked
-        if (callback && typeof(callback) === 'function') {
-            callback();
-        }
-    });
+    icon.addEventListener('click', callback);
     
-    // Add icon to the parent element
+    // Append icon to parent
     parent.appendChild(icon);
-}
+};
 
 
 })()
   </script>
   <script id="desktop_desktop-app">
    (() => {
-window.os = window.os || {}; // If window.os doesn't exist, create it
+/**
+ * Adds an application to the desktop content.
+ * @param {string} emoji - The emoji to display in this application's icon.
+ * @param {string} title - The tooltip text to display when hovering over this application's icon.
+ * @param {function} callback - The callback to call when this application's icon is clicked.
+ */
 window.os.addApp = function(emoji, title, callback) {
-  window.os.icon(document.querySelector('#desktop_content'), emoji, title, callback);
+    window.os.icon(document.querySelector('#desktop_content'), emoji, title, callback);
 };
 
 
 })()
   </script>
-  <style id="output_output-styles">
-   .output-wrapper {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 300px;
-    height: 100vh; /* viewport height */
+  <script id="gui_draggable">
+   (() => {
+if (!window.os) {
+    window.os = {};
+}
+if (!window.os.gui) {
+    window.os.gui = {};
 }
 
-.output {
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* semi-transparent black */
-    color: white; /* white text */
-    white-space: pre-wrap; /* text wrap */
-    font-size: 9px;
-    padding: 10px; /* padding */
-    margin: 0; /* no margins */
-    overflow: auto; /* scroll if content overflows */
+/**
+ * Makes an element draggable by a given handle element.
+ * @param {HTMLElement} root - The element to be made draggable.
+ * @param {HTMLElement} dragHandleHTMLElement - The handle element to initiate the drag operation.
+ */
+window.os.gui.makeDraggable = function(root, dragHandleHTMLElement) {
+    let isDragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+    
+    const handleMouseDown = (event) => {
+        isDragging = true;
+        offsetX = event.clientX - root.getBoundingClientRect().left;
+        offsetY = event.clientY - root.getBoundingClientRect().top;
+        
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+    };
+    
+    const handleMouseMove = (event) => {
+        if (isDragging) {
+            const x = event.clientX - offsetX;
+            const y = event.clientY - offsetY;
+            
+            // Prevent the element from being dragged off the screen
+            const boundingRect = document.body.getBoundingClientRect();
+            const rootRect = root.getBoundingClientRect();
+            if (x < boundingRect.left || y < boundingRect.top || x + rootRect.width > boundingRect.right || y + rootRect.height > boundingRect.bottom) {
+                return;
+            }
+            
+            root.style.left = `${x}px`;
+            root.style.top = `${y}px`;
+        }
+    };
+    
+    const handleMouseUp = () => {
+        isDragging = false;
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+    };
+    
+    dragHandleHTMLElement.addEventListener('mousedown', handleMouseDown);
+};
+
+/**
+* Makes an element resizable by a given handle element.
+* @param {HTMLElement} root - The element to be made resizable.
+* @param {HTMLElement} resizeHandleHTMLElement - The handle element to initiate the resize operation.
+*/
+window.os.gui.makeResizable = function(root, resizeHandleHTMLElement) {
+    let startWidth = root.offsetWidth;
+    let startHeight = root.offsetHeight;
+    let startX;
+    let startY;
+    
+    resizeHandleHTMLElement.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        startX = e.clientX;
+        startY = e.clientY;
+        
+        document.addEventListener('mousemove', resize);
+        document.addEventListener('mouseup', stopResize);
+    });
+    
+    function resize(e) {
+        let width = startWidth + (e.clientX - startX);
+        let height = startHeight + (e.clientY - startY);
+        
+        // Ensure width and height are not negative
+        width = Math.max(width, 0);
+        height = Math.max(height, 0);
+        
+        // Update width and height of root element
+        root.style.width = width + 'px';
+        root.style.height = height + 'px';
+    }
+    
+    function stopResize() {
+        // Update starting width and height on mouseup
+        startWidth = root.offsetWidth;
+        startHeight = root.offsetHeight;
+        
+        // Remove event listeners
+        document.removeEventListener('mousemove', resize);
+        document.removeEventListener('mouseup', stopResize);
+    }
+};
+
+/**
+* Brings the specified DOM node to the front of its siblings.
+* @param {HTMLElement} rootDOMNode - The DOM node to bring to front.
+*/
+window.os.gui.bringToFront = function(rootDOMNode) {
+    // Internal function to bring to front
+    var bringToFront = function() {
+        // Get all elements with same class as rootDOMNode
+        var siblings = document.getElementsByClassName(rootDOMNode.className);
+        // Iterate through them and set z-index to 0
+        for (var i = 0; i < siblings.length; i++) {
+            siblings[i].style.zIndex = 0;
+        }
+        // Set z-index of rootDOMNode to 1
+        rootDOMNode.style.zIndex = 1;
+    };
+    
+    // Call internal function on mousedown event of rootDOMNode
+    rootDOMNode.addEventListener('mousedown', bringToFront);
+    
+    // Call internal function immediately to bring to front on load
+    bringToFront();
+};
+
+
+})()
+  </script>
+  <script id="gui_titleBar">
+   (() => {
+// Assuming window.os is an existing object with gui as its property
+if (!window.os) {
+    window.os = {};
 }
-  </style>
+if (!window.os.gui) {
+    window.os.gui = {};
+}
+
+/**
+ * Creates a title bar with a title and a close button.
+ * @param {HTMLElement} parentElement - The DOM element to append this title bar to.
+ * @param {string} title - The title to display in the title bar.
+ * @param {function} close - The callback to call when the close button is clicked.
+ */
+window.os.gui.titleBar = function(parentElement, title, close) {
+    // Create root element
+    var root = document.createElement('div');
+    root.classList.add('titleBar');
+    
+    // Create title span
+    var titleSpan = document.createElement('span');
+    titleSpan.textContent = title;
+    root.appendChild(titleSpan);
+    
+    // Create close button
+    var closeButton = document.createElement('button');
+    closeButton.textContent = '❌';
+    closeButton.classList.add('close');
+    closeButton.addEventListener('click', close); // Add click event listener to close button
+    root.appendChild(closeButton);
+    
+    // Append root to parent element
+    parentElement.appendChild(root);
+};
+
+
+})()
+  </script>
+  <script id="gui_toolbar">
+   (() => {
+/**
+ * Create a toolbar with a button inside it.
+ * @param {HTMLElement} win - The window element to add toolbar to.
+ * @returns {function(string, function): void} - The addButton function.
+ */
+window.os.gui.createToolbar = function(win) {
+    // Create a root DOM element with class .toolbar
+    var toolbar = document.createElement('div');
+    toolbar.className = 'toolbar';
+    
+    // Append the root DOM element to .toolbarPlaceholder from win HTML element
+    win.querySelector('.toolbarPlaceholder').appendChild(toolbar);
+    
+    /**
+     * Add a button to the toolbar with a specific text and callback when clicked.
+     * @param {string} text - The text to display on the button.
+     * @param {function} callback - The callback to call when the button is clicked.
+     */
+    var addButton = function(text, callback) {
+        // Create a button element with text parameter
+        var button = document.createElement('button');
+        button.textContent = text;
+        
+        // Add event listener to call callback when button is clicked
+        button.addEventListener('click', callback);
+        
+        // Append button to toolbar root element
+        toolbar.appendChild(button);
+    };
+    
+    // Return addButton function
+    return addButton;
+};
+
+
+})()
+  </script>
+  <script id="gui_window">
+   (() => {
+/**
+* Create a new window with given emoji, title, width and height.
+* @param {string} emoji - The emoji to display in the window's title bar.
+* @param {string} title - The title to display in the window's title bar.
+* @param {number} [width=400] - The width of the window in pixels.
+* @param {number} [height=300] - The height of the window in pixels.
+* @return {HTMLElement} The root DOM element of the newly created window.
+*/
+window.os.gui.createWindow = function(emoji, title, width = 400, height = 300) {
+    // Create root DOM element
+    const root = document.createElement('div');
+    root.className = 'window';
+    root.style.width = `${width}px`;
+    root.style.height = `${height}px`;
+    document.body.appendChild(root);
+    
+    // Bring to front
+    window.os.gui.bringToFront(root);
+    
+    // Create placeholders for title bar, toolbar, content, status
+    ['titlePlaceholder', 'toolbarPlaceholder', 'contentPlaceholder', 'statusPlaceholder'].forEach(className => {
+        const placeholder = document.createElement('div');
+        placeholder.className = className;
+        root.appendChild(placeholder);
+    });
+    
+    // Create resize handle
+    const resizeHandle = document.createElement('div');
+    resizeHandle.className = 'resizeHandle';
+    root.appendChild(resizeHandle);
+    
+    // Create title bar
+    window.os.gui.titleBar(root.querySelector('.titlePlaceholder'), emoji + ' ' + title, () => document.body.removeChild(root));
+    
+    // Make window draggable by title bar
+    window.os.gui.makeDraggable(root, root.querySelector('.titlePlaceholder'));
+    
+    // Make window resizable by resize handle
+    window.os.gui.makeResizable(root, resizeHandle);
+    
+    // Position window in center of document
+    root.style.position = 'absolute';
+    root.style.left = `${window.innerWidth / 2 - width / 2}px`;
+    root.style.top = `${window.innerHeight / 2 - height / 2}px`;
+    
+    return root;
+};
+
+/**
+* Attach content to an existing window.
+* @param {HTMLElement} windowElement - The window to attach content to.
+* @param {HTMLElement} contentElement - The content to attach to the window.
+*/
+window.os.gui.attachToWindow = function(windowElement, contentElement) {
+    // Find the .contentPlaceholder element in the windowElement
+    var contentPlaceholder = windowElement.querySelector('.contentPlaceholder');
+    
+    // Append the contentElement to the .contentPlaceholder element
+    contentPlaceholder.appendChild(contentElement);
+};
+
+
+})()
+  </script>
   <style id="gui_gui-styles">
-   .titleBar {
+   /* Define styles for .titleBar */
+.titleBar {
     background-color: orange;
     border-bottom: 1px solid black;
     display: flex;
@@ -225,37 +569,38 @@ window.os.addApp = function(emoji, title, callback) {
     align-items: center;
     font-family: monospace;
     font-size: small;
-    padding: 5px;
+    padding: 0px 5px;
     border-bottom: 2px solid black;
+    user-select: none; /* Prevent text selection */
 }
 
+/* Define styles for buttons */
 .titleBar button {
     border: none;
     background: none;
     cursor: pointer;
-    font-size: 6;
-    padding: 0;
-    -webkit-user-select: none; /* Safari */
-    -ms-user-select: none; /* IE 10+ */
-    user-select: none; /* Standard syntax */
+    font-size: 6px;
+    padding: 5px;
 }
 
 .window {
     position: absolute;
     display: flex;
     flex-direction: column;
-    background-color: white;
     border: 2px solid black;
     border-radius: 8px;
     box-shadow: 4px 4px 0 0 rgba(0,0,0,0.5);
     overflow: hidden;
-    padding: 0;
+    background-color: white;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10+ */
+    user-select: none; /* Standard syntax */
 }
 
 .contentPlaceholder {
+    padding: 5px;
     flex-grow: 1;
     overflow: auto;
-    padding: 5px;
 }
 
 .statusPlaceholder {
@@ -265,9 +610,9 @@ window.os.addApp = function(emoji, title, callback) {
 }
 
 .resizeHandle {
+    position: absolute;
     width: 0px;
     height: 0px;
-    position: absolute;
     bottom: 0;
     right: 0;
     cursor: se-resize;
@@ -278,281 +623,39 @@ window.os.addApp = function(emoji, title, callback) {
 }
 
 .toolbar {
-    display: flex;
-    justify-content: flex-start;
     padding: 2px;
+    background-color: antiquewhite;
     margin-bottom: 2px;
     border-bottom: 1px solid black;
-    background-color: antiquewhite;
+    display: flex;
+    justify-content: flex-start;
 }
 
-.toolbar button {
+button {
     border: none;
     cursor: pointer;
     background-color: transparent;
 }
   </style>
-  <script id="gui_draggable">
-   (() => {
-// Firstly, we need to check if window.os exists and gui exists inside it. If not, we create them.
-if (!window.os) {
-    window.os = {};
-}
-if (!window.os.gui) {
-    window.os.gui = {};
-}
-
-// Now we implement makeDraggable function
-window.os.gui.makeDraggable = function (root, dragHandleHTMLElement) {
-    var isDragging = false; // flag to check if we're currently dragging
-    var offsetX = 0; // offset from mouse to element start position
-    var offsetY = 0; // offset from mouse to element start position
-    
-    // function to start dragging
-    function startDragging(e) {
-        e = e || window.event; // for IE
-        e.preventDefault(); // prevent selection of text while dragging
-        isDragging = true; // set flag to true
-        offsetX = e.clientX - root.getBoundingClientRect().left; // calculate offsets
-        offsetY = e.clientY - root.getBoundingClientRect().top;
-        document.onmousemove = function (e) { moveElement(e); }; // set mousemove event handler
-        document.onmouseup = function () { stopDragging(); }; // set mouseup event handler
-    }
-    
-    // function to move element during dragging
-    function moveElement(e) {
-        e = e || window.event; // for IE
-        if (isDragging) { // if we're currently dragging
-            var newX = e.clientX - offsetX; // calculate new position
-            var newY = e.clientY - offsetY; // calculate new position
-            root.style.left = newX + 'px'; // set new position
-            root.style.top = newY + 'px'; // set new position
-        }
-    }
-    
-    // function to stop dragging
-    function stopDragging() {
-        isDragging = false; // set flag to false
-        document.onmousemove = null; // remove mousemove event handler
-        document.onmouseup = null; // remove mouseup event handler
-    }
-    
-    // add mousedown event listener to drag handle
-    dragHandleHTMLElement.addEventListener('mousedown', startDragging);
-}
-
-// Create 'gui' namespace if it doesn't exist
-if (!window.os) {
-    window.os = {};
-}
-if (!window.os.gui) {
-    window.os.gui = {};
-}
-
-// Function to make an element resizable
-window.os.gui.makeResizable = function (root, resizeHandleElement) {
-    var startX;
-    var startY;
-    var startWidth = root.offsetWidth;
-    var startHeight = root.offsetHeight;
-    
-    // Function to handle mouse down event
-    function handleMouseDown(e) {
-        e = e || window.event;
-        startX = e.clientX;
-        startY = e.clientY;
-        document.onmouseup = handleMouseUp;
-        document.onmousemove = handleMouseMove;
-    }
-    
-    // Function to handle mouse up event
-    function handleMouseUp() {
-        document.onmouseup = null;
-        document.onmousemove = null;
-        startWidth = root.offsetWidth;
-        startHeight = root.offsetHeight;
-    }
-    
-    // Function to handle mouse move event
-    function handleMouseMove(e) {
-        e = e || window.event;
-        var diffX = e.clientX - startX;
-        var diffY = e.clientY - startY;
-        root.style.width = (startWidth + diffX) + 'px';
-        root.style.height = (startHeight + diffY) + 'px';
-    }
-    
-    // Add event listeners to handle mouse events
-    resizeHandleElement.addEventListener('mousedown', handleMouseDown);
-}
-
-// Assuming window.os.gui is already defined
-if (!window.os.gui) {
-    window.os.gui = {};
-}
-
-// Function to bring to front
-window.os.gui.bringToFront = function (rootDomNode) {
-    // Internal function to set z-index to 0 for all elements with same class as rootDomNode
-    var setZIndexToZero = function (className) {
-        var elements = document.getElementsByClassName(className);
-        for (var i = 0; i < elements.length; i++) {
-            elements[i].style.zIndex = 0;
-        }
-    };
-    
-    // Set z-index of rootDomNode to 1
-    rootDomNode.style.zIndex = 1;
-    
-    // Add mousedown event listener to rootDomNode
-    rootDomNode.addEventListener('mousedown', function () {
-        setZIndexToZero(rootDomNode.className);
-    });
-};
-
-
-})()
-  </script>
-  <script id="gui_titleBar">
-   (() => {
-if (!window.os) {
-    window.os = {};
-}
-if (!window.os.gui) {
-    window.os.gui = {};
-}
-
-window.os.gui.titleBar = function(parentElement, title, close) {
-    // Create root DOM element with class .titleBar
-    var root = document.createElement('div');
-    root.className = 'titleBar';
-    
-    // Create span containing the title parameter
-    var span = document.createElement('span');
-    span.textContent = title;
-    root.appendChild(span);
-    
-    // Create button with text '❌' and class 'close'
-    var button = document.createElement('button');
-    button.textContent = '❌';
-    button.className = 'close';
-    button.addEventListener('click', close); // Add click event listener to the button
-    root.appendChild(button);
-    
-    // Append root DOM element to parentElement
-    parentElement.appendChild(root);
-};
-
-
-})()
-  </script>
-  <script id="gui_toolbar">
-   (() => {
-// Assuming os.gui is already defined as an object
-if (typeof window.os === 'undefined') window.os = {};
-if (typeof window.os.gui === 'undefined') window.os.gui = {};
-
-// Function to create toolbar
-window.os.gui.createToolbar = function(win) {
-    // Create root DOM element with class .toolbar
-    var toolbar = document.createElement('div');
-    toolbar.className = 'toolbar';
-    
-    // Append root DOM element to .toolbarPlaceholder from win parameter
-    win.querySelector('.toolbarPlaceholder').appendChild(toolbar);
-    
-    // Return an object with addButton function
-    return {
-        addButton: function(text, callback) {
-            // Create button element
-            var button = document.createElement('button');
-            button.textContent = text;
-            
-            // Add click event listener to button
-            button.addEventListener('click', callback);
-            
-            // Append button to toolbar
-            toolbar.appendChild(button);
-        }
-    };
-};
-
-
-})()
-  </script>
-  <script id="gui_window">
-   (() => {
-window.os.gui = window.os.gui || {};  // Initialize namespace if it doesn't exist
-window.os.gui.createWindow = function(emoji = '🖥️', title = 'Window', width = 400, height = 300) {
-    // Create root DOM element
-    var root = document.createElement('div');
-    root.className = 'window';
-    root.style.width = width + 'px';
-    root.style.height = height + 'px';
-    document.body.appendChild(root);
-    
-    // Bring root DOM node to front when mousedown event is triggered
-    window.os.gui.bringToFront(root);
-    
-    // Create placeholder divs for title, toolbar, content and status
-    ['titlePlaceholder', 'toolbarPlaceholder', 'contentPlaceholder', 'statusPlaceholder'].forEach(function(className) {
-        var placeholder = document.createElement('div');
-        placeholder.className = className;
-        root.appendChild(placeholder);
-    });
-    
-    // Create resize handle
-    var resizeHandle = document.createElement('div');
-    resizeHandle.className = 'resizeHandle';
-    root.appendChild(resizeHandle);
-    
-    // Create titleBar
-    window.os.gui.titleBar(root.querySelector('.titlePlaceholder'), emoji + ' ' + title, function() {
-        document.body.removeChild(root);  // Remove root DOM node from document body when close button is clicked
-    });
-    
-    // Make window draggable by title placeholder
-    window.os.gui.makeDraggable(root, root.querySelector('.titlePlaceholder'));
-    
-    // Make window resizable by resize handle
-    window.os.gui.makeResizable(root, resizeHandle);
-    
-    // Position window in center of document
-    root.style.position = 'absolute';
-    root.style.left = (window.innerWidth / 2 - width / 2) + 'px';
-    root.style.top = (window.innerHeight / 2 - height / 2) + 'px';
-    
-    return root;  // Return root DOM node
-};
-
-window.os.gui = window.os.gui || {};  // Ensure os.gui namespace exists
-
-window.os.gui.attachToWindow = function(windowElement, contentElement) {
-    // Get .contentPlaceholder of windowElement
-    var contentPlaceholder = windowElement.querySelector('.contentPlaceholder');
-    
-    // Append contentElement to .contentPlaceholder of windowElement
-    contentPlaceholder.appendChild(contentElement);
-};
-
-
-})()
-  </script>
   <script id="registry_extension">
    (() => {
-// Check if window.os exists, if not create it
-if (typeof window.os === 'undefined') {
+// Assuming window.os is already defined
+if (!window.os) {
     window.os = {};
 }
 
-// Check if window.os.registry exists, if not create it
-if (typeof window.os.registry === 'undefined') {
+// Assuming window.os.registry is already defined
+if (!window.os.registry) {
     window.os.registry = {};
 }
 
-// Define registerExtension function
+/**
+ * Register an extension with its corresponding emoji and callback.
+ * @param {string} extension - The name of the extension to register.
+ * @param {string} emoji - The corresponding emoji for this extension.
+ * @param {function} callback - The callback to be executed when this extension is used.
+ */
 window.os.registerExtension = function(extension, emoji, callback) {
-    // Store extension, emoji and callback in window.os.registry
     window.os.registry[extension] = {emoji: emoji, callback: callback};
 };
 
@@ -561,37 +664,43 @@ window.os.registerExtension = function(extension, emoji, callback) {
   </script>
   <script id="registry_app-icon">
    (() => {
-window.os = window.os || {};
+/**
+ * Create an icon element for a file or directory at given path
+ * @param {string} path - The path to the file or directory
+ * @param {function} callback - The callback to call when the icon is clicked
+ * @returns {HTMLElement} - The icon element
+ */
 window.os.getOSIcon = function(path, callback) {
-    const root = document.createElement('div');
-    root.classList.add('icon');
-    
     const isFile = window.os.fs.isFile(path);
-    const emoji = document.createElement('span');
-    emoji.classList.add('emoji');
-    emoji.textContent = isFile ? '📄' : '📁';
-    root.appendChild(emoji);
+    const rootElement = document.createElement('div');
+    rootElement.classList.add('icon');
     
-    const title = document.createElement('div');
-    title.classList.add('title');
-    title.textContent = path.split('/').pop();  // Assuming path is in Unix format
-    root.appendChild(title);
+    const emojiElement = document.createElement('span');
+    emojiElement.classList.add('emoji');
+    emojiElement.textContent = isFile ? '📄' : '📁';
+    rootElement.appendChild(emojiElement);
     
-    const extension = path.split('.').pop();  // Assuming path has an extension
-    let currentCallback = callback;
-    if (extension in window.os.registry) {
-        const {emoji: regEmoji, callback: regCallback} = window.os.registry[extension];
-        const appEmoji = document.createElement('span');
-        appEmoji.classList.add('app-emoji');
-        appEmoji.textContent = regEmoji;
-        root.appendChild(appEmoji);
+    const titleElement = document.createElement('div');
+    titleElement.classList.add('title');
+    titleElement.textContent = path.split('/').pop(); // Assuming path is a Unix-like path
+    rootElement.appendChild(titleElement);
+    
+    const ext = path.split('.').pop(); // Assuming path has an extension
+    const extData = window.os.registry[ext];
+    if (extData) {
+        const appEmojiElement = document.createElement('span');
+        appEmojiElement.classList.add('app-emoji');
+        appEmojiElement.textContent = extData.emoji;
+        rootElement.appendChild(appEmojiElement);
         
-        currentCallback = regCallback;
+        let currentCallback = path => extData.callback(path); // Closure for path
+        rootElement.addEventListener('click', () => currentCallback(path));
+    } else {
+        let currentCallback = path => callback(path); // Closure for path
+        rootElement.addEventListener('click', () => currentCallback(path));
     }
     
-    root.addEventListener('click', () => currentCallback(path));
-    
-    return root;
+    return rootElement;
 };
 
 
@@ -599,27 +708,31 @@ window.os.getOSIcon = function(path, callback) {
   </script>
   <script id="registry_registry">
    (() => {
-// Define the registerApplication function on the os object
-window.os.registerApplication = function(title, emoji, callback, width=400, height=400, extensions=undefined) {
-  // Define an internal execute function
-  const execute = (...params) => {
-    // Create a new window instance with the title, emoji, width and height
-    const appWindow = window.os.gui.createWindow(emoji, title, width, height);
+/**
+ * Register an application on the desktop.
+ * 
+ * @param {string} title - The tooltip text to display when hovering over this application's icon.
+ * @param {string} emoji - The emoji to display in this application's icon.
+ * @param {function} callback - The callback to call when this application's icon is clicked.
+ * @param {number} [width=400] - The width of the application's window in pixels.
+ * @param {number} [height=400] - The height of the application's window in pixels.
+ * @param {Array<string>} [extensions] - The file extensions this application can handle.
+ */
+window.os.registerApplication = function(title, emoji, callback, width = 400, height = 400, extensions) {
+    const execute = (...params) => {
+        const windowInstance = window.os.gui.createWindow(emoji, title, width, height);
+        window.os.gui.attachToWindow(windowInstance, callback(windowInstance, ...params));
+    };
     
-    // Attach to window the result of calling the callback with the window instance and spread params
-    const content = callback(appWindow, ...params);
-    window.os.gui.attachToWindow(appWindow, content);
-  };
-  
-  // If extensions is defined, call registerExtension for each extension with the emoji and the execute function
-  if (extensions) {
-    extensions.forEach(extension => {
-      window.os.registerExtension(extension, emoji, execute);
-    });
-  }
-  
-  // Call addApp with the emoji, title and execute function 
-  window.os.addApp(emoji, title, execute);
+    if (extensions) {
+        extensions.forEach(extension => {
+            // Assuming `registerExtension` is also available on `window.os` object
+            // and it takes an extension, emoji and callback as parameters
+            window.os.registerExtension(extension, emoji, execute);
+        });
+    }
+    
+    window.os.addApp(emoji, title, execute);
 };
 
 
@@ -631,38 +744,6 @@ window.os.registerApplication = function(title, emoji, callback, width=400, heig
     flex-wrap: wrap;
 }
   </style>
-  <style id="apps_assistant-styles">
-   .chat {
-    display: flex;
-    flex-direction: column;
-}
-
-.results {
-    width: 100%;
-    height: 300px;
-    overflow-y: scroll;
-    margin: 10px;
-}
-
-.results pre {
-    white-space: pre-wrap;
-}
-  </style>
-  <script id="development_run-app">
-   (() => {
-// Define runApp on os object
-window.os.runApp = function(callback, width = 500, height = 400) {
-    // Create new window instance with 'Development' title , '🔥' emoji, width and height
-    const appWindow = window.os.gui.createWindow('🔥', 'Development', width, height);
-    
-    // Attach to window the result of calling the callback with the window instance 
-    const content = callback(appWindow);
-    window.os.gui.attachToWindow(appWindow, content);
-};
-
-
-})()
-  </script>
   <style id="games_styles">
    .gmroot {
     display: flex;
@@ -695,7 +776,7 @@ window.os.runApp = function(callback, width = 500, height = 400) {
 
 .cell.visited {
     background-color: white;
-    border-color: white;
+    border: 1px solid white;
 }
 
 .score {
@@ -710,17 +791,47 @@ window.os.runApp = function(callback, width = 500, height = 400) {
   </style>
  </head>
  <body>
-  <div id="desktop_content">
-  </div>
+  <script id="osbase_tests">
+   (() => {
+/**
+ * Executes log with about message.
+ */
+function executeLogWithAbout() {
+    window.os.log(window.os.about());
+}
+
+
+})()
+  </script>
+  <script id="osbase_fs-tests">
+   (() => {
+// Create a new directory in the root directory called `fstest`
+window.os.fs.mkdir('fstest');
+
+// Create a new file in the `fstest` directory called `test.txt` with the content `hello world`
+window.os.fs.write('fstest/test.txt', 'hello world');
+
+// List the entries in the `fstest` directory and log it to console
+console.log(window.os.fs.ls('fstest'));
+
+// Read the content of the `fstest/test.txt` file and log it to console
+console.log(window.os.fs.getFileContentFromPath('fstest/test.txt'));
+
+// Remove the `fstest` directory 
+window.os.fs.rm('fstest');
+
+
+})()
+  </script>
   <script id="output_output-window">
    (() => {
-// Create root container div
+// Create root container div element
 let outputWrapper = document.createElement('div');
 outputWrapper.className = 'output-wrapper';
 outputWrapper.id = 'output-wrapper';
 document.body.appendChild(outputWrapper);
 
-// Create output pre element
+// Create pre element
 let output = document.createElement('pre');
 output.className = 'output';
 output.id = 'output';
@@ -728,61 +839,67 @@ outputWrapper.appendChild(output);
 
 // Internal function to fetch content from 'http://localhost:8080/output'
 async function fetchContent() {
-  try {
-    let response = await fetch('http://localhost:8080/output');
-    let data = await response.text();
-    output.innerHTML = data;
-  } catch (error) {
-    console.error('Error fetching content:', error);
-  }
+    try {
+        let response = await fetch('http://localhost:8080/output');
+        let data = await response.text();
+        output.innerHTML = data;
+    } catch (error) {
+        console.error('Error:', error);
+    }
 }
 
-// Fetch http://localhost:8080/ping
+// Call http://localhost:8080/ping
 fetch('http://localhost:8080/ping')
-  .then(response => {
-    if (response.status === 200) {
-      // If response is 200, set an interval to call fetchContent every 1000ms
-      setInterval(fetchContent, 1000);
-    } else {
-      console.error('Ping failed with status:', response.status);
-    }
-  })
-  .catch(error => {
-    console.error('Error pinging server:', error);
-  });
+    .then(response => {
+        if (response.status === 200) {
+            // If response is 200, set an interval to call fetchContent every 1000ms
+            setInterval(fetchContent, 1000);
+        } else {
+            console.error('Ping failed with status', response.status);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 
 
 })()
   </script>
+  <div id="desktop_content">
+  </div>
   <script id="registry_hello-world">
    (() => {
-// Define your application's title, emoji and callback function
-const title = "Hello World";
-const emoji = "👋";
-const callback = (appWindow, param1, param2) => {
-   // Create root element div
-   const root = document.createElement('div');
-   
-   // Create h1 child element with 'Hello World' text
-   const h1 = document.createElement('h1');
-   h1.textContent = 'Hello World';
-   root.appendChild(h1);
-   
-   // If path is defined append a pre element containing the content of reading the file at the path
-   if (param1) {
-       const pre = document.createElement('pre');
-       pre.textContent = window.os.fs.readPath(param1);
-       root.appendChild(pre);
-   }
-   
-   // Return root element
-   return root;
-};
-const width = 300;  // Set width to 300
-const height = 200; // Set height to 200
+/**
+ * Create a root element div with an h1 child element containing 'Hello World'
+ * If path is defined append a pre element containing the content of reading the file at the path
+ * @param {HTMLElement} parent - The parent element to append the root element to
+ * @param {string} [path] - The path to a file to read content from
+ * @returns {HTMLElement} - The root element containing h1 and pre child elements
+ */
+function helloWorld(parent, path) {
+    // Create root div element
+    const root = document.createElement('div');
+    
+    // Create h1 element with 'Hello World' text
+    const h1 = document.createElement('h1');
+    h1.textContent = 'Hello World';
+    root.appendChild(h1);
+    
+    // If path is defined, create pre element with file content
+    if (path) {
+        const pre = document.createElement('pre');
+        pre.textContent = window.os.fs.getFileContentFromPath(path);
+        root.appendChild(pre);
+    }
+    
+    // Append root element to parent
+    parent.appendChild(root);
+    
+    return root;
+}
 
-// Register your application with the operating system
-window.os.registerApplication(title, emoji, callback, width, height);
+// Register application with 'hello world' title, 👋 as emoji, helloWorld function and 300x200 size
+window.os.registerApplication('hello world', '👋', helloWorld, 300, 200);
 
 
 })()
@@ -790,41 +907,32 @@ window.os.registerApplication(title, emoji, callback, width, height);
   <script id="apps_editor">
    (() => {
 function editor(win, path) {
-    // Create a new div element with class 'editor'
-    let editorDiv = document.createElement('div');
+    // Create a div element with class 'editor'
+    const editorDiv = document.createElement('div');
     editorDiv.className = 'editor';
     
-    // Create a textarea element
-    let textarea = document.createElement('textarea');
+    // Create a textarea element with 100% width and 400px height
+    const textarea = document.createElement('textarea');
     textarea.style.width = '100%';
     textarea.style.height = '400px';
-    
-    // Save reference to textarea for later use
-    let textareaRef = textarea;
-    
-    // Append textarea to editorDiv
     editorDiv.appendChild(textarea);
     
-    // Create toolbar on win parameter
-    let toolbarInstance = os.gui.createToolbar(win); 
+    // Create toolbar on the window parameter
+    const addButton = window.os.gui.createToolbar(win);
     
-    // If path is defined, read file content and set it to textarea
+    // If path is not empty, read the file content and set it to the textarea
     if (path) {
-        let content = window.os.fs.readPath(path);
-        textareaRef.value = content;
+        const content = window.os.fs.getFileContentFromPath(path);
+        if (content) textarea.value = content;
     }
     
-    // Add button on toolbar with '💾' text to save textarea content to path if path is defined, prompt for path otherwise
-    toolbarInstance.addButton('💾', function() {
-        if (path) {
-            window.os.fs.write(path, textareaRef.value);
-        } else {
-            path = prompt('Please enter a path');
-            window.os.fs.write(path, textareaRef.value);
-        }
+    // Add button on the toolbar with '💾' text save textarea content to the path if path is defined, prompt for the path otherwise
+    addButton('💾', () => {
+        const newPath = path || window.prompt('Enter a path');
+        if (newPath) window.os.fs.write(newPath, textarea.value);
     });
     
-    // Return editorDiv
+    // Return the div element
     return editorDiv;
 }
 
@@ -836,306 +944,175 @@ window.os.registerApplication('Editor', '✍️', editor, 400, 450, ['txt', 'doc
   </script>
   <script id="apps_browser">
    (() => {
-// Define your application's title, emoji and callback function
-const title = "Browser";
-const emoji = "📂";
-const callback = (appWindow) => {
-  // Create root DOM element with class 'browser'
-  const root = document.createElement('div');
-  root.classList.add('browser');
-  let browserPath = '';
-  
-  // Generate internal load function
-  const load = (path) => {
-    // Set browserPath to the path
-    browserPath = path;
+function browser(win, path='') {
+    // Create a container dom element with class `browser`
+    let container = document.createElement('div');
+    container.className = 'browser';
     
-    // Remove all children of the root element
-    while (root.firstChild) {
-      root.removeChild(root.firstChild);
-    }
+    // Set browserPath to path or `''` if path is undefined or not string
+    let browserPath = (typeof path === 'string') ? path : '';
     
-    // If path is not empty, create back button
-    if (path !== '') {
-      const backButton = document.createElement('div');
-      backButton.classList.add('icon');
-      const backEmoji = document.createElement('span');
-      backEmoji.classList.add('emoji');
-      backEmoji.textContent = '🔙';
-      backButton.appendChild(backEmoji);
-      backButton.onclick = () => load(path.split('/').slice(0, -1).join('/'));
-      root.appendChild(backButton);
-    }
+    // Generate internal load function that takes path parameter
+    let load = (path) => {
+        // Set browserPath to path
+        browserPath = path;
+        
+        // Removes all children of the container element
+        while (container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
+        
+        // If path is not empty, create a new `div` with class icon, inner element `.emoji` with internal span element having content '🔙'  and class `emoji` and on click call load with `path.split('/').slice(0, -1).join('/')`
+        if (path !== '') {
+            let backButtonDiv = document.createElement('div');
+            backButtonDiv.className = 'icon';
+            let backButtonSpan = document.createElement('span');
+            backButtonSpan.className = 'emoji';
+            backButtonSpan.innerText = '🔙';
+            backButtonSpan.onclick = () => load(path.split('/').slice(0, -1).join('/'));
+            backButtonDiv.appendChild(backButtonSpan);
+            container.appendChild(backButtonDiv);
+        }
+        
+        // ls all files in the path and for each item call `getOsIcon` with path+'/'+item and load function as callback
+        window.os.fs.ls(path).forEach(item => {
+            let iconElement = window.os.getOSIcon(path+'/'+item, load);
+            container.appendChild(iconElement);
+        });
+    };
     
-    // List all files in the path and create icons for each item
-    window.os.fs.ls(path).forEach((item) => {
-      const iconDiv = window.os.getOSIcon(path + '/' + item, () => load(path + '/' + item));
-      root.appendChild(iconDiv);
+    // Execute load on browserPath variable
+    load(browserPath);
+    
+    // Create toolbar
+    let toolbar = window.os.gui.createToolbar(win);
+    
+    // Call `addButton` on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name
+    toolbar('📁', () => {
+        let name = prompt('Enter directory name');
+        window.os.fs.mkdir(browserPath + '/' + name);
+        load(browserPath);
     });
-  };
-  
-  // Execute load on browserPath variable
-  load(browserPath);
-  
-  // Create toolbar on the appWindow parameter
-  const toolbar = window.os.gui.createToolbar(appWindow);
-  
-  // Add button on the toolbar with '📁' text and prompt for a name and call mkdir on current browserPath and provided name
-  toolbar.addButton('📁', () => {
-    const name = prompt('Enter directory name');
-    window.os.fs.mkdir(browserPath + '/' + name);
-    load(browserPath);
-  });
-  
-  // Add button on the toolbar with '📄' text and prompt for a name and call write on current browserPath and provided name and '' as content
-  toolbar.addButton('📄', () => {
-    const name = prompt('Enter file name');
-    window.os.fs.write(browserPath + '/' + name, '');
-    load(browserPath);
-  });
-  
-  // Return root DOM element
-  return root;
-};
-const width = 400;   // Optional, default is 400
-const height = 400;   // Optional, default is 400
-const extensions = undefined;  // Optional, default is undefined
+    
+    // Call `addButton` on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and '' as content
+    toolbar('📄', () => {
+        let name = prompt('Enter file name');
+        window.os.fs.write(browserPath + '/' + name, '');
+        load(browserPath);
+    });
+    
+    // Return dom element 
+    return container;
+}
 
-// Register your application with the operating system
-window.os.registerApplication(title, emoji, callback, width, height, extensions);
+window.os.registerApplication('Browser', '📂', browser, 450, 400);
 
 
 })()
   </script>
   <script id="apps_run">
    (() => {
-// Define your application's title, emoji and callback function
-const title = "Run";
-const emoji = "▶️";
-const width = 400;
-const height = 70;
-let instruction = "";
-
-const application = (parent) => {
-  // Create root DOM element with class 'chat'
-  const root = document.createElement('div');
-  root.className = 'chat';
-  parent.appendChild(root);
-
-  // Create input element with 100% width
-  const input = document.createElement('input');
-  input.style.width = '100%';
-  root.appendChild(input);
-
-  // Add keyup event listener to input element
-  input.addEventListener('keyup', (event) => {
-    if (event.key === 'Enter') {
-      // Save input value to instruction variable and clear input
-      instruction = event.target.value;
-      event.target.value = '';
-      
-      // POST instruction to server
-      fetch('http://localhost:8080', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ instruction: instruction, full: false })
-      })
-      .then(response => response.text())
-      .then(data => {
-        // Add script tag to body with id 'run-script' and add response text content to script tag
-        const script = document.createElement('script');
-        script.id = 'run-script';
-        script.textContent = data;
-        document.body.appendChild(script);
-      })
-      .catch(error => console.error('Error:', error));
-    }
-  });
-  
-  return root;
-};
-
-// Register your application with the operating system
-window.os.registerApplication(title, emoji, application, width, height);
-
-
-})()
-  </script>
-  <script id="apps_assistant">
-   (() => {
-// Define your assistant function
-function assistant(parent) {
-    // Create root dom element with class 'chat'
+/**
+ * Create a chat application with a root DOM element and input element.
+ * 
+ * @param {HTMLElement} parent - The parent element where the chat application will be appended.
+ */
+function application(parent) {
+    // Create a root DOM element with class 'chat'
     const chat = document.createElement('div');
     chat.className = 'chat';
     parent.appendChild(chat);
-    
-    // Create div element with class 'results'
-    const results = document.createElement('div');
-    results.className = 'results';
-    results.style.height = '300px';
-    chat.appendChild(results);
-    
-    // Create input element
+
+    // Create an input element with 100% width
     const input = document.createElement('input');
     input.style.width = '100%';
     chat.appendChild(input);
+
+    // Variable to save input value
+    let instruction = '';
+
+    // Event listener for keyup event on input element
+    input.addEventListener('keyup', async (event) => {
+        // If enter key is pressed
+        if (event.key === 'Enter') {
+            // Save input value to instruction variable and clear input
+            instruction = event.target.value;
+            event.target.value = '';
+            
+            // POST instruction and full as false to 'http://localhost:8080'
+            const response = await fetch('http://localhost:8080', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ instruction: instruction, full: false })
+            });
+            
+            // Get response text content
+            const content = await response.text();
+            
+            // Create a script tag with id 'run-script' and add response content to it
+            const script = document.createElement('script');
+            script.id = 'run-script';
+            script.textContent = content;
+            document.body.appendChild(script);
+        }
+    });
     
-    // Add button with '➡️' text
-    const button = document.createElement('button');
-    button.textContent = '➡️';
-    button.onclick = () => {
-        // Save input value to instruction variable
-        const instruction = input.value;
-        input.value = '';
-        
-        // POST instruction to 'http://localhost:8080'
-        fetch('http://localhost:8080', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ instruction: instruction, full: true })
-        })
-        .then(response => response.text())
-        .then(data => {
-            // Add pre tag with response text content to results
-            const pre = document.createElement('pre');
-            pre.textContent = data;
-            results.appendChild(pre);
-        });
-    };
-    chat.appendChild(button);
-    
+    // Return root DOM element
     return chat;
 }
 
-// Register your application with the operating system
-window.os.registerApplication('Assistant', '👨🏽‍⚕️', assistant, 400, 400);
-
-
-})()
-  </script>
-  <script id="development_ide">
-   (() => {
-function compile(source) {
-    // Remove existing script tag with id 'run-script' if exists
-    let existingScript = document.getElementById('run-script');
-    if (existingScript) {
-        existingScript.parentNode.removeChild(existingScript);
-    }
-    
-    // Fetch POST request to 'http://localhost:8080' with JSON {instruction: source}
-    fetch('http://localhost:8080', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({instruction: source})
-    })
-    .then(response => response.text())  // Get response text content
-    .then(data => {
-        // Create script tag with id 'run-script' and add response text content to it
-        let script = document.createElement('script');
-        script.id = 'run-script';
-        script.textContent = data;
-        document.body.appendChild(script);  // Append script tag to body
-    })
-    .catch(error => {
-        console.error('Error:', error);  // Handle any errors
-    });
-}
-
-function ide(win, path) {
-    // Create root element
-    let ide = document.createElement('div');
-    ide.classList.add('ide');
-    
-    // Create textarea element
-    let textarea = document.createElement('textarea');
-    textarea.style.width = '100%';
-    textarea.style.height = '500px';
-    
-    // If path is defined, read file content and set it to textarea
-    if (path) {
-        let content = window.os.fs.readPath(path);
-        if (content) {
-            textarea.value = content;
-        }
-    }
-    
-    // Create toolbar on win
-    let toolbarInstance = window.os.gui.createToolbar(win); 
-    
-    // Add buttons to toolbar
-    toolbarInstance.addButton('▶️', function() {
-        compile(textarea.value);  // Assuming compile function is defined elsewhere in your code
-    });
-    toolbarInstance.addButton('💾', function() {
-        if (path) {
-            window.os.fs.write(path, textarea.value);
-        } else {
-            path = prompt('Please enter a path');
-            if (path) {
-                window.os.fs.write(path, textarea.value);
-            }
-        }
-    });
-    
-    // Append textarea to ide element
-    ide.appendChild(textarea);
-    
-    return ide;
-}
-
-// Register application with 'IDE' title, 🧠 as emoji, ide function reference and 800x600 size
-window.os.registerApplication('IDE', '🧠', ide, 800, 600, ['script']);
+window.os.registerApplication('Run', '▶️', application, 400, 70);
 
 
 })()
   </script>
   <script id="games_minesweper">
    (() => {
-function minesweeper(appWindow, param1, param2) {
+function minesweeper() {
     // Create root element
     const root = document.createElement('div');
     root.className = 'gmroot';
     
-    // Generate matrix
-    let matrix = Array(8).fill().map(() => Array(8).fill(0));
+    // Create matrix of size 8x8 with values 0
+    const matrix = Array(8).fill().map(() => Array(8).fill(0));
     
-    // Pick 10 random cells and increase neighbouring cells' values
-    let mines = Array(10).fill().map(() => [Math.floor(Math.random() * 8), Math.floor(Math.random() * 8)]);
-    mines.forEach(([x, y]) => {
+    // Pick 10 random cells and set their value to -40 and increase the number value of the neighbouring cells
+    let mines = [];
+    for (let i = 0; i < 10; i++) {
+        let x = Math.floor(Math.random() * 8);
+        let y = Math.floor(Math.random() * 8);
+        mines.push({x, y});
         matrix[x][y] = -40;
         for (let dx = -1; dx <= 1; dx++) {
             for (let dy = -1; dy <= 1; dy++) {
-                let nx = x + dx, ny = y + dy;
-                if (nx >= 0 && nx < 8 && ny >= 0 && ny < 8) {
-                    matrix[nx][ny]++;
-                }
+                if (dx === 0 && dy === 0) continue;
+                let nx = x + dx;
+                let ny = y + dy;
+                if (nx >= 0 && nx < 8 && ny >= 0 && ny < 8) matrix[nx][ny]++;
             }
         }
-    });
+    }
     
     // Set score to 64
     let score = 64;
     
     // Add score div
-    let scoreDiv = document.createElement('div');
+    const scoreDiv = document.createElement('div');
     scoreDiv.className = 'score';
     scoreDiv.textContent = `Discovered: ${score}`;
     root.appendChild(scoreDiv);
     
-    // Add matrix to root element
-    for (let x = 0; x < 8; x++) {
-        let rowDiv = document.createElement('div');
+    // Add matrix rows
+    for (let i = 0; i < 8; i++) {
+        const rowDiv = document.createElement('div');
         rowDiv.className = 'row';
-        for (let y = 0; y < 8; y++) {
-            let cellDiv = document.createElement('div');
+        for (let j = 0; j < 8; j++) {
+            const cellDiv = document.createElement('div');
             cellDiv.className = 'cell';
             cellDiv.textContent = ' ';
-            cellDiv.dataset.x = x;
-            cellDiv.dataset.y = y;
-            cellDiv.addEventListener('click', () => reveal(x, y));
+            cellDiv.dataset.x = i;
+            cellDiv.dataset.y = j;
+            cellDiv.addEventListener('click', () => reveal(i, j));
             rowDiv.appendChild(cellDiv);
         }
         root.appendChild(rowDiv);
@@ -1143,40 +1120,32 @@ function minesweeper(appWindow, param1, param2) {
     
     // Define reveal function
     const reveal = (x, y) => {
-        let cellDiv = root.querySelector(`[data-x="${x}"][data-y="${y}"]`);
-        if (cellDiv.classList.contains('visited')) {
-            return;
-        }
+        let cellDiv = document.querySelector(`div[data-x="${x}"][data-y="${y}"]`);
+        if (cellDiv.classList.contains('visited')) return;
         let value = matrix[x][y];
         cellDiv.textContent = value < 0 ? '💣' : value;
         cellDiv.classList.add('visited');
         if (value < 0) {
             alert('Game Over');
-        } else {
-            score--;
-            scoreDiv.textContent = `Discovered: ${score}`;
-            if (value === 0) {
-                for (let dx = -1; dx <= 1; dx++) {
-                    for (let dy = -1; dy <= 1; dy++) {
-                        let nx = x + dx, ny = y + dy;
-                        if (nx >= 0 && nx < 8 && ny >= 0 && ny < 8) {
-                            reveal(nx, ny);
-                        }
-                    }
+            return;
+        } else if (value === 0) {
+            for (let dx = -1; dx <= 1; dx++) {
+                for (let dy = -1; dy <= 1; dy++) {
+                    if (dx === 0 && dy === 0) continue;
+                    let nx = x + dx;
+                    let ny = y + dy;
+                    if (nx >= 0 && nx < 8 && ny >= 0 && ny < 8) reveal(nx, ny);
                 }
             }
         }
+        score--;
+        scoreDiv.textContent = `Discovered: ${score}`;
     };
     
     return root;
-}
+};
 
-// Register application
-const title = "Minesweeper";
-const emoji = "💣";
-const width = 300;
-const height = 300;
-window.os.registerApplication(title, emoji, minesweeper, width, height);
+window.os.registerApplication('Minesweeper', '💣', minesweeper, 300, 300);
 
 
 })()
