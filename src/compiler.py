@@ -19,6 +19,7 @@ class Compiler:
         self.recompile = recompile
         self.llm = llm
         self.data = data
+        self.api = {}
 
     def process_output(self, output, single_group=True):
         if single_group:
@@ -189,7 +190,7 @@ class Compiler:
 
     def build(self, update_response=None):
         print("Compiling...")
-        api = {}
+
         html = {
             "head": {"_children_": []},
             "body": {"_children_": []},
@@ -199,7 +200,9 @@ class Compiler:
             print(f"Compiling partial: {partial}...")
             with open(f"./partials/{partial}", "r") as read_file:
                 partial_data = json.load(read_file)
-                self.compile(partial_data, html, api, update_response=update_response)
+                self.compile(
+                    partial_data, html, self.api, update_response=update_response
+                )
 
         with open(f"{DEBUG}/compiled.json", "w") as file:
             json.dump(html, file, indent=4)

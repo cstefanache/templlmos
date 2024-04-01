@@ -69,29 +69,7 @@
                 ]
             ]
             
-        },
-        "run": {
-            "disabled": false,
-            "rebuld": false,
-            "to": "body",
-            "tag": "script",
-            "dependencies": [
-                "registry"
-            ],
-            "instructions": [
-                [
-                    "Create an `application` function that takes a parent parameter having the following functionality:",
-                    " - create a root dom element with class `chat`",
-                    " - create an input element with 100% width with keyup event listener that on enter key press:",
-                    "   - save the input value to instruction variable and clear the input",
-                    "   - POST the json having instruction and full as false to `http://localhost:8080`, on response add a script tag to the body with id `run-script` and add the response text content to the script tag",
-                    " - return dom element"
-                ],
-                [
-                    "call register application with 'Run' title, ▶️ as emoji, already defined `application` function reference and 400x70 size"
-                ]
-            ]
-        },
+        },       
         "assistant-styles": {
             "disabled": true,
             "rebuild": false,

@@ -744,6 +744,26 @@ window.os.registerApplication = function(title, emoji, callback, width = 400, he
     flex-wrap: wrap;
 }
   </style>
+  <script id="development_run">
+   (() => {
+/**
+ * Run an application in a new window.
+ * @param {function} callback - The callback to run in the new window.
+ * @param {number} [width=500] - The width of the window in pixels.
+ * @param {number} [height=400] - The height of the window in pixels.
+ */
+window.os.runApp = function(callback, width = 500, height = 400) {
+    // Create a new window instance
+    const appWindow = window.os.gui.createWindow('🔥', 'Development', width, height);
+    
+    // Attach content to the window
+    const contentElement = callback(appWindow);
+    window.os.gui.attachToWindow(appWindow, contentElement);
+};
+
+
+})()
+  </script>
   <style id="games_styles">
    .gmroot {
     display: flex;
@@ -1010,58 +1030,76 @@ window.os.registerApplication('Browser', '📂', browser, 450, 400);
 
 })()
   </script>
-  <script id="apps_run">
+  <script id="development_ide">
    (() => {
 /**
- * Create a chat application with a root DOM element and input element.
- * 
- * @param {HTMLElement} parent - The parent element where the chat application will be appended.
+ * Compile a source code string into a runnable script.
+ * @param {string} source - The source code string to compile.
  */
-function application(parent) {
-    // Create a root DOM element with class 'chat'
-    const chat = document.createElement('div');
-    chat.className = 'chat';
-    parent.appendChild(chat);
+function compile(source) {
+    // Remove existing script tag with id 'run-script' if exists
+    var existingScriptTag = document.getElementById('run-script');
+    if (existingScriptTag) {
+        existingScriptTag.parentNode.removeChild(existingScriptTag);
+    }
+    
+    // Fetch POST request with source code as JSON data
+    fetch('http://localhost:8080', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({instruction: source})
+    })
+    .then(response => response.text()) // Get response text content
+    .then(data => {
+        // Create a new script tag with id 'run-script' and add response text content to it
+        var newScriptTag = document.createElement('script');
+        newScriptTag.id = 'run-script';
+        newScriptTag.textContent = data;
+        document.body.appendChild(newScriptTag);
+    })
+    .catch(error => console.error('Error:', error)); // Handle any errors that occurred during fetch request
+}
 
-    // Create an input element with 100% width
-    const input = document.createElement('input');
-    input.style.width = '100%';
-    chat.appendChild(input);
-
-    // Variable to save input value
-    let instruction = '';
-
-    // Event listener for keyup event on input element
-    input.addEventListener('keyup', async (event) => {
-        // If enter key is pressed
-        if (event.key === 'Enter') {
-            // Save input value to instruction variable and clear input
-            instruction = event.target.value;
-            event.target.value = '';
-            
-            // POST instruction and full as false to 'http://localhost:8080'
-            const response = await fetch('http://localhost:8080', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ instruction: instruction, full: false })
-            });
-            
-            // Get response text content
-            const content = await response.text();
-            
-            // Create a script tag with id 'run-script' and add response content to it
-            const script = document.createElement('script');
-            script.id = 'run-script';
-            script.textContent = content;
-            document.body.appendChild(script);
+function ide(win, path) {
+    // Create root element
+    const ideRoot = document.createElement('div');
+    ideRoot.classList.add('ide');
+    
+    // Create textarea element
+    const textarea = document.createElement('textarea');
+    textarea.style.width = '100%';
+    textarea.style.height = '500px';
+    
+    // If path is not empty, read file content and set it to textarea
+    if (path) {
+        const content = window.os.fs.getFileContentFromPath(path);
+        if (content) textarea.value = content;
+    }
+    
+    // Create toolbar on win
+    const addButton = window.os.gui.createToolbar(win);
+    
+    // Add buttons on toolbar
+    addButton('▶️', () => compile(textarea.value)); // Execute compile on click
+    addButton('💾', () => { // Save on click
+        if (path) {
+            window.os.fs.write(path, textarea.value);
+        } else {
+            path = prompt('Please enter a path');
+            if (path) window.os.fs.write(path, textarea.value);
         }
     });
     
-    // Return root DOM element
-    return chat;
+    // Append textarea to root element
+    ideRoot.appendChild(textarea);
+    
+    return ideRoot;
 }
 
-window.os.registerApplication('Run', '▶️', application, 400, 70);
+// Register application
+window.os.registerApplication('IDE', '🧠', ide, 800, 600, ['script']);
 
 
 })()

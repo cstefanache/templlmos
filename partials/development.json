@@ -1,7 +1,7 @@
 {
     "development": {
-        "run-app": {
-            "disabled": true,
+        "run": {
+            "disabled": false,
             "to": "head",
             "tag": "script",
             "rebuild": false,
@@ -18,7 +18,7 @@
             ]
         },
         "ide": {
-            "disabled": true,
+            "disabled": false,
             "rebuld": false,
             "to": "body",
             "tag": "script",

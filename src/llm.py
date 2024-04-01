@@ -47,7 +47,7 @@ class LLM:
                     model["libraryPrefix"],
                     model["librarySuffix"],
                     self.default_wrappers[5],
-                    self.default_wrappers[6]
+                    self.default_wrappers[6],
                 )
 
         hf_cache_info = scan_cache_dir("./models")
@@ -72,10 +72,22 @@ class LLM:
         else:
             return self.default_wrappers
 
-    def call_default_llm(self, instruction, update_fn=None):
-        (name, pre, suff, lib_mode, lib_pre, lib_suff, deps_prefix, stop) = self.default_wrappers
+    def call_default_llm(self, instruction, dependencies="", update_fn=None):
+        (name, pre, suff, lib_mode, lib_pre, lib_suff, deps_prefix, stop) = (
+            self.default_wrappers
+        )
+
+        compiled_dependencies = (
+            f"{deps_prefix} {dependencies}" if dependencies != "" else ""
+        )
+        dep_prefix = pre.replace("{deps}", compiled_dependencies)
+        compiled_instruction = f"{dep_prefix} {instruction} {suff}"
+
+        print("----------[ RealTime Compile ]----------")
+        print(compiled_instruction)
+
         output = self.runtime_models[name](
-            pre + instruction + suff,
+            compiled_instruction,
             max_tokens=8096,
             top_k=40,
             seed=0,
@@ -103,9 +115,9 @@ class LLM:
         self, model_name, instruction, include_stop=True, update_response=None
     ):
         model = self.runtime_models[model_name]
-        (name, pre, suff, limb_model, lib_pre, lib_suff, deps_prefix, stop) = self.prompt_wrappers[
-            model_name
-        ]
+        (name, pre, suff, limb_model, lib_pre, lib_suff, deps_prefix, stop) = (
+            self.prompt_wrappers[model_name]
+        )
         output = model(
             instruction,
             max_tokens=4096,

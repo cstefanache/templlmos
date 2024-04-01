@@ -92,12 +92,24 @@ class Server(BaseHTTPRequestHandler):
         json_data = json.loads(post_data)
         # model = json_data["model"]
         instruction = json_data["instruction"]
-        
-        dependencies = re.findall(r"^# include: (\w+)", instruction, re.MULTILINE)
-        
-        
+
+        json.dump(compiler.api, open("debug/apis.json", "w"), indent=4)
+
+        dependencies = re.findall(r"^#include:? (\w+)", instruction, re.MULTILINE)
+        instruction = re.sub(r"^#include:? \w+", "", instruction, flags=re.MULTILINE)
+
+        print("Dependencies: ", dependencies)
+        compiled_dependencies = ""
+        for dependency in dependencies:
+            try:
+                compiled_dependencies += compiler.api[dependency] + "\n"
+            except KeyError:
+                print(f"Dependency not found: {dependency}")
+
         response = instruction + "\n" + "-------------------------------" + "\n"
-        result = compiler.llm.call_default_llm(instruction, update_fn=update_response)
+        result = compiler.llm.call_default_llm(
+            instruction, dependencies=compiled_dependencies, update_fn=update_response
+        )
         if json_data.get("full", False) is False:
             result = compiler.process_output(result)
         self.send_response(200)
@@ -140,6 +152,7 @@ class OSSourcesHandler(FileSystemEventHandler):
 
 
 if __name__ == "__main__":
+    rebuild()
     if args.listen:
         event_handler = OSSourcesHandler()
         observer = Observer()
@@ -163,7 +176,3 @@ if __name__ == "__main__":
 
         server.server_close()
         print("Server stopped.")
-
-    if not args.serve and not args.listen:
-        rebuild()
-        print("Rebuild complete.")
