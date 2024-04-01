@@ -1,11 +1,11 @@
 ## registry_hello-world_0
 ### API
 <pre style='text-wrap: wrap'>/**
- * Create a root element div with an h1 child element containing 'Hello World'
+ * Create a root element div having an h1 child element with 'Hello World' text
  * If path is defined append a pre element containing the content of reading the file at the path
- * @param {HTMLElement} parent - The parent element to append the root element to
- * @param {string} [path] - The path to a file to read content from
- * @returns {HTMLElement} - The root element containing h1 and pre child elements
+ * @param {HTMLElement} parent - The parent element to append the created elements to
+ * @param {string} [path] - The path to a file to read its content from
+ * @returns {HTMLElement} - The root element containing h1 and pre elements
  */
 function helloWorld(parent, path) { ... }
 </pre>
@@ -21,7 +21,7 @@ Given the following already defined functions:
  * @param {function} callback - The callback to call when this application's icon is clicked.
  * @param {number} [width=400] - The width of the application's window in pixels.
  * @param {number} [height=400] - The height of the application's window in pixels.
- * @param {Array<string>} [extensions] - The file extensions this application can handle.
+ * @param {Array<string>} [extensions] - The file extensions to register for this application.
  */
 window.os.registerApplication = function(title, emoji, callback, width = 400, height = 400, extensions) { ... }
 
@@ -75,11 +75,11 @@ after definition, register application with 'hello world' title, 👋 as emoji, 
 </pre>
 ### Output
 <pre style='text-wrap: wrap'>/**
- * Create a root element div with an h1 child element containing 'Hello World'
+ * Create a root element div having an h1 child element with 'Hello World' text
  * If path is defined append a pre element containing the content of reading the file at the path
- * @param {HTMLElement} parent - The parent element to append the root element to
- * @param {string} [path] - The path to a file to read content from
- * @returns {HTMLElement} - The root element containing h1 and pre child elements
+ * @param {HTMLElement} parent - The parent element to append the created elements to
+ * @param {string} [path] - The path to a file to read its content from
+ * @returns {HTMLElement} - The root element containing h1 and pre elements
  */
 function helloWorld(parent, path) {
     // Create root div element
@@ -90,7 +90,7 @@ function helloWorld(parent, path) {
     h1.textContent = 'Hello World';
     root.appendChild(h1);
     
-    // If path is defined, create pre element with file content
+    // If path is provided, create pre element with file content
     if (path) {
         const pre = document.createElement('pre');
         pre.textContent = window.os.fs.getFileContentFromPath(path);

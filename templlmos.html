@@ -161,28 +161,6 @@ window.os.fs.isFile = function(path) {
 
 })()
   </script>
-  <style id="output_output-styles">
-   .output-wrapper {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 300px;
-    height: 100vh; /* viewport height */
-    z-index: -1;
-}
-
-.output {
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* semi-transparent black */
-    color: white; /* white text */
-    white-space: pre-wrap; /* text wrap */
-    font-size: 9px; /* font size of 9px */
-    padding: 10px; /* padding of 10px */
-    margin: 0; /* no margins */
-    overflow: auto; /* overflow auto */
-}
-  </style>
   <style id="desktop_content-style">
    #desktop_content {
     position: absolute;
@@ -289,6 +267,28 @@ window.os.addApp = function(emoji, title, callback) {
 
 })()
   </script>
+  <style id="output_output-styles">
+   .output-wrapper {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 40%;
+    max-width: 500px;
+    height: 100vh; /* viewport height */
+}
+
+.output {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* semi-transparent black */
+    color: white; /* white text */
+    white-space: pre-wrap; /* text wrap */
+    font-size: 9px;
+    padding: 10px; /* padding */
+    margin: 0; /* no margins */
+    overflow: auto; /* scroll if content overflows */
+}
+  </style>
   <script id="gui_draggable">
    (() => {
 if (!window.os) {
@@ -716,7 +716,7 @@ window.os.getOSIcon = function(path, callback) {
  * @param {function} callback - The callback to call when this application's icon is clicked.
  * @param {number} [width=400] - The width of the application's window in pixels.
  * @param {number} [height=400] - The height of the application's window in pixels.
- * @param {Array<string>} [extensions] - The file extensions this application can handle.
+ * @param {Array<string>} [extensions] - The file extensions to register for this application.
  */
 window.os.registerApplication = function(title, emoji, callback, width = 400, height = 400, extensions) {
     const execute = (...params) => {
@@ -732,7 +732,8 @@ window.os.registerApplication = function(title, emoji, callback, width = 400, he
         });
     }
     
-    window.os.addApp(emoji, title, execute);
+    // Add application to desktop
+    window.os.addApp(emoji, title, () => execute());
 };
 
 
@@ -843,6 +844,8 @@ window.os.fs.rm('fstest');
 
 })()
   </script>
+  <div id="desktop_content">
+  </div>
   <script id="output_output-window">
    (() => {
 // Create root container div element
@@ -885,16 +888,14 @@ fetch('http://localhost:8080/ping')
 
 })()
   </script>
-  <div id="desktop_content">
-  </div>
   <script id="registry_hello-world">
    (() => {
 /**
- * Create a root element div with an h1 child element containing 'Hello World'
+ * Create a root element div having an h1 child element with 'Hello World' text
  * If path is defined append a pre element containing the content of reading the file at the path
- * @param {HTMLElement} parent - The parent element to append the root element to
- * @param {string} [path] - The path to a file to read content from
- * @returns {HTMLElement} - The root element containing h1 and pre child elements
+ * @param {HTMLElement} parent - The parent element to append the created elements to
+ * @param {string} [path] - The path to a file to read its content from
+ * @returns {HTMLElement} - The root element containing h1 and pre elements
  */
 function helloWorld(parent, path) {
     // Create root div element
@@ -905,7 +906,7 @@ function helloWorld(parent, path) {
     h1.textContent = 'Hello World';
     root.appendChild(h1);
     
-    // If path is defined, create pre element with file content
+    // If path is provided, create pre element with file content
     if (path) {
         const pre = document.createElement('pre');
         pre.textContent = window.os.fs.getFileContentFromPath(path);
@@ -996,7 +997,7 @@ function browser(win, path='') {
         
         // ls all files in the path and for each item call `getOsIcon` with path+'/'+item and load function as callback
         window.os.fs.ls(path).forEach(item => {
-            let iconElement = window.os.getOSIcon(path+'/'+item, load);
+            let iconElement = window.os.getOSIcon(path+'/'+item, () => load(path+'/'+item));
             container.appendChild(iconElement);
         });
     };
@@ -1065,7 +1066,7 @@ function compile(source) {
 function ide(win, path) {
     // Create root element
     const ideRoot = document.createElement('div');
-    ideRoot.classList.add('ide');
+    ideRoot.className = 'ide';
     
     // Create textarea element
     const textarea = document.createElement('textarea');
@@ -1095,10 +1096,11 @@ function ide(win, path) {
     // Append textarea to root element
     ideRoot.appendChild(textarea);
     
+    // Return root element
     return ideRoot;
 }
 
-// Register application
+// Register application with 'IDE' title, 🧠 as emoji, ide function reference and 800x600 size
 window.os.registerApplication('IDE', '🧠', ide, 800, 600, ['script']);
 
 

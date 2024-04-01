@@ -88,16 +88,16 @@ class Server(BaseHTTPRequestHandler):
         content_length = int(self.headers["Content-Length"])
         global response
 
+        output = ""
+
         post_data = self.rfile.read(content_length).decode("utf-8")
         json_data = json.loads(post_data)
         # model = json_data["model"]
-        instruction = json_data["instruction"]
+        instructions = json_data["instruction"]
 
-        json.dump(compiler.api, open("debug/apis.json", "w"), indent=4)
-
-        dependencies = re.findall(r"^#include:? (\w+)", instruction, re.MULTILINE)
-        instruction = re.sub(r"^#include:? \w+", "", instruction, flags=re.MULTILINE)
-
+        dependencies = re.findall(r"^#include:? (\w+)", instructions, re.MULTILINE)
+        instruction = re.sub(r"^#include:? \w+", "", instructions, flags=re.MULTILINE)
+        response = ""
         print("Dependencies: ", dependencies)
         compiled_dependencies = ""
         for dependency in dependencies:
@@ -106,17 +106,22 @@ class Server(BaseHTTPRequestHandler):
             except KeyError:
                 print(f"Dependency not found: {dependency}")
 
-        response = instruction + "\n" + "-------------------------------" + "\n"
-        result = compiler.llm.call_default_llm(
-            instruction, dependencies=compiled_dependencies, update_fn=update_response
-        )
-        if json_data.get("full", False) is False:
-            result = compiler.process_output(result)
+        for instruction in instructions.split("---"):
+            update_response(instruction + "\n" + "-------------------------------" + "\n")
+            result = compiler.llm.call_default_llm(
+                instruction,
+                dependencies=compiled_dependencies,
+                update_fn=update_response,
+            )
+            if json_data.get("full", False) is False:
+                output += compiler.process_output(result)
+            compiled_dependencies += compiler.get_api(result)
+
         self.send_response(200)
         self.send_header("Content-type", "application/text")
         self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
-        self.wfile.write(bytes("(() => {\n" + result + "\n})()", "utf-8"))
+        self.wfile.write(bytes("(() => {\n" + output + "\n})()", "utf-8"))
 
     def serve_compiled(self):
         self.send_response(200)

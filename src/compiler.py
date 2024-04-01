@@ -32,6 +32,17 @@ class Compiler:
                 result += group + "\n"
             return result
 
+    def get_api(self, output_src):
+        local_api = ""
+        for line in output_src.split("\n"):
+            if re.search(r"^ ?\/?\*", line):
+                local_api += line + "\n"
+            elif re.search(
+                r"^[a-zA-Z.]+ = [function]", line
+            ) or re.search(r"^function [a-z]", line):
+                local_api += line + " ... }\n"
+        return local_api
+    
     def compile(self, partial, html, api, update_response=None):
         (
             model,
@@ -131,14 +142,8 @@ class Compiler:
                         }
 
                     if tag == "script":
-                        for line in output_src.split("\n"):
-                            if re.search(r"^ ?\/?\*", line):
-                                local_api += line + "\n"
-                            elif re.search(
-                                r"^[a-zA-Z.]+ = [function]", line
-                            ) or re.search(r"^function [a-z]", line):
-                                local_api += line + " ... }\n"
-
+                        local_api += self.get_api(output_src)
+                        
                         compiled_dependencies += local_api
                     cache_data["library"] = local_api
 

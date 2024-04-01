@@ -59,7 +59,7 @@ window.os.gui.createToolbar = function(win) { ... }
  * @param {function} callback - The callback to call when this application's icon is clicked.
  * @param {number} [width=400] - The width of the application's window in pixels.
  * @param {number} [height=400] - The height of the application's window in pixels.
- * @param {Array<string>} [extensions] - The file extensions this application can handle.
+ * @param {Array<string>} [extensions] - The file extensions to register for this application.
  */
 window.os.registerApplication = function(title, emoji, callback, width = 400, height = 400, extensions) { ... }
 
@@ -110,7 +110,7 @@ function browser(win, path='') { ... }
         
         // ls all files in the path and for each item call `getOsIcon` with path+'/'+item and load function as callback
         window.os.fs.ls(path).forEach(item => {
-            let iconElement = window.os.getOSIcon(path+'/'+item, load);
+            let iconElement = window.os.getOSIcon(path+'/'+item, () => load(path+'/'+item));
             container.appendChild(iconElement);
         });
     };

@@ -14,8 +14,8 @@
     "partials": [
         "os.json",
         "filesystem.json",
-        "output.json",
         "desktop.json",
+        "output.json",
         "gui.json",
         "registry.json",
         "apps.json",

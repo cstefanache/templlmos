@@ -53,7 +53,7 @@ window.os.fs.isFile = function(path) { ... }
  * @param {function} callback - The callback to call when this application's icon is clicked.
  * @param {number} [width=400] - The width of the application's window in pixels.
  * @param {number} [height=400] - The height of the application's window in pixels.
- * @param {Array<string>} [extensions] - The file extensions this application can handle.
+ * @param {Array<string>} [extensions] - The file extensions to register for this application.
  */
 window.os.registerApplication = function(title, emoji, callback, width = 400, height = 400, extensions) { ... }
 
@@ -116,7 +116,7 @@ function compile(source) {
 function ide(win, path) {
     // Create root element
     const ideRoot = document.createElement('div');
-    ideRoot.classList.add('ide');
+    ideRoot.className = 'ide';
     
     // Create textarea element
     const textarea = document.createElement('textarea');
@@ -146,10 +146,11 @@ function ide(win, path) {
     // Append textarea to root element
     ideRoot.appendChild(textarea);
     
+    // Return root element
     return ideRoot;
 }
 
-// Register application
+// Register application with 'IDE' title, 🧠 as emoji, ide function reference and 800x600 size
 window.os.registerApplication('IDE', '🧠', ide, 800, 600, ['script']);
 
 </pre>

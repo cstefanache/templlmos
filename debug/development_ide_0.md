@@ -57,7 +57,7 @@ window.os.fs.isFile = function(path) { ... }
  * @param {function} callback - The callback to call when this application's icon is clicked.
  * @param {number} [width=400] - The width of the application's window in pixels.
  * @param {number} [height=400] - The height of the application's window in pixels.
- * @param {Array<string>} [extensions] - The file extensions this application can handle.
+ * @param {Array<string>} [extensions] - The file extensions to register for this application.
  */
 window.os.registerApplication = function(title, emoji, callback, width = 400, height = 400, extensions) { ... }
 

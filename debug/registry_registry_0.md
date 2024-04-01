@@ -8,7 +8,7 @@
  * @param {function} callback - The callback to call when this application's icon is clicked.
  * @param {number} [width=400] - The width of the application's window in pixels.
  * @param {number} [height=400] - The height of the application's window in pixels.
- * @param {Array<string>} [extensions] - The file extensions this application can handle.
+ * @param {Array<string>} [extensions] - The file extensions to register for this application.
  */
 window.os.registerApplication = function(title, emoji, callback, width = 400, height = 400, extensions) { ... }
 </pre>
@@ -55,7 +55,7 @@ window.os.getOSIcon = function(path, callback) { ... }
   - creates a new window instance with the title, emoji, width and height and saves it to a constant
   - attach to window the result of calling the callback with the window instance and spread params
 - if extensions is defined, call `registerExtension` for each extension with extension, emoji and the execute function
-- call addApp with the emoji, title and execute function 
+- call addApp with the emoji, title and callback that calls the execute function with no parameters 
 ### Response:
 </pre>
 ### Output
@@ -67,7 +67,7 @@ window.os.getOSIcon = function(path, callback) { ... }
  * @param {function} callback - The callback to call when this application's icon is clicked.
  * @param {number} [width=400] - The width of the application's window in pixels.
  * @param {number} [height=400] - The height of the application's window in pixels.
- * @param {Array<string>} [extensions] - The file extensions this application can handle.
+ * @param {Array<string>} [extensions] - The file extensions to register for this application.
  */
 window.os.registerApplication = function(title, emoji, callback, width = 400, height = 400, extensions) {
     const execute = (...params) => {
@@ -83,7 +83,8 @@ window.os.registerApplication = function(title, emoji, callback, width = 400, he
         });
     }
     
-    window.os.addApp(emoji, title, execute);
+    // Add application to desktop
+    window.os.addApp(emoji, title, () => execute());
 };
 
 </pre>
