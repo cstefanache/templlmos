@@ -1,0 +1,10 @@
+#include run
+
+create a myApp function:
+- create a local root dom element
+- adds a "randomize" button that changes the document body background color to a random lite pastel one
+- return root dom element
+
+--- 
+
+run application with the defined myApp callback 120px width and 60px height

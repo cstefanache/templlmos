@@ -112,6 +112,7 @@ class Server(BaseHTTPRequestHandler):
                 instruction,
                 dependencies=compiled_dependencies,
                 update_fn=update_response,
+                with_cache=True,
             )
             if json_data.get("full", False) is False:
                 output += compiler.process_output(result)

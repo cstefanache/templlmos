@@ -13,7 +13,7 @@ style .output class having:
  - a semi-transparent black background
  - white text
  - text wrap
- - font size of 9px
+ - font size of 12px
  - padding of 10px and 0 margins
  - overflow auto 
 ### Response:
@@ -34,7 +34,7 @@ style .output class having:
     background-color: rgba(0, 0, 0, 0.5); /* semi-transparent black */
     color: white; /* white text */
     white-space: pre-wrap; /* text wrap */
-    font-size: 9px;
+    font-size: 12px;
     padding: 10px; /* padding */
     margin: 0; /* no margins */
     overflow: auto; /* scroll if content overflows */

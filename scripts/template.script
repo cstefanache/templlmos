@@ -1,0 +1,9 @@
+#include run
+
+create a myApp function that takes a win parameter:
+- create a root dom element
+- return root dom element
+
+--- 
+
+run application with the defined myApp callback

@@ -1,12 +1,13 @@
 from llama_cpp import Llama
 from huggingface_hub import hf_hub_download, scan_cache_dir
-
+import binascii
 
 class LLM:
     def __init__(self, models):
         self.runtime_models = {}
         self.prompt_wrappers = {}
         self.default_wrappers = None
+        self.cache = {}
 
         for model in models:
             print(f"Downloading {model['repository']} from {model['model']}...")
@@ -72,7 +73,7 @@ class LLM:
         else:
             return self.default_wrappers
 
-    def call_default_llm(self, instruction, dependencies="", update_fn=None):
+    def call_default_llm(self, instruction, dependencies="", update_fn=None, with_cache = False):
         (name, pre, suff, lib_mode, lib_pre, lib_suff, deps_prefix, stop) = (
             self.default_wrappers
         )
@@ -85,6 +86,15 @@ class LLM:
 
         print("----------[ RealTime Compile ]----------")
         print(compiled_instruction)
+
+        if with_cache:
+            cache_key = binascii.crc32(compiled_instruction.encode())
+            if cache_key in self.cache:
+                print("Cache hit")
+                result = "```" + self.cache[cache_key] + "\n```"
+                update_fn(result)
+                return result
+            
 
         output = self.runtime_models[name](
             compiled_instruction,
@@ -105,6 +115,9 @@ class LLM:
             if update_fn is not None:
                 update_fn(val)
             print(val, end="")
+
+        if with_cache:
+            self.cache[cache_key] = result
 
         result += "\n```"
         if update_fn is not None:

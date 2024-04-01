@@ -11,7 +11,7 @@
                     " - a semi-transparent black background",
                     " - white text",
                     " - text wrap",
-                    " - font size of 9px",
+                    " - font size of 12px",
                     " - padding of 10px and 0 margins",
                     " - overflow auto"
                 ]
@@ -25,6 +25,7 @@
             "dependencies": [],
             "instructions": [
                 [
+                    "use browser fetch for API requests",
                     "crate a root container div element having the class `output-wrapper` and id `output-wrapper`",
                     "create and append to root container a pre element having the class `output` and id `output`",
                     "create an internal function that fetches the content from 'http://localhost:8080/output' and sets the innerHTML of the output div to the fetched content",

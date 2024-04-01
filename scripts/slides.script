@@ -4,17 +4,23 @@
 #include registry
 
 create a render item function that takes a string param:
-- if param starts with # then create a h1 with the content withtout the # and return it
-- otherwise create a paragraph with the content and return it
+- if param starts with # then create a h1 with the content, horizontally centered, without the # and return it
+- if the content is between [] then create an image element with the source having the content between brackets, absolute position in the middle of the parent, 80% width, 60% height
+- otherwise create a paragraph, absolute position in the middle of parent, align text center, 50% width, with the content and return it
+
+---
 
 create a render function that takes a string param and a parent dom element:
 - remove all content from DOM element
 - splits the string param by `\n`
-- for each element in array call render item with item param
+- for each element in array append to content execution of render item with item param
 
-create a callback function that takes a win parameter:
+---
+
+create a slidesApp function that takes a win parameter:
 - create a root dom element
 - loads content of 'script.txt' into a content constant
+- console log content
 - sets index to 0 
 - split the content by `-` into slides array
 - call render for the first item and root dom element
@@ -23,6 +29,6 @@ create a callback function that takes a win parameter:
 - call add button on toolbar with emoji ⏪ and function that decreases the index and renders the slide at index as callback
 - return root dom element
 
+--- 
 
-run application with the created callback
-register app with title 'Slides', 🎆 as emoji callback function
+run application with the defined slidesApp callback

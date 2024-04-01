@@ -1,0 +1,10 @@
+#include run
+
+create app function that:
+creates a root dom element
+adds two buttons +/- that are used to increase and decrease the size of font of the existing element with id output
+return root dom element
+
+---
+
+run application with the app function reference 
