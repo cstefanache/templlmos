@@ -81,25 +81,28 @@ window.os.getOSIcon = function(path, callback) { ... }
    - set browserPath to path
    - removes all children of the container element
    - if path is not empty, create a new `div` with class icon, inner element `.emoji` with internal span element having content '🔙'  and class `emoji` and on click call load with `path.split('/').slice(0, -1).join('/')`
-   - ls all files in the path and for each item call `getOsIcon` with path+'/'+item and load function as callback
+   - ls all files in the path and for each item:
+      - call `getOsIcon` with path+'/'+item and load function as callback
+      - add a checkbox with value path+'/'+item that prevent event bubbling
  - execute load on browserPath variable
  - create toolbar
  - call `addButton` on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name
  - call `addButton` on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and '' as content
+ - call `addButton` on the toolbar with `🗑️` text and list all the selected checkbox values, removes them and calls load on the current path
  - return dom element 
 ### Response:
 </pre>
 ### Output
 <pre style='text-wrap: wrap'>function browser(win, path='') {
     // Create a container dom element with class `browser`
-    let container = document.createElement('div');
-    container.className = 'browser';
+    const container = document.createElement('div');
+    container.classList.add('browser');
     
     // Set browserPath to path or `''` if path is undefined or not string
     let browserPath = (typeof path === 'string') ? path : '';
     
     // Generate internal load function that takes path parameter
-    let load = (path) => {
+    const load = (path) => {
         // Set browserPath to path
         browserPath = path;
         
@@ -110,19 +113,24 @@ window.os.getOSIcon = function(path, callback) { ... }
         
         // If path is not empty, create a new `div` with class icon, inner element `.emoji` with internal span element having content '🔙'  and class `emoji` and on click call load with `path.split('/').slice(0, -1).join('/')`
         if (path !== '') {
-            let backButtonDiv = document.createElement('div');
-            backButtonDiv.className = 'icon';
-            let backButtonSpan = document.createElement('span');
-            backButtonSpan.className = 'emoji';
-            backButtonSpan.innerText = '🔙';
-            backButtonSpan.onclick = () => load(path.split('/').slice(0, -1).join('/'));
+            const backButtonDiv = document.createElement('div');
+            backButtonDiv.classList.add('icon');
+            const backButtonSpan = document.createElement('span');
+            backButtonSpan.classList.add('emoji');
+            backButtonSpan.textContent = '🔙';
+            backButtonSpan.addEventListener('click', () => load(path.split('/').slice(0, -1).join('/')));
             backButtonDiv.appendChild(backButtonSpan);
             container.appendChild(backButtonDiv);
         }
         
-        // ls all files in the path and for each item call `getOsIcon` with path+'/'+item and load function as callback
+        // ls all files in the path and for each item: call `getOsIcon` with path+'/'+item and load function as callback
         window.os.fs.ls(path).forEach(item => {
-            let iconElement = window.os.getOSIcon(path+'/'+item, () => load(path+'/'+item));
+            const iconElement = window.os.getOSIcon(path+'/'+item, () => load(path+'/'+item));
+            const checkboxElement = document.createElement('input');
+            checkboxElement.type = 'checkbox';
+            checkboxElement.value = path+'/'+item;
+            checkboxElement.addEventListener('click', (event) => event.stopPropagation()); // prevent event bubbling
+            iconElement.appendChild(checkboxElement);
             container.appendChild(iconElement);
         });
     };
@@ -131,23 +139,32 @@ window.os.getOSIcon = function(path, callback) { ... }
     load(browserPath);
     
     // Create toolbar
-    let toolbar = window.os.gui.createToolbar(win);
+    const toolbar = window.os.gui.createToolbar(win);
     
     // Call `addButton` on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name
     toolbar('📁', () => {
-        let name = prompt('Enter directory name');
-        window.os.fs.mkdir(browserPath + '/' + name);
+        const name = prompt('Enter directory name');
+        if (name) window.os.fs.mkdir(browserPath + '/' + name);
         load(browserPath);
     });
     
     // Call `addButton` on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and '' as content
     toolbar('📄', () => {
-        let name = prompt('Enter file name');
-        window.os.fs.write(browserPath + '/' + name, '');
+        const name = prompt('Enter file name');
+        if (name) window.os.fs.write(browserPath + '/' + name, '');
         load(browserPath);
     });
     
-    // Return dom element 
+    // Call `addButton` on the toolbar with `🗑️` text and list all the selected checkbox values, removes them and calls load on the current path
+    toolbar('🗑️', () => {
+        const checkboxes = container.querySelectorAll('input[type=checkbox]:checked');
+        checkboxes.forEach(checkbox => {
+            window.os.fs.rm(checkbox.value);
+            checkbox.parentNode.removeChild(checkbox); // remove checkbox from its parent node
+        });
+        load(browserPath);
+    });
+    
     return container;
 }
 

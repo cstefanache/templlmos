@@ -57,11 +57,14 @@
                     "   - set browserPath to path",
                     "   - removes all children of the container element",
                     "   - if path is not empty, create a new `div` with class icon, inner element `.emoji` with internal span element having content '🔙'  and class `emoji` and on click call load with `path.split('/').slice(0, -1).join('/')`",
-                    "   - ls all files in the path and for each item call `getOsIcon` with path+'/'+item and load function as callback",
+                    "   - ls all files in the path and for each item:",
+                    "      - call `getOsIcon` with path+'/'+item and load function as callback",
+                    "      - add a checkbox with value path+'/'+item that prevent event bubbling",
                     " - execute load on browserPath variable",
                     " - create toolbar",
                     " - call `addButton` on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name",
                     " - call `addButton` on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and '' as content",
+                    " - call `addButton` on the toolbar with `🗑️` text and list all the selected checkbox values, removes them and calls load on the current path",
                     " - return dom element"
                 ],
                 [

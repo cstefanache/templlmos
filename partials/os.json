@@ -5,7 +5,7 @@
             "tag": "style",
             "instructions": [
                 [
-                    "css to apply a lite pink color to the body and overflow hidden"
+                    "css to apply a rgb(21, 79, 114) background color to the body and overflow hidden"
                 ]
             ]
         },
