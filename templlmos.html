@@ -859,37 +859,36 @@ window.os.fs.rm('fstest');
   </div>
   <script id="output_output-window">
    (() => {
-// Create root container div element
+// Create a root container div element with class 'output-wrapper' and id 'output-wrapper'
 let rootContainer = document.createElement('div');
 rootContainer.className = 'output-wrapper';
 rootContainer.id = 'output-wrapper';
 document.body.appendChild(rootContainer);
 
-// Create pre element
+// Create and append to root container a pre element with class 'output' and id 'output'
 let output = document.createElement('pre');
 output.className = 'output';
 output.id = 'output';
 rootContainer.appendChild(output);
 
-// Store empty string in content variable
+// Store empty string in a variable 'content'
 let content = '';
 
-// Internal function to fetch content from 'http://localhost:8080/output'
+// Create an internal function fetches the content from '/output' if the data differs from the content
 async function fetchContent() {
-    let response = await fetch('http://localhost:8080/output');
+    let response = await fetch('/output');
     let newContent = await response.text();
     if (newContent !== content) {
         content = newContent;
-        output.innerHTML = content;
-        output.scrollTop = output.scrollHeight; // Scroll to bottom
+        output.innerHTML = content; // Set innerHTML of the pre element to the fetched content
+        output.scrollTop = output.scrollHeight; // Scroll output to bottom
     }
 }
 
-// Fetch http://localhost:8080/ping
-fetch('http://localhost:8080/ping')
+// Call /ping and if the response is 200 then set an interval to call the internal function every 1000ms
+fetch('/ping')
     .then(response => {
         if (response.status === 200) {
-            // If response is 200, set an interval to call the internal function every 1000ms
             setInterval(fetchContent, 1000);
         }
     });
@@ -1285,7 +1284,7 @@ window.os.fs.write('/sources/desktop/icon.txt', 'Package: icon\nDefine a functio
 window.os.fs.write('/sources/desktop/desktop-app.txt', 'Package: desktop-app\nDefine a function called `addApp` on `window.os` namespace that takes four parameters: emoji, title and a callback:\n- call `icon` with element at `#desktop_content`, emoji, title and the callback as parameters')
 window.os.fs.write('/sources/desktop/tests.txt', 'Package: tests\ncall addApp 10 times for 10 different emojis and random titles and callback to log the title when clicked')
 window.os.fs.write('/sources/output/output-styles.txt', 'Package: output-styles\nstyle .output-wrapper class having a fixed position having top and right to 0 and width 40%  and max-width of 500px and 100% height of the screen\nstyle .output class having:\n - 100% width and height\n - a semi-transparent black background\n - white text\n - text wrap\n - font size of 12px\n - padding of 10px and 0 margins\n - overflow auto')
-window.os.fs.write('/sources/output/output-window.txt', 'Package: output-window\nuse browser fetch for API requests\ncrate a root container div element having the class `output-wrapper` and id `output-wrapper`\ncreate and append to root container a pre element having the class `output` and id `output`\nstore empty string in a variable `content`\ncreate an internal function fetches the content from "http://localhost:8080/output" if the data differes from the content: sets the innerHTML of the pre element to the fetched content and  scroll output to bottom\ncalls http://localhost:8080/ping and if the response is 200 then set an interval to call the internal function every 1000ms')
+window.os.fs.write('/sources/output/output-window.txt', 'Package: output-window\nuse browser fetch for API requests\ncrate a root container div element having the class `output-wrapper` and id `output-wrapper`\ncreate and append to root container a pre element having the class `output` and id `output`\nstore empty string in a variable `content`\ncreate an internal function fetches the content from "/output" if the data differes from the content: sets the innerHTML of the pre element to the fetched content and  scroll output to bottom\ncalls /ping and if the response is 200 then set an interval to call the internal function every 1000ms')
 window.os.fs.write('/sources/gui/draggable.txt', 'Package: draggable\nImplement `makeDraggable` on `window.os.gui` object that takes two parameters root and dragHandleHTMLElement with the following functionality:\n - change absolute position of root by dragging the dragHandleHTMLElement\nImplement `makeResizable` on `window.os.gui` object  that takes two parameters: root, resizeHandleHTMLElement with the following functionality:` \n - resize (both width and height) the root HTMLElement element by dragging the resizeHandle DOM element.\n - update starting width and height on mouseup\nImplement `bringToFront` on `window.os.gui` object that taskes a single parameter: rootDOMNode  with the following functionality:\n- creates an internal function that:\n  * takes all elements with the same class as rootDomNode\n  * iterate through them and sets the z-index to 0 and at the end sets the z-index of rootDOMNode to 1\n- adds a mousedown event listener to rootDOMNode that calls the internal function\n- call the internal function')
 window.os.fs.write('/sources/gui/gui-tests.txt', 'Package: gui-tests')
 window.os.fs.write('/sources/gui/titleBar.txt', 'Package: titleBar\nDefine a function `titleBar` on the `window.os.gui` object that takes two parameter: parentElement (DOM element), title (string), and a callback `close` and has the following functionality:\n- create a root DOM element with the class `.titleBar`\n- add to the root DOM element a `span` containing the title parameter\n- add to the root DOM element a `button` with the text `❌` and class `close` that calls the close callback\n- append the root DOM element to parentElement')

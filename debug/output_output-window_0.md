@@ -11,42 +11,41 @@ Given the following already defined functions:
 crate a root container div element having the class `output-wrapper` and id `output-wrapper`
 create and append to root container a pre element having the class `output` and id `output`
 store empty string in a variable `content`
-create an internal function fetches the content from 'http://localhost:8080/output' if the data differes from the content: sets the innerHTML of the pre element to the fetched content and  scroll output to bottom
-calls http://localhost:8080/ping and if the response is 200 then set an interval to call the internal function every 1000ms 
+create an internal function fetches the content from '/output' if the data differes from the content: sets the innerHTML of the pre element to the fetched content and  scroll output to bottom
+calls /ping and if the response is 200 then set an interval to call the internal function every 1000ms 
 ### Response:
 </pre>
 ### Output
-<pre style='text-wrap: wrap'>// Create root container div element
+<pre style='text-wrap: wrap'>// Create a root container div element with class 'output-wrapper' and id 'output-wrapper'
 let rootContainer = document.createElement('div');
 rootContainer.className = 'output-wrapper';
 rootContainer.id = 'output-wrapper';
 document.body.appendChild(rootContainer);
 
-// Create pre element
+// Create and append to root container a pre element with class 'output' and id 'output'
 let output = document.createElement('pre');
 output.className = 'output';
 output.id = 'output';
 rootContainer.appendChild(output);
 
-// Store empty string in content variable
+// Store empty string in a variable 'content'
 let content = '';
 
-// Internal function to fetch content from 'http://localhost:8080/output'
+// Create an internal function fetches the content from '/output' if the data differs from the content
 async function fetchContent() {
-    let response = await fetch('http://localhost:8080/output');
+    let response = await fetch('/output');
     let newContent = await response.text();
     if (newContent !== content) {
         content = newContent;
-        output.innerHTML = content;
-        output.scrollTop = output.scrollHeight; // Scroll to bottom
+        output.innerHTML = content; // Set innerHTML of the pre element to the fetched content
+        output.scrollTop = output.scrollHeight; // Scroll output to bottom
     }
 }
 
-// Fetch http://localhost:8080/ping
-fetch('http://localhost:8080/ping')
+// Call /ping and if the response is 200 then set an interval to call the internal function every 1000ms
+fetch('/ping')
     .then(response => {
         if (response.status === 200) {
-            // If response is 200, set an interval to call the internal function every 1000ms
             setInterval(fetchContent, 1000);
         }
     });

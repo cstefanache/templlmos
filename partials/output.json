@@ -29,8 +29,8 @@
                     "crate a root container div element having the class `output-wrapper` and id `output-wrapper`",
                     "create and append to root container a pre element having the class `output` and id `output`",
                     "store empty string in a variable `content`",
-                    "create an internal function fetches the content from 'http://localhost:8080/output' if the data differes from the content: sets the innerHTML of the pre element to the fetched content and  scroll output to bottom",
-                    "calls http://localhost:8080/ping and if the response is 200 then set an interval to call the internal function every 1000ms"
+                    "create an internal function fetches the content from '/output' if the data differes from the content: sets the innerHTML of the pre element to the fetched content and  scroll output to bottom",
+                    "calls /ping and if the response is 200 then set an interval to call the internal function every 1000ms"
                 ]
             ]
         }

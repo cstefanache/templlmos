@@ -174,7 +174,7 @@ if __name__ == "__main__":
                 observer.join()
 
     if args.serve:
-        server = ThreadingHTTPServer(("localhost", 8080), Server)
+        server = ThreadingHTTPServer(("0.0.0.0", 8080), Server)
         try:
             server.serve_forever()
         except KeyboardInterrupt:
