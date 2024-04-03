@@ -23,10 +23,10 @@ class Compiler:
 
     def process_output(self, output, single_group=True):
         if single_group:
-            result = re.search(r"```\S{0,}\n(.*?)```", output, re.DOTALL).group(1)
+            result = re.search(r"```[a-z]+\n(.*?)```", output, re.DOTALL).group(1)
             return result
         else:
-            groups = re.findall(r"```\S{0,}\n(.*?)```", output, re.DOTALL)
+            groups = re.findall(r"```[a-z]+\n(.*?)```", output, re.DOTALL)
             result = ""
             for group in groups:
                 result += group + "\n"
