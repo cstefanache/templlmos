@@ -2,7 +2,7 @@
  <head>
   <style id="osbase_general-styles">
    body {
-    background-color: rgb(21, 79, 114);
+    background-color: #FFF4DF;
     overflow: hidden;
 }
   </style>
@@ -220,6 +220,8 @@ input[type="checkbox"] {
     position: absolute;
     left: 2px;
     top: -6px;
+    width: 8px;
+    height: 8px;
 }
   </style>
   <script id="desktop_icon">
@@ -823,6 +825,29 @@ window.os.runApp = function(callback, width = 500, height = 400) {
   </style>
  </head>
  <body>
+  <script id="osbase_logo">
+   (() => {
+// Create a new img element
+let img = document.createElement('img');
+
+// Set its src attribute to your URL
+img.src = 'https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg';
+
+// Set its id to 'logo'
+img.id = 'logo';
+
+// Style it to be positioned absolutely in the middle of the document body
+img.style.position = 'absolute';
+img.style.top = '50%';
+img.style.left = '50%';
+img.style.transform = 'translate(-50%, -50%)';
+
+// Append it to the body of the document
+document.body.appendChild(img);
+
+
+})()
+  </script>
   <script id="osbase_tests">
    (() => {
 /**
@@ -1111,6 +1136,44 @@ window.os.registerApplication('Browser', '📂', browser, 450, 400);
 
 })()
   </script>
+  <script id="apps_image">
+   (() => {
+/**
+ * Generate an image viewer for a given path
+ * @param {string} unused - Unused parameter (not used in this implementation)
+ * @param {string} path - The path of the image file to view
+ * @returns {HTMLImageElement} - The generated image element
+ */
+function imageViewer(unused, path) {
+    // Read file content as base64 string from path
+    let content = window.os.fs.getFileContentFromPath(path);
+    
+    // Remove "data:image/png;base64," or "data:image/jpeg;base64," from content
+    content = content.replace(/^data:image\/(png|jpeg);base64,/, '');
+    
+    // Create image element with src set to content
+    let imgElement = document.createElement('img');
+    imgElement.src = `data:image/png;base64,${content}`; // assuming it's a PNG image
+    
+    // Make the image fill the entire parent content (assuming parent is body)
+    imgElement.style.width = '100%';
+    imgElement.style.height = '100%';
+    
+    return imgElement;
+}
+
+window.os.registerApplication(
+    'Image Viewer', 
+    '🖼️', 
+    imageViewer, 
+    650, 
+    520, 
+    ['png', 'jpg', 'jpeg']
+);
+
+
+})()
+  </script>
   <script id="development_ide">
    (() => {
 /**
@@ -1271,15 +1334,16 @@ window.os.registerApplication('Minesweeper', '💣', minesweeper, 300, 300);
 })()
   </script>
   <script>
-   window.os.fs.write('/sources/os/general-styles.txt', 'Package: general-styles\ncss to apply a rgb(21, 79, 114) background color to the body and overflow hidden')
+   window.os.fs.write('/sources/os/general-styles.txt', 'Package: general-styles\ncss to apply a #FFF4DF background color to the body and overflow hidden')
 window.os.fs.write('/sources/os/global-objects.txt', 'Package: global-objects\nCreate a new empty object `os` on the window global object')
 window.os.fs.write('/sources/os/about.txt', 'Package: about\n- Define the `window.os.about` function that returns "TempLLMOS is an experimental WebOS controlled by a Large Language Model.\n- Define the `window.os.log` that takes a single parameter and calls console.log function')
+window.os.fs.write('/sources/os/logo.txt', 'Package: logo\njs that creates an image element with source: https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg with id #logo, position absolutely in the middle of the document body')
 window.os.fs.write('/sources/os/tests.txt', 'Package: tests\nexecute log with the about message')
 window.os.fs.write('/sources/filesystem/filesystem.txt', 'Package: filesystem\nLoad the `filesystem` object from the local storage as json\nDefine the `window.os.fs` object and define the following functions on it (remove leading and trailing `/` from the path):\n- `window.os.fs.sync` function that save the `filesystem` object to the local storage.\n- `window.os.fs.getFileContentFromPath` function that returns the content of the entry in the `filesystem` object at the given path. path should be split by `/` and the method should traverse the `filesystem` object and return the value at path (allow undefined or empty string). if the path starts with `/` remove the leading `/`\n- `window.os.fs.write` function that writes the content to an entry in the `filesystem` object at the given path and file name. in the end execute the `sync` method.\n- `window.os.fs.ls` function that returns a list of entries in the `filesystem` object at the given path. if path is empty or not found, return the root entries.\n- `window.os.fs.mkdir` function that creates a new directory in the `filesystem` object at the given path and directory name. in the end execute the `sync` method.\n- `window.os.fs.rm` function that removes the object at the given path and file name. in the end execute the `sync` method.\n- `window.os.fs.isFile` function that returns true the entry at the given path is a string.')
 window.os.fs.write('/sources/filesystem/fs-tests.txt', 'Package: fs-tests\ncreate a new directory in the root directory called `fstest`\ncreate a new file in the `fstest` directory called `test.txt` with the content `hello world`\nlist the entries in the `fstest` directory and log it to console\nread the content of the `fstest/test.txt` file and log it to console\nremove the `fstest` directory')
 window.os.fs.write('/sources/desktop/content-style.txt', 'Package: content-style\ncss style the `#desktop_content` id to match the following rules:\nabsolute position, fixed size, 100% width, 100% height, overflow-y hidden, padding of 10px, display flex, flex-wrap wrap, flex-direction column, align content: flex start')
 window.os.fs.write('/sources/desktop/content.txt', 'Package: content')
-window.os.fs.write('/sources/desktop/styles.txt', 'Package: styles\ncss style the `.icon` class to match the following rules:\n1. 64px width, 64px min height, text-align center, margin of 5px, pointer cursor, position relative, display flex with a column flex direction\n2. containing `.emoji` class should be a block, have a font-size of 30px and inline-block display, position relative\n3. containing `.title` class should be a block, have a font-size of 8px, monospaced font, black text, padding of 5px, allow word-wrap to break word, black rounded border with white background\n4. containing `.app-emoji` class should be absolutely positioned  12px on the right of the icon and 20px top\n5. containing checkbox should be absolutely positioned  2px on the left of the icon and -6px top')
+window.os.fs.write('/sources/desktop/styles.txt', 'Package: styles\ncss style the `.icon` class to match the following rules:\n1. 64px width, 64px min height, text-align center, margin of 5px, pointer cursor, position relative, display flex with a column flex direction\n2. containing `.emoji` class should be a block, have a font-size of 30px and inline-block display, position relative\n3. containing `.title` class should be a block, have a font-size of 8px, monospaced font, black text, padding of 5px, allow word-wrap to break word, black rounded border with white background\n4. containing `.app-emoji` class should be absolutely positioned  12px on the right of the icon and 20px top\n5. containing checkbox should be absolutely positioned  2px on the left of the icon and -6px top, with a 8px width and 8px height')
 window.os.fs.write('/sources/desktop/icon.txt', 'Package: icon\nDefine a function called `icon` on `window.os` namespace that takes three parameters: parent, emoji, title and a callback:\n- create a root DOM element with the class `.icon` and add it to `parent`\n- add a span with the class `.emoji` and the emoji as its content\n- add a span with the class `.title` and the title as its content\n- when the icon is clicked, call the callback')
 window.os.fs.write('/sources/desktop/desktop-app.txt', 'Package: desktop-app\nDefine a function called `addApp` on `window.os` namespace that takes four parameters: emoji, title and a callback:\n- call `icon` with element at `#desktop_content`, emoji, title and the callback as parameters')
 window.os.fs.write('/sources/desktop/tests.txt', 'Package: tests\ncall addApp 10 times for 10 different emojis and random titles and callback to log the title when clicked')
@@ -1302,6 +1366,7 @@ window.os.fs.write('/sources/apps/editor.txt', 'Package: editor\nCreate a `edito
 window.os.fs.write('/sources/apps/browser.txt', 'Package: browser\n1. Create a `browser` function that takes a win and path defaulting to "" parameter:\n - create a container dom element with class `browser`\n - set browserPath to path or `""` if path is undefined or not string\n - generate internal load function that takes path parameter:\n   - set browserPath to path\n   - removes all children of the container element\n   - if path is not empty, create a new `div` with class icon, inner element `.emoji` with internal span element having content "🔙"  and class `emoji` and on click call load with `path.split("/").slice(0, -1).join("/")`\n   - ls all files in the path and for each item:\n      - call `getOsIcon` with path+"/"+item and load function as callback\n      - add a checkbox with value path+"/"+item that prevent event bubbling\n - execute load on browserPath variable\n - create toolbar\n - call `addButton` on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name\n - call `addButton` on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and "" as content\n - call `addButton` on the toolbar with `🗑️` text and list all the selected checkbox values, removes them and calls load on the current path\n - return dom element\nCall register application with "Browser" title, 📂 as emoji, browser and 450x400 size')
 window.os.fs.write('/sources/apps/assistant-styles.txt', 'Package: assistant-styles\nstyle .chat class to have display flex and flex-direction column\nstyle .results class to have 100% width and 300px height, overflow-y scroll and margin 10px\nstyle .results pre to have white-space pre-wrap')
 window.os.fs.write('/sources/apps/assistant.txt', 'Package: assistant\nCreate a `assistant` function that takes a parent parameter:\n - create a root dom element with class `chat`\n - create a div element with 100% width and 300px height with class `results`\n - create an input element with 100% width\n - add a button with `➡️` text and on click:\n   - save the input value to instruction variable and clear the input\n   - POST the json having instruction and full as true to `/`, on response add pre tag with the response text content to the results\n return dom element\ncall register application with "Assistant" title, 👨🏽‍⚕️ as emoji, already defined `assistant` function reference and 400x400 size')
+window.os.fs.write('/sources/apps/image.txt', 'Package: image\nCreate a local `imageViewer` and generate jsdoc for it function that takes two parameters: `unused` and `path`  with the following functionality:\nreads file content as base64 string from the path to a variable `content`\nremove data:image/png;base64, or data:image/jpeg;base64 from the content\ncreate image element with src to content\nmake the image fill the entire parent content\nreturn image element\ncall register application with "Image Viewer" title, 🖼️ as emoji, `imageViewer` function reference and 650x520 size and [png,jpg,jpeg] as extensions')
 window.os.fs.write('/sources/development/run.txt', 'Package: run\ncreate a new function `window.os.runApp` object that takes a callback, width and height defaulting to 500 and 400, having the following functionality:\n  - creates a new window instance with the `Development` title , 🔥 emoji, width and height and saves it to a constant\n  - attach to window the result of calling the callback with the window instance')
 window.os.fs.write('/sources/development/ide.txt', 'Package: ide\nCreate `compile` function that takes a source parameter and:\n - remove the script tag with id `run-script` if exists\n - fetch post  to `/` with a json having {instruction: source}, and on response create a script tag with id `run-script` and add the response text content to the script tag\n - add end function comment\n1. Create an `ide` function that takes a win and path parameter: \n - create a root dom element with class `ide`\n - create a textarea element with 100% width and 500px height\n - if path is not empty, read the file content and set it to the textarea\n - create toolbar on win\n - add button on the toolbar with `▶️` text and on click execute `compile` function with textarea content\n - add button on the toolbar with `💾` text and on click fs.write textarea content to the path if path is defined, prompt for the path otherwise\n - return dom element\n2. Call register application with "IDE" title, 🧠 as emoji, already defined `ide` function reference and 800x600 size and register for ["script"] extensions')
 window.os.fs.write('/sources/games/styles.txt', 'Package: styles\ncss style for a .gmroot class to follow the following rules:\n- `.gmroot` is a flex container with column direction, centered content, margin of 2px, padding of 4px, background color of white\n- `.row` is display flex with row direction, centered content\n- `.cell` classes in `.gmroot` be the size of 22px by 22px, inline flex with content centered vertically and horizontally, 2px rounded dark grey border 1px width, margin of 1px, monospace font\n- `.cell.visited` class to have a background color of white, 1px white border\n- `.score` class to have a margin of 4px, monospace font, bold, centered text, background color of white, 2px rounded white border')

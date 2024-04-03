@@ -1,0 +1,13 @@
+#include filesystem
+#include run
+
+
+create a local photoBooth function that takes no parameters:
+- create a root dom element
+- append webcam video element to the root element that takes 100% of the root width
+- add a button with text "Take Snapshot" that takes an image snapshot of the video and saves it to "photobooth/image+{timestamp}.png"
+- return root dom element
+
+--- 
+
+run application with photoBooth function reference callback

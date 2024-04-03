@@ -1,6 +1,6 @@
 {
-    "crc": 1370034102,
-    "compiled_instruction": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\nGiven the following already defined functions:\n \n\n css to apply a rgb(21, 79, 114) background color to the body and overflow hidden \n### Response:\n",
-    "output": "body {\n    background-color: rgb(21, 79, 114);\n    overflow: hidden;\n}\n\n",
+    "crc": 3832971467,
+    "compiled_instruction": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\nGiven the following already defined functions:\n \n\n css to apply a #FFF4DF background color to the body and overflow hidden \n### Response:\n",
+    "output": "body {\n    background-color: #FFF4DF;\n    overflow: hidden;\n}\n\n",
     "library": ""
 }

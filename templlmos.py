@@ -135,12 +135,6 @@ class Server(BaseHTTPRequestHandler):
 
 class OSSourcesHandler(FileSystemEventHandler):
     def on_modified(self, event):
-        print(f"Event type: {event.event_type}  path : {event.src_path}")
-        print(
-            event.src_path.endswith(".json"),
-            "cache" not in event.src_path,
-            "debug" not in event.src_path,
-        )
         if (
             event.src_path.endswith(".json")
             and "cache" not in event.src_path

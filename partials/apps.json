@@ -129,6 +129,28 @@
                     "call register application with 'Assistant' title, 👨🏽‍⚕️ as emoji, already defined `assistant` function reference and 400x400 size"
                 ]
             ]
+        },
+        "image": {
+            "disabled": false,
+            "rebuild": false,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "filesystem",
+                "registry"
+            ],
+            "instructions": [
+                [
+                    "Create a local `imageViewer` and generate jsdoc for it function that takes two parameters: `unused` and `path`  with the following functionality:",
+                    "reads file content as base64 string from the path to a variable `content`",
+                    "remove data:image/png;base64, or data:image/jpeg;base64 from the content",
+                    "create image element with src to content",
+                    "make the image fill the entire parent content",
+                    "return image element"
+                ],[
+                    "call register application with 'Image Viewer' title, 🖼️ as emoji, `imageViewer` function reference and 650x520 size and [png,jpg,jpeg] as extensions"
+                ]
+            ]
         }
     }
 }

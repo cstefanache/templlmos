@@ -12,7 +12,7 @@ Given the following already defined functions:
 2. containing `.emoji` class should be a block, have a font-size of 30px and inline-block display, position relative
 3. containing `.title` class should be a block, have a font-size of 8px, monospaced font, black text, padding of 5px, allow word-wrap to break word, black rounded border with white background
 4. containing `.app-emoji` class should be absolutely positioned  12px on the right of the icon and 20px top
-5. containing checkbox should be absolutely positioned  2px on the left of the icon and -6px top 
+5. containing checkbox should be absolutely positioned  2px on the left of the icon and -6px top, with a 8px width and 8px height 
 ### Response:
 </pre>
 ### Output
@@ -61,6 +61,8 @@ input[type="checkbox"] {
     position: absolute;
     left: 2px;
     top: -6px;
+    width: 8px;
+    height: 8px;
 }
 
 </pre>

@@ -5,7 +5,7 @@
             "tag": "style",
             "instructions": [
                 [
-                    "css to apply a rgb(21, 79, 114) background color to the body and overflow hidden"
+                    "css to apply a #FFF4DF background color to the body and overflow hidden"
                 ]
             ]
         },
@@ -29,6 +29,20 @@
                 ],
                 [
                     "- Define the `window.os.log` that takes a single parameter and calls console.log function"
+                ]
+            ]
+        },
+        "logo": {
+            "to": "body",
+            "tag": "script",
+            "disabled": false,
+            "rebuild": false,
+            "library": false,
+            "dependencies": [
+            ],
+            "instructions": [
+                [
+                    "js that creates an image element with source: https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg with id #logo, position absolutely in the middle of the document body"
                 ]
             ]
         },
