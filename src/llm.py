@@ -63,7 +63,7 @@ class LLM:
                             do_sample=True,
                             num_return_sequences=1,
                             n_ctx=4096,
-                            n_gpu_layers=128,
+                            n_gpu_layers=64,
                             n_threads=8,
                         )
 

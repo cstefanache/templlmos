@@ -68,7 +68,7 @@ window.os.registerApplication = function(title, emoji, callback, width = 400, he
 
  Create a `editor` function that takes a window and path parameter:
  - create a dom element with class `editor`
- - add a textarea element to the previously created element 100% width and 400px height
+ - add a textarea element to the previously created element 100% width and 100% height
  - save reference to the textarea element
  - create toolbar on the `window` parameter
  - if path is not empty, read the file content and set it to the textarea
@@ -84,28 +84,30 @@ call register application with 'Editor' title, ✍️ as emoji, `editor` functio
     const editorDiv = document.createElement('div');
     editorDiv.className = 'editor';
     
-    // Create a textarea element with 100% width and 400px height
+    // Create a textarea element with 100% width and height
     const textarea = document.createElement('textarea');
     textarea.style.width = '100%';
-    textarea.style.height = '400px';
+    textarea.style.height = '100%';
+    
+    // Add textarea to editorDiv
     editorDiv.appendChild(textarea);
     
-    // Create toolbar on the window parameter
+    // Create toolbar on win parameter
     const addButton = window.os.gui.createToolbar(win);
     
-    // If path is not empty, read the file content and set it to the textarea
+    // If path is not empty, read file content and set it to textarea
     if (path) {
         const content = window.os.fs.getFileContentFromPath(path);
         if (content) textarea.value = content;
     }
     
-    // Add button on the toolbar with '💾' text save textarea content to the path if path is defined, prompt for the path otherwise
+    // Add button on toolbar with '💾' text that saves textarea content to path if path is defined, prompt for path otherwise
     addButton('💾', () => {
         const newPath = path || window.prompt('Enter a path');
         if (newPath) window.os.fs.write(newPath, textarea.value);
     });
     
-    // Return the div element
+    // Return editorDiv
     return editorDiv;
 }
 

@@ -37,12 +37,12 @@ class Compiler:
         for line in output_src.split("\n"):
             if re.search(r"^ ?\/?\*", line):
                 local_api += line + "\n"
-            elif re.search(
-                r"^[a-zA-Z.]+ = [function]", line
-            ) or re.search(r"^function [a-z]", line):
+            elif re.search(r"^[a-zA-Z.]+ = [function]", line) or re.search(
+                r"^function [a-z]", line
+            ):
                 local_api += line + " ... }\n"
         return local_api
-    
+
     def compile(self, partial, html, api, update_response=None):
         (
             model,
@@ -109,8 +109,6 @@ class Compiler:
                     instruction = "\n".join(instruction_set)
                     dep_prefix = prefix.replace("{deps}", compiled_dependencies)
                     compiled_instruction = f"{dep_prefix} {instruction} {suffix}"
-                    print(f"----------[ {app} {package_id} {index} ]----------")
-                    print(compiled_instruction)
 
                     cache_file_name = f"{CACHE}/{app}_{package_id}_{index}.json"
                     skip_compilation = False
@@ -130,6 +128,8 @@ class Compiler:
                                 package_src += cache_data["output"]
 
                     if not skip_compilation:
+                        print(f"----------[ {app} {package_id} {index} ]----------")
+                        print(compiled_instruction)
                         result = self.llm.call_llm(
                             model, compiled_instruction, update_response=update_response
                         )
@@ -143,7 +143,7 @@ class Compiler:
 
                     if tag == "script":
                         local_api += self.get_api(output_src)
-                        
+
                         compiled_dependencies += local_api
                     cache_data["library"] = local_api
 
@@ -201,13 +201,31 @@ class Compiler:
             "body": {"_children_": []},
             "_children_": [],
         }
+        sources = []
         for partial in self.data.get("partials", []):
             print(f"Compiling partial: {partial}...")
             with open(f"./partials/{partial}", "r") as read_file:
                 partial_data = json.load(read_file)
+
+                for app, packages in partial_data.items():
+                   
+                    for package_id, package in packages.items():
+                        source = []
+                        source.append(f"Package: {package_id}")
+                        for instruction_set in package.get("instructions", []):
+                            source.append("\n".join(instruction_set))
+                        all_escaped_sources = (
+                            "\n".join(source).replace("'", '"').replace("\n", "\\n")
+                        )
+                        sources.append(
+                            f"window.os.fs.write('/sources/{partial[:-5]}/{package_id}.txt', '{all_escaped_sources}')"
+                        )
                 self.compile(
                     partial_data, html, self.api, update_response=update_response
                 )
+
+        gen = "\n".join(sources)
+        html["body"]["_children_"].append(f"<script>{gen}</script>")
 
         with open(f"{DEBUG}/compiled.json", "w") as file:
             json.dump(html, file, indent=4)

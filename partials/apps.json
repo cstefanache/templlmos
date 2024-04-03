@@ -12,6 +12,28 @@
                 ]
             ]
         },
+        "simple-run": {
+            "disabled": false,
+            "rebuld": false,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "registry"
+            ],
+            "instructions": [
+                [
+                    "Create an `application` function that takes a parent parameter having the following functionality:",
+                    " - create a root dom element with class `chat`",
+                    " - create an input element with 100% width with keyup event listener that on enter key press:",
+                    "   - save the input value to instruction variable and clear the input",
+                    "   - POST the json having instruction and full as false to `http://localhost:8080`, on response add a script tag to the body with id `run-script` and add the response text content to the script tag",
+                    " - return dom element"
+                ],
+                [
+                    "call register application with 'Run' title, ▶️ as emoji, already defined `application` function reference and 400x70 size"
+                ]
+            ]
+        },
         "editor": {
             "disabled": false,
             "rebuild": false,
@@ -26,7 +48,7 @@
                 [
                     "Create a `editor` function that takes a window and path parameter:",
                     " - create a dom element with class `editor`",
-                    " - add a textarea element to the previously created element 100% width and 400px height",
+                    " - add a textarea element to the previously created element 100% width and 100% height",
                     " - save reference to the textarea element",
                     " - create toolbar on the `window` parameter",
                     " - if path is not empty, read the file content and set it to the textarea",
@@ -71,8 +93,7 @@
                     "Call register application with 'Browser' title, 📂 as emoji, browser and 450x400 size"
                 ]
             ]
-            
-        },       
+        },
         "assistant-styles": {
             "disabled": true,
             "rebuild": false,

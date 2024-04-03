@@ -871,14 +871,17 @@ output.className = 'output';
 output.id = 'output';
 rootContainer.appendChild(output);
 
+// Store empty string in content variable
+let content = '';
+
 // Internal function to fetch content from 'http://localhost:8080/output'
 async function fetchContent() {
-    try {
-        let response = await fetch('http://localhost:8080/output');
-        let data = await response.text();
-        output.innerHTML = data;
-    } catch (error) {
-        console.error('Error:', error);
+    let response = await fetch('http://localhost:8080/output');
+    let newContent = await response.text();
+    if (newContent !== content) {
+        content = newContent;
+        output.innerHTML = content;
+        output.scrollTop = output.scrollHeight; // Scroll to bottom
     }
 }
 
@@ -888,12 +891,7 @@ fetch('http://localhost:8080/ping')
         if (response.status === 200) {
             // If response is 200, set an interval to call the internal function every 1000ms
             setInterval(fetchContent, 1000);
-        } else {
-            console.error('Ping failed with status', response.status);
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
     });
 
 
@@ -936,6 +934,62 @@ window.os.registerApplication('hello world', '👋', helloWorld, 300, 200);
 
 })()
   </script>
+  <script id="apps_simple-run">
+   (() => {
+/**
+ * Create a chat application with a root DOM element and input element.
+ * 
+ * @param {HTMLElement} parent - The parent element where the chat application will be appended.
+ */
+function application(parent) {
+    // Create a root DOM element with class 'chat'
+    const chat = document.createElement('div');
+    chat.className = 'chat';
+    parent.appendChild(chat);
+
+    // Create an input element with 100% width
+    const input = document.createElement('input');
+    input.style.width = '100%';
+    chat.appendChild(input);
+
+    // Variable to save input value
+    let instruction = '';
+
+    // Event listener for keyup event on input element
+    input.addEventListener('keyup', async (event) => {
+        // If enter key is pressed
+        if (event.key === 'Enter') {
+            // Save input value to instruction variable and clear input
+            instruction = event.target.value;
+            event.target.value = '';
+            
+            // POST instruction and full as false to 'http://localhost:8080'
+            const response = await fetch('http://localhost:8080', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ instruction: instruction, full: false })
+            });
+            
+            // Get response text content
+            const content = await response.text();
+            
+            // Create a script tag with id 'run-script' and add response content to it
+            const script = document.createElement('script');
+            script.id = 'run-script';
+            script.textContent = content;
+            document.body.appendChild(script);
+        }
+    });
+    
+    // Return root DOM element
+    return chat;
+}
+
+window.os.registerApplication('Run', '▶️', application, 400, 70);
+
+
+})()
+  </script>
   <script id="apps_editor">
    (() => {
 function editor(win, path) {
@@ -943,28 +997,30 @@ function editor(win, path) {
     const editorDiv = document.createElement('div');
     editorDiv.className = 'editor';
     
-    // Create a textarea element with 100% width and 400px height
+    // Create a textarea element with 100% width and height
     const textarea = document.createElement('textarea');
     textarea.style.width = '100%';
-    textarea.style.height = '400px';
+    textarea.style.height = '100%';
+    
+    // Add textarea to editorDiv
     editorDiv.appendChild(textarea);
     
-    // Create toolbar on the window parameter
+    // Create toolbar on win parameter
     const addButton = window.os.gui.createToolbar(win);
     
-    // If path is not empty, read the file content and set it to the textarea
+    // If path is not empty, read file content and set it to textarea
     if (path) {
         const content = window.os.fs.getFileContentFromPath(path);
         if (content) textarea.value = content;
     }
     
-    // Add button on the toolbar with '💾' text save textarea content to the path if path is defined, prompt for the path otherwise
+    // Add button on toolbar with '💾' text that saves textarea content to path if path is defined, prompt for path otherwise
     addButton('💾', () => {
         const newPath = path || window.prompt('Enter a path');
         if (newPath) window.os.fs.write(newPath, textarea.value);
     });
     
-    // Return the div element
+    // Return editorDiv
     return editorDiv;
 }
 
@@ -1214,6 +1270,43 @@ window.os.registerApplication('Minesweeper', '💣', minesweeper, 300, 300);
 
 
 })()
+  </script>
+  <script>
+   window.os.fs.write('/sources/os/general-styles.txt', 'Package: general-styles\ncss to apply a rgb(21, 79, 114) background color to the body and overflow hidden')
+window.os.fs.write('/sources/os/global-objects.txt', 'Package: global-objects\nCreate a new empty object `os` on the window global object')
+window.os.fs.write('/sources/os/about.txt', 'Package: about\n- Define the `window.os.about` function that returns "TempLLMOS is an experimental WebOS controlled by a Large Language Model.\n- Define the `window.os.log` that takes a single parameter and calls console.log function')
+window.os.fs.write('/sources/os/tests.txt', 'Package: tests\nexecute log with the about message')
+window.os.fs.write('/sources/filesystem/filesystem.txt', 'Package: filesystem\nLoad the `filesystem` object from the local storage as json\nDefine the `window.os.fs` object and define the following functions on it (remove leading and trailing `/` from the path):\n- `window.os.fs.sync` function that save the `filesystem` object to the local storage.\n- `window.os.fs.getFileContentFromPath` function that returns the content of the entry in the `filesystem` object at the given path. path should be split by `/` and the method should traverse the `filesystem` object and return the value at path (allow undefined or empty string). if the path starts with `/` remove the leading `/`\n- `window.os.fs.write` function that writes the content to an entry in the `filesystem` object at the given path and file name. in the end execute the `sync` method.\n- `window.os.fs.ls` function that returns a list of entries in the `filesystem` object at the given path. if path is empty or not found, return the root entries.\n- `window.os.fs.mkdir` function that creates a new directory in the `filesystem` object at the given path and directory name. in the end execute the `sync` method.\n- `window.os.fs.rm` function that removes the object at the given path and file name. in the end execute the `sync` method.\n- `window.os.fs.isFile` function that returns true the entry at the given path is a string.')
+window.os.fs.write('/sources/filesystem/fs-tests.txt', 'Package: fs-tests\ncreate a new directory in the root directory called `fstest`\ncreate a new file in the `fstest` directory called `test.txt` with the content `hello world`\nlist the entries in the `fstest` directory and log it to console\nread the content of the `fstest/test.txt` file and log it to console\nremove the `fstest` directory')
+window.os.fs.write('/sources/desktop/content-style.txt', 'Package: content-style\ncss style the `#desktop_content` id to match the following rules:\nabsolute position, fixed size, 100% width, 100% height, overflow-y hidden, padding of 10px, display flex, flex-wrap wrap, flex-direction column, align content: flex start')
+window.os.fs.write('/sources/desktop/content.txt', 'Package: content')
+window.os.fs.write('/sources/desktop/styles.txt', 'Package: styles\ncss style the `.icon` class to match the following rules:\n1. 64px width, 64px min height, text-align center, margin of 5px, pointer cursor, position relative, display flex with a column flex direction\n2. containing `.emoji` class should be a block, have a font-size of 30px and inline-block display, position relative\n3. containing `.title` class should be a block, have a font-size of 8px, monospaced font, black text, padding of 5px, allow word-wrap to break word, black rounded border with white background\n4. containing `.app-emoji` class should be absolutely positioned  12px on the right of the icon and 20px top\n5. containing checkbox should be absolutely positioned  2px on the left of the icon and -6px top')
+window.os.fs.write('/sources/desktop/icon.txt', 'Package: icon\nDefine a function called `icon` on `window.os` namespace that takes three parameters: parent, emoji, title and a callback:\n- create a root DOM element with the class `.icon` and add it to `parent`\n- add a span with the class `.emoji` and the emoji as its content\n- add a span with the class `.title` and the title as its content\n- when the icon is clicked, call the callback')
+window.os.fs.write('/sources/desktop/desktop-app.txt', 'Package: desktop-app\nDefine a function called `addApp` on `window.os` namespace that takes four parameters: emoji, title and a callback:\n- call `icon` with element at `#desktop_content`, emoji, title and the callback as parameters')
+window.os.fs.write('/sources/desktop/tests.txt', 'Package: tests\ncall addApp 10 times for 10 different emojis and random titles and callback to log the title when clicked')
+window.os.fs.write('/sources/output/output-styles.txt', 'Package: output-styles\nstyle .output-wrapper class having a fixed position having top and right to 0 and width 40%  and max-width of 500px and 100% height of the screen\nstyle .output class having:\n - 100% width and height\n - a semi-transparent black background\n - white text\n - text wrap\n - font size of 12px\n - padding of 10px and 0 margins\n - overflow auto')
+window.os.fs.write('/sources/output/output-window.txt', 'Package: output-window\nuse browser fetch for API requests\ncrate a root container div element having the class `output-wrapper` and id `output-wrapper`\ncreate and append to root container a pre element having the class `output` and id `output`\nstore empty string in a variable `content`\ncreate an internal function fetches the content from "http://localhost:8080/output" if the data differes from the content: sets the innerHTML of the pre element to the fetched content and  scroll output to bottom\ncalls http://localhost:8080/ping and if the response is 200 then set an interval to call the internal function every 1000ms')
+window.os.fs.write('/sources/gui/draggable.txt', 'Package: draggable\nImplement `makeDraggable` on `window.os.gui` object that takes two parameters root and dragHandleHTMLElement with the following functionality:\n - change absolute position of root by dragging the dragHandleHTMLElement\nImplement `makeResizable` on `window.os.gui` object  that takes two parameters: root, resizeHandleHTMLElement with the following functionality:` \n - resize (both width and height) the root HTMLElement element by dragging the resizeHandle DOM element.\n - update starting width and height on mouseup\nImplement `bringToFront` on `window.os.gui` object that taskes a single parameter: rootDOMNode  with the following functionality:\n- creates an internal function that:\n  * takes all elements with the same class as rootDomNode\n  * iterate through them and sets the z-index to 0 and at the end sets the z-index of rootDOMNode to 1\n- adds a mousedown event listener to rootDOMNode that calls the internal function\n- call the internal function')
+window.os.fs.write('/sources/gui/gui-tests.txt', 'Package: gui-tests')
+window.os.fs.write('/sources/gui/titleBar.txt', 'Package: titleBar\nDefine a function `titleBar` on the `window.os.gui` object that takes two parameter: parentElement (DOM element), title (string), and a callback `close` and has the following functionality:\n- create a root DOM element with the class `.titleBar`\n- add to the root DOM element a `span` containing the title parameter\n- add to the root DOM element a `button` with the text `❌` and class `close` that calls the close callback\n- append the root DOM element to parentElement')
+window.os.fs.write('/sources/gui/toolbar.txt', 'Package: toolbar\ncreate function `createToolbar` on the `window.os.gui` object and generate jsdoc that takes one HTMLElement parameter `win`\n- create a root DOM element with the class `.toolbar`\n- append the root DOM element to the `.toolbarPlaceholder` from `win` HTML element\n- create internal function `addButton` that takes two parameters: text and callback that adds a button to the root DOM element with the text parameter and call the callback when the button is clicked\n- return internal addButton function')
+window.os.fs.write('/sources/gui/window.txt', 'Package: window\nDefine a function `createWindow` on the `window.os.gui` object that takes four parameters: emoji, title, width and height that are defaulting to 400 and 300, respectively if not passed and have the following functionality:\n- create a root DOM element with the class `.window`, set the width and height only, and add it to document body in the middle of the document\n- call bringToFront on the root element\n- add and empty div with class `titlePlaceholder` to the root DOM element\n- add and empty div with class `toolbarPlaceholder` to the root DOM element\n- add and empty div with class `contentPlaceholder` to the root DOM element\n- add and empty div with class `statusPlaceholder` to the root DOM element\n- add a resize handle to the root DOM element with class `resizeHandle`\n- add titleBar to `.titlePlaceholder` having the text `emoji + title` and close callback removes root DOM element from the document body\n- make root element draggable by the `.titlePlaceholder` element\n- make root element resizable by the `resizeHandle` element\n- set root DOM element left position document width divided by 2 minus width divided by 2\n- set root DOM element top position document height divided by 2 minus height divided by 2\n- return root DOM element\nDefine a function called `attachToWindow` on the `window.os.gui` object that takes two parameters: windowElement and contentElement that takes the contentElement and appends it to the `.contentPlaceholder` of the windowElement')
+window.os.fs.write('/sources/gui/gui-styles.txt', 'Package: gui-styles\ncss style for a .titleBar class to follow the following rules:\n- orange background color, a black bottom border of 1px solid\n- display of flex, a justify-content of space-between, an align-items of center\n- monospaced black small text\n- 5px horizontal padding, 0 vertical padding\n- 2px black border bottom\n- render buttons flat, no border, no background, a cursor of pointer, font size of 6, 5px padding\n- do not allow text selection\ncss style for a .window class to follow the following rules:\n- white background color\n- disable text selection\n- a border of 2px solid black\n- a border-radius of 8px\n- hidden overflow\n- a box-shadow of 4px 4px 0 0 rgba(0,0,0,0.5)\n- absolute position\n- display of flex and flex-direction of column\n- inner .contentPlaceholder class should have a padding of 5px, flex-grow of 1 and overflow of auto\n- inner .statusPlaceholder class should have  a border-top of 1px solid black and a monospaced small text\ncss style for a  `.resizeHandle` class with the following rules:\n- a width and height of 0px\n- an absolute position\n- a bottom and right of 0\n- a cursor of se-resize\n- border width: 0 0 10px 10px\n- border style: solid\n- `border-color: transparent transparent #ff7200 transparent`\n- transform: rotate(0deg)\ncss style for `.toolbar` class to follow the following rules:\n- a padding of 2px\n- a background of antique white\n- a margin-bottom of 2px\n- a border-bottom of 1px solid black\n- a display of flex\n- a justify-content of flex-start\ninner buttons have:\n - no border\n - cursor pointer\n - transparent background')
+window.os.fs.write('/sources/gui/tests.txt', 'Package: tests\ncreate an element h1 with text `hello world!` and attach to a window with title `Hello World` and emoji `🌍` having 300x200 size\ncreate an element h1 with text `good bye world!` and attach to a window with title `Good Bye` and emoji `👋` having 300x200 size\ncreate a h3 element with the text "here\ncreate a window with title `Toolbar` and emoji `🛠`\ncreate a toolbar on window and add button with text `👋` that alerts `clicked` on callback\nattach the h3 element to the window')
+window.os.fs.write('/sources/registry/extension.txt', 'Package: extension\ncreate a new function `registerExtension` on `window.os` object that takes an extension, an emoji and a callback function with the following functionality:\n - stores on the `window.os.registry` object the extension as key and emoji and callback as value')
+window.os.fs.write('/sources/registry/app-icon.txt', 'Package: app-icon\ncreate jsdoc and function `getOSIcon` on `window.os` object having a path and callback parameter with the following functionality:\n- create a root element `div` having the class `icon`\n- save isFile to constant\n- add a span element with class `emoji` and content 📄 if isFile, 📁 otherwise\n- add a div element with class title containing the name from path\n- extract extension from path and search if is registered in the `window.os.registry` object\n- sets `currentCallback` to function parameter callback\n- if extension is registered reads stores it in a `extData` property and:\n   - adds span element with class `app-emoji` with the content of `extData.emoji` \n   - sets the `currentCallback` to a function that calls `extData.callback` with the path\n- exit condition and add click listener to the root element that calls `currentCallback` with the path\n- return the root element')
+window.os.fs.write('/sources/registry/registry.txt', 'Package: registry\ncreate a new function `registerApplication` on the `window.os` object and jsdoc that takes a title, emoji, callback, width=400 and height = 400 and a an array of extensions being undefined by default having the following functionality:\n- define an internal `execute` that takes a spread params:\n  - creates a new window instance with the title, emoji, width and height and saves it to a constant\n  - attach to window the result of calling the callback with the window instance and spread params\n- if extensions is defined, call `registerExtension` for each extension with extension, emoji and the execute function\n- call addApp with the emoji, title and callback that calls the execute function with no parameters')
+window.os.fs.write('/sources/registry/hello-world.txt', 'Package: hello-world\nCreate a `helloWorld` function that takes a parent and path parameter:\n - creates and returns a root element `div` having an h1 child element with "Hello World" text\n - if path is defined append a pre element containing the content of reading the file at the path\n - returns the root element\nafter definition, register application with "hello world" title, 👋 as emoji, `helloWorld` function and 300x200 size')
+window.os.fs.write('/sources/apps/styles.txt', 'Package: styles\ncss to style .browser class to have display flex and flex-wrap wrap')
+window.os.fs.write('/sources/apps/simple-run.txt', 'Package: simple-run\nCreate an `application` function that takes a parent parameter having the following functionality:\n - create a root dom element with class `chat`\n - create an input element with 100% width with keyup event listener that on enter key press:\n   - save the input value to instruction variable and clear the input\n   - POST the json having instruction and full as false to `http://localhost:8080`, on response add a script tag to the body with id `run-script` and add the response text content to the script tag\n - return dom element\ncall register application with "Run" title, ▶️ as emoji, already defined `application` function reference and 400x70 size')
+window.os.fs.write('/sources/apps/editor.txt', 'Package: editor\nCreate a `editor` function that takes a window and path parameter:\n - create a dom element with class `editor`\n - add a textarea element to the previously created element 100% width and 100% height\n - save reference to the textarea element\n - create toolbar on the `window` parameter\n - if path is not empty, read the file content and set it to the textarea\n - add button on the toolbar with `💾` text save textarea content to the path if path is defined, prompt for the path otherwise\n - return  dom element\n\ncall register application with "Editor" title, ✍️ as emoji, `editor` function reference and 400x450 size for [txt,doc] extensions')
+window.os.fs.write('/sources/apps/browser.txt', 'Package: browser\n1. Create a `browser` function that takes a win and path defaulting to "" parameter:\n - create a container dom element with class `browser`\n - set browserPath to path or `""` if path is undefined or not string\n - generate internal load function that takes path parameter:\n   - set browserPath to path\n   - removes all children of the container element\n   - if path is not empty, create a new `div` with class icon, inner element `.emoji` with internal span element having content "🔙"  and class `emoji` and on click call load with `path.split("/").slice(0, -1).join("/")`\n   - ls all files in the path and for each item:\n      - call `getOsIcon` with path+"/"+item and load function as callback\n      - add a checkbox with value path+"/"+item that prevent event bubbling\n - execute load on browserPath variable\n - create toolbar\n - call `addButton` on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name\n - call `addButton` on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and "" as content\n - call `addButton` on the toolbar with `🗑️` text and list all the selected checkbox values, removes them and calls load on the current path\n - return dom element\nCall register application with "Browser" title, 📂 as emoji, browser and 450x400 size')
+window.os.fs.write('/sources/apps/assistant-styles.txt', 'Package: assistant-styles\nstyle .chat class to have display flex and flex-direction column\nstyle .results class to have 100% width and 300px height, overflow-y scroll and margin 10px\nstyle .results pre to have white-space pre-wrap')
+window.os.fs.write('/sources/apps/assistant.txt', 'Package: assistant\nCreate a `assistant` function that takes a parent parameter:\n - create a root dom element with class `chat`\n - create a div element with 100% width and 300px height with class `results`\n - create an input element with 100% width\n - add a button with `➡️` text and on click:\n   - save the input value to instruction variable and clear the input\n   - POST the json having instruction and full as true to `http://localhost:8080`, on response add pre tag with the response text content to the results\n return dom element\ncall register application with "Assistant" title, 👨🏽‍⚕️ as emoji, already defined `assistant` function reference and 400x400 size')
+window.os.fs.write('/sources/development/run.txt', 'Package: run\ncreate a new function `window.os.runApp` object that takes a callback, width and height defaulting to 500 and 400, having the following functionality:\n  - creates a new window instance with the `Development` title , 🔥 emoji, width and height and saves it to a constant\n  - attach to window the result of calling the callback with the window instance')
+window.os.fs.write('/sources/development/ide.txt', 'Package: ide\nCreate `compile` function that takes a source parameter and:\n - remove the script tag with id `run-script` if exists\n - fetch post  to `http://localhost:8080` with a json having {instruction: source}, and on response create a script tag with id `run-script` and add the response text content to the script tag\n - add end function comment\n1. Create an `ide` function that takes a win and path parameter: \n - create a root dom element with class `ide`\n - create a textarea element with 100% width and 500px height\n - if path is not empty, read the file content and set it to the textarea\n - create toolbar on win\n - add button on the toolbar with `▶️` text and on click execute `compile` function with textarea content\n - add button on the toolbar with `💾` text and on click fs.write textarea content to the path if path is defined, prompt for the path otherwise\n - return dom element\n2. Call register application with "IDE" title, 🧠 as emoji, already defined `ide` function reference and 800x600 size and register for ["script"] extensions')
+window.os.fs.write('/sources/games/styles.txt', 'Package: styles\ncss style for a .gmroot class to follow the following rules:\n- `.gmroot` is a flex container with column direction, centered content, margin of 2px, padding of 4px, background color of white\n- `.row` is display flex with row direction, centered content\n- `.cell` classes in `.gmroot` be the size of 22px by 22px, inline flex with content centered vertically and horizontally, 2px rounded dark grey border 1px width, margin of 1px, monospace font\n- `.cell.visited` class to have a background color of white, 1px white border\n- `.score` class to have a margin of 4px, monospace font, bold, centered text, background color of white, 2px rounded white border')
+window.os.fs.write('/sources/games/minesweper.txt', 'Package: minesweper\nCreate a callback function `minesweeper` that:\n - creates a root dom element with the class `gmroot`\n - generate a matrix of 8x8 with values 0\n - pick a random of 10 cells and set their value to -40 and increase the number value of the neighbouring cells\n - set score to 64\n - add a div with the class `score` and the content `Discovered: 64` to the root dom element\n - iterate through the matrix and for each row add a div element with the class `.row` and for each item add a div with the class `cell`,  ` ` as content and add data-x and data-y as attributes. when the div is clicked call `reveal` function for the current x and y\n - define internal function reveal that:\n   - get div at x and y using data-x and data-y attributes\n   - if the div is already revealed return\n   - set the div content to the value of the cell and add class `.visited` to the div\n   - if the div has am integer value smaller than 0 set the div content to `💣` and call `alert` with the message `Game Over` and the title `💣 minesweeper`\n   - else decrease the score by 1 and update the score div content to `Discovered: ${score}`\n   - if the div has an integer value of 0 call `reveal` for all the neighbouring cells\n - return root element\nCall register application with "Minesweeper" title, 💣 as emoji, `minesweeper` callback function reference and 300x300 size')
   </script>
  </body>
 </html>

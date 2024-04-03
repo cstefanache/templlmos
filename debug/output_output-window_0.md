@@ -10,7 +10,8 @@ Given the following already defined functions:
  use browser fetch for API requests
 crate a root container div element having the class `output-wrapper` and id `output-wrapper`
 create and append to root container a pre element having the class `output` and id `output`
-create an internal function that fetches the content from 'http://localhost:8080/output' and sets the innerHTML of the output div to the fetched content
+store empty string in a variable `content`
+create an internal function fetches the content from 'http://localhost:8080/output' if the data differes from the content: sets the innerHTML of the pre element to the fetched content and  scroll output to bottom
 calls http://localhost:8080/ping and if the response is 200 then set an interval to call the internal function every 1000ms 
 ### Response:
 </pre>
@@ -27,14 +28,17 @@ output.className = 'output';
 output.id = 'output';
 rootContainer.appendChild(output);
 
+// Store empty string in content variable
+let content = '';
+
 // Internal function to fetch content from 'http://localhost:8080/output'
 async function fetchContent() {
-    try {
-        let response = await fetch('http://localhost:8080/output');
-        let data = await response.text();
-        output.innerHTML = data;
-    } catch (error) {
-        console.error('Error:', error);
+    let response = await fetch('http://localhost:8080/output');
+    let newContent = await response.text();
+    if (newContent !== content) {
+        content = newContent;
+        output.innerHTML = content;
+        output.scrollTop = output.scrollHeight; // Scroll to bottom
     }
 }
 
@@ -44,12 +48,7 @@ fetch('http://localhost:8080/ping')
         if (response.status === 200) {
             // If response is 200, set an interval to call the internal function every 1000ms
             setInterval(fetchContent, 1000);
-        } else {
-            console.error('Ping failed with status', response.status);
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
     });
 
 </pre>
