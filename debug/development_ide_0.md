@@ -2,6 +2,7 @@
 ### API
 <pre style='text-wrap: wrap'>/**
  * Compile a source code string into a runnable script.
+ * 
  * @param {string} source - The source code string to compile.
  */
 function compile(source) { ... }
@@ -72,39 +73,40 @@ window.os.gui.createToolbar = function(win) { ... }
 
  Create `compile` function that takes a source parameter and:
  - remove the script tag with id `run-script` if exists
- - fetch post  to `http://localhost:8080` with a json having {instruction: source}, and on response create a script tag with id `run-script` and add the response text content to the script tag
+ - fetch post  to `/` with a json having {instruction: source}, and on response create a script tag with id `run-script` and add the response text content to the script tag
  - add end function comment 
 ### Response:
 </pre>
 ### Output
 <pre style='text-wrap: wrap'>/**
  * Compile a source code string into a runnable script.
+ * 
  * @param {string} source - The source code string to compile.
  */
 function compile(source) {
-    // Remove existing script tag with id 'run-script' if exists
-    var existingScriptTag = document.getElementById('run-script');
+    // Remove existing 'run-script' script tag if exists
+    let existingScriptTag = document.getElementById('run-script');
     if (existingScriptTag) {
         existingScriptTag.parentNode.removeChild(existingScriptTag);
     }
     
     // Fetch POST request with source code as JSON data
-    fetch('http://localhost:8080', {
+    fetch('/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({instruction: source})
     })
-    .then(response => response.text()) // Get response text content
+    .then(response => response.text())
     .then(data => {
         // Create a new script tag with id 'run-script' and add response text content to it
-        var newScriptTag = document.createElement('script');
+        let newScriptTag = document.createElement('script');
         newScriptTag.id = 'run-script';
         newScriptTag.textContent = data;
         document.body.appendChild(newScriptTag);
     })
-    .catch(error => console.error('Error:', error)); // Handle any errors that occurred during fetch request
+    .catch(error => console.error('Error:', error));
 }
 
 </pre>

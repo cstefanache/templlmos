@@ -26,7 +26,7 @@
                     " - create a root dom element with class `chat`",
                     " - create an input element with 100% width with keyup event listener that on enter key press:",
                     "   - save the input value to instruction variable and clear the input",
-                    "   - POST the json having instruction and full as false to `http://localhost:8080`, on response add a script tag to the body with id `run-script` and add the response text content to the script tag",
+                    "   - POST the json having instruction and full as false to `/`, on response add a script tag to the body with id `run-script` and add the response text content to the script tag",
                     " - return dom element"
                 ],
                 [
@@ -124,7 +124,7 @@
                     " - create an input element with 100% width",
                     " - add a button with `➡️` text and on click:",
                     "   - save the input value to instruction variable and clear the input",
-                    "   - POST the json having instruction and full as true to `http://localhost:8080`, on response add pre tag with the response text content to the results",
+                    "   - POST the json having instruction and full as true to `/`, on response add pre tag with the response text content to the results",
                     " return dom element",
                     "call register application with 'Assistant' title, 👨🏽‍⚕️ as emoji, already defined `assistant` function reference and 400x400 size"
                 ]

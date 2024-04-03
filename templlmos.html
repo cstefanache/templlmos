@@ -962,8 +962,8 @@ function application(parent) {
             instruction = event.target.value;
             event.target.value = '';
             
-            // POST instruction and full as false to 'http://localhost:8080'
-            const response = await fetch('http://localhost:8080', {
+            // POST instruction and full as false to '/'
+            const response = await fetch('/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ instruction: instruction, full: false })
@@ -1115,38 +1115,39 @@ window.os.registerApplication('Browser', '📂', browser, 450, 400);
    (() => {
 /**
  * Compile a source code string into a runnable script.
+ * 
  * @param {string} source - The source code string to compile.
  */
 function compile(source) {
-    // Remove existing script tag with id 'run-script' if exists
-    var existingScriptTag = document.getElementById('run-script');
+    // Remove existing 'run-script' script tag if exists
+    let existingScriptTag = document.getElementById('run-script');
     if (existingScriptTag) {
         existingScriptTag.parentNode.removeChild(existingScriptTag);
     }
     
     // Fetch POST request with source code as JSON data
-    fetch('http://localhost:8080', {
+    fetch('/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({instruction: source})
     })
-    .then(response => response.text()) // Get response text content
+    .then(response => response.text())
     .then(data => {
         // Create a new script tag with id 'run-script' and add response text content to it
-        var newScriptTag = document.createElement('script');
+        let newScriptTag = document.createElement('script');
         newScriptTag.id = 'run-script';
         newScriptTag.textContent = data;
         document.body.appendChild(newScriptTag);
     })
-    .catch(error => console.error('Error:', error)); // Handle any errors that occurred during fetch request
+    .catch(error => console.error('Error:', error));
 }
 
 function ide(win, path) {
     // Create root element
     const ideRoot = document.createElement('div');
-    ideRoot.className = 'ide';
+    ideRoot.classList.add('ide');
     
     // Create textarea element
     const textarea = document.createElement('textarea');
@@ -1176,11 +1177,10 @@ function ide(win, path) {
     // Append textarea to root element
     ideRoot.appendChild(textarea);
     
-    // Return root element
     return ideRoot;
 }
 
-// Register application with 'IDE' title, 🧠 as emoji, ide function reference and 800x600 size
+// Register application
 window.os.registerApplication('IDE', '🧠', ide, 800, 600, ['script']);
 
 
@@ -1297,13 +1297,13 @@ window.os.fs.write('/sources/registry/app-icon.txt', 'Package: app-icon\ncreate 
 window.os.fs.write('/sources/registry/registry.txt', 'Package: registry\ncreate a new function `registerApplication` on the `window.os` object and jsdoc that takes a title, emoji, callback, width=400 and height = 400 and a an array of extensions being undefined by default having the following functionality:\n- define an internal `execute` that takes a spread params:\n  - creates a new window instance with the title, emoji, width and height and saves it to a constant\n  - attach to window the result of calling the callback with the window instance and spread params\n- if extensions is defined, call `registerExtension` for each extension with extension, emoji and the execute function\n- call addApp with the emoji, title and callback that calls the execute function with no parameters')
 window.os.fs.write('/sources/registry/hello-world.txt', 'Package: hello-world\nCreate a `helloWorld` function that takes a parent and path parameter:\n - creates and returns a root element `div` having an h1 child element with "Hello World" text\n - if path is defined append a pre element containing the content of reading the file at the path\n - returns the root element\nafter definition, register application with "hello world" title, 👋 as emoji, `helloWorld` function and 300x200 size')
 window.os.fs.write('/sources/apps/styles.txt', 'Package: styles\ncss to style .browser class to have display flex and flex-wrap wrap')
-window.os.fs.write('/sources/apps/simple-run.txt', 'Package: simple-run\nCreate an `application` function that takes a parent parameter having the following functionality:\n - create a root dom element with class `chat`\n - create an input element with 100% width with keyup event listener that on enter key press:\n   - save the input value to instruction variable and clear the input\n   - POST the json having instruction and full as false to `http://localhost:8080`, on response add a script tag to the body with id `run-script` and add the response text content to the script tag\n - return dom element\ncall register application with "Run" title, ▶️ as emoji, already defined `application` function reference and 400x70 size')
+window.os.fs.write('/sources/apps/simple-run.txt', 'Package: simple-run\nCreate an `application` function that takes a parent parameter having the following functionality:\n - create a root dom element with class `chat`\n - create an input element with 100% width with keyup event listener that on enter key press:\n   - save the input value to instruction variable and clear the input\n   - POST the json having instruction and full as false to `/`, on response add a script tag to the body with id `run-script` and add the response text content to the script tag\n - return dom element\ncall register application with "Run" title, ▶️ as emoji, already defined `application` function reference and 400x70 size')
 window.os.fs.write('/sources/apps/editor.txt', 'Package: editor\nCreate a `editor` function that takes a window and path parameter:\n - create a dom element with class `editor`\n - add a textarea element to the previously created element 100% width and 100% height\n - save reference to the textarea element\n - create toolbar on the `window` parameter\n - if path is not empty, read the file content and set it to the textarea\n - add button on the toolbar with `💾` text save textarea content to the path if path is defined, prompt for the path otherwise\n - return  dom element\n\ncall register application with "Editor" title, ✍️ as emoji, `editor` function reference and 400x450 size for [txt,doc] extensions')
 window.os.fs.write('/sources/apps/browser.txt', 'Package: browser\n1. Create a `browser` function that takes a win and path defaulting to "" parameter:\n - create a container dom element with class `browser`\n - set browserPath to path or `""` if path is undefined or not string\n - generate internal load function that takes path parameter:\n   - set browserPath to path\n   - removes all children of the container element\n   - if path is not empty, create a new `div` with class icon, inner element `.emoji` with internal span element having content "🔙"  and class `emoji` and on click call load with `path.split("/").slice(0, -1).join("/")`\n   - ls all files in the path and for each item:\n      - call `getOsIcon` with path+"/"+item and load function as callback\n      - add a checkbox with value path+"/"+item that prevent event bubbling\n - execute load on browserPath variable\n - create toolbar\n - call `addButton` on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name\n - call `addButton` on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and "" as content\n - call `addButton` on the toolbar with `🗑️` text and list all the selected checkbox values, removes them and calls load on the current path\n - return dom element\nCall register application with "Browser" title, 📂 as emoji, browser and 450x400 size')
 window.os.fs.write('/sources/apps/assistant-styles.txt', 'Package: assistant-styles\nstyle .chat class to have display flex and flex-direction column\nstyle .results class to have 100% width and 300px height, overflow-y scroll and margin 10px\nstyle .results pre to have white-space pre-wrap')
-window.os.fs.write('/sources/apps/assistant.txt', 'Package: assistant\nCreate a `assistant` function that takes a parent parameter:\n - create a root dom element with class `chat`\n - create a div element with 100% width and 300px height with class `results`\n - create an input element with 100% width\n - add a button with `➡️` text and on click:\n   - save the input value to instruction variable and clear the input\n   - POST the json having instruction and full as true to `http://localhost:8080`, on response add pre tag with the response text content to the results\n return dom element\ncall register application with "Assistant" title, 👨🏽‍⚕️ as emoji, already defined `assistant` function reference and 400x400 size')
+window.os.fs.write('/sources/apps/assistant.txt', 'Package: assistant\nCreate a `assistant` function that takes a parent parameter:\n - create a root dom element with class `chat`\n - create a div element with 100% width and 300px height with class `results`\n - create an input element with 100% width\n - add a button with `➡️` text and on click:\n   - save the input value to instruction variable and clear the input\n   - POST the json having instruction and full as true to `/`, on response add pre tag with the response text content to the results\n return dom element\ncall register application with "Assistant" title, 👨🏽‍⚕️ as emoji, already defined `assistant` function reference and 400x400 size')
 window.os.fs.write('/sources/development/run.txt', 'Package: run\ncreate a new function `window.os.runApp` object that takes a callback, width and height defaulting to 500 and 400, having the following functionality:\n  - creates a new window instance with the `Development` title , 🔥 emoji, width and height and saves it to a constant\n  - attach to window the result of calling the callback with the window instance')
-window.os.fs.write('/sources/development/ide.txt', 'Package: ide\nCreate `compile` function that takes a source parameter and:\n - remove the script tag with id `run-script` if exists\n - fetch post  to `http://localhost:8080` with a json having {instruction: source}, and on response create a script tag with id `run-script` and add the response text content to the script tag\n - add end function comment\n1. Create an `ide` function that takes a win and path parameter: \n - create a root dom element with class `ide`\n - create a textarea element with 100% width and 500px height\n - if path is not empty, read the file content and set it to the textarea\n - create toolbar on win\n - add button on the toolbar with `▶️` text and on click execute `compile` function with textarea content\n - add button on the toolbar with `💾` text and on click fs.write textarea content to the path if path is defined, prompt for the path otherwise\n - return dom element\n2. Call register application with "IDE" title, 🧠 as emoji, already defined `ide` function reference and 800x600 size and register for ["script"] extensions')
+window.os.fs.write('/sources/development/ide.txt', 'Package: ide\nCreate `compile` function that takes a source parameter and:\n - remove the script tag with id `run-script` if exists\n - fetch post  to `/` with a json having {instruction: source}, and on response create a script tag with id `run-script` and add the response text content to the script tag\n - add end function comment\n1. Create an `ide` function that takes a win and path parameter: \n - create a root dom element with class `ide`\n - create a textarea element with 100% width and 500px height\n - if path is not empty, read the file content and set it to the textarea\n - create toolbar on win\n - add button on the toolbar with `▶️` text and on click execute `compile` function with textarea content\n - add button on the toolbar with `💾` text and on click fs.write textarea content to the path if path is defined, prompt for the path otherwise\n - return dom element\n2. Call register application with "IDE" title, 🧠 as emoji, already defined `ide` function reference and 800x600 size and register for ["script"] extensions')
 window.os.fs.write('/sources/games/styles.txt', 'Package: styles\ncss style for a .gmroot class to follow the following rules:\n- `.gmroot` is a flex container with column direction, centered content, margin of 2px, padding of 4px, background color of white\n- `.row` is display flex with row direction, centered content\n- `.cell` classes in `.gmroot` be the size of 22px by 22px, inline flex with content centered vertically and horizontally, 2px rounded dark grey border 1px width, margin of 1px, monospace font\n- `.cell.visited` class to have a background color of white, 1px white border\n- `.score` class to have a margin of 4px, monospace font, bold, centered text, background color of white, 2px rounded white border')
 window.os.fs.write('/sources/games/minesweper.txt', 'Package: minesweper\nCreate a callback function `minesweeper` that:\n - creates a root dom element with the class `gmroot`\n - generate a matrix of 8x8 with values 0\n - pick a random of 10 cells and set their value to -40 and increase the number value of the neighbouring cells\n - set score to 64\n - add a div with the class `score` and the content `Discovered: 64` to the root dom element\n - iterate through the matrix and for each row add a div element with the class `.row` and for each item add a div with the class `cell`,  ` ` as content and add data-x and data-y as attributes. when the div is clicked call `reveal` function for the current x and y\n - define internal function reveal that:\n   - get div at x and y using data-x and data-y attributes\n   - if the div is already revealed return\n   - set the div content to the value of the cell and add class `.visited` to the div\n   - if the div has am integer value smaller than 0 set the div content to `💣` and call `alert` with the message `Game Over` and the title `💣 minesweeper`\n   - else decrease the score by 1 and update the score div content to `Discovered: ${score}`\n   - if the div has an integer value of 0 call `reveal` for all the neighbouring cells\n - return root element\nCall register application with "Minesweeper" title, 💣 as emoji, `minesweeper` callback function reference and 300x300 size')
   </script>

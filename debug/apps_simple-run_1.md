@@ -56,8 +56,8 @@ function application(parent) {
             instruction = event.target.value;
             event.target.value = '';
             
-            // POST instruction and full as false to 'http://localhost:8080'
-            const response = await fetch('http://localhost:8080', {
+            // POST instruction and full as false to '/'
+            const response = await fetch('/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ instruction: instruction, full: false })

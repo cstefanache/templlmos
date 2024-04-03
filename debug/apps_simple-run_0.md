@@ -29,7 +29,7 @@ window.os.registerApplication = function(title, emoji, callback, width = 400, he
  - create a root dom element with class `chat`
  - create an input element with 100% width with keyup event listener that on enter key press:
    - save the input value to instruction variable and clear the input
-   - POST the json having instruction and full as false to `http://localhost:8080`, on response add a script tag to the body with id `run-script` and add the response text content to the script tag
+   - POST the json having instruction and full as false to `/`, on response add a script tag to the body with id `run-script` and add the response text content to the script tag
  - return dom element 
 ### Response:
 </pre>
@@ -61,8 +61,8 @@ function application(parent) {
             instruction = event.target.value;
             event.target.value = '';
             
-            // POST instruction and full as false to 'http://localhost:8080'
-            const response = await fetch('http://localhost:8080', {
+            // POST instruction and full as false to '/'
+            const response = await fetch('/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ instruction: instruction, full: false })

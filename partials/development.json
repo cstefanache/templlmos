@@ -32,7 +32,7 @@
                 [
                     "Create `compile` function that takes a source parameter and:",
                     " - remove the script tag with id `run-script` if exists",
-                    " - fetch post  to `http://localhost:8080` with a json having {instruction: source}, and on response create a script tag with id `run-script` and add the response text content to the script tag",
+                    " - fetch post  to `/` with a json having {instruction: source}, and on response create a script tag with id `run-script` and add the response text content to the script tag",
                     " - add end function comment"
                 ],
                 [
