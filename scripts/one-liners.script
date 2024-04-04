@@ -1,0 +1,5 @@
+do not use jquery
+reset #logo left and top positions
+animate #logo to bounce off window edges
+
+vanilla js to make #logo twice the size

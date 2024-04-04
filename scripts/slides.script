@@ -19,7 +19,7 @@ create a render function that takes a string param and a parent dom element:
 
 create a slidesApp function that takes a win parameter:
 - create a root dom element
-- loads content of 'script.txt' into a content constant
+- loads content of 'presentation.txt' into a content constant
 - console log content
 - sets index to 0 
 - split the content by `-` into slides array

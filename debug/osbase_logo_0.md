@@ -7,26 +7,20 @@
 Given the following already defined functions:
  
 
- js that creates an image element with source: https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg with id #logo, position absolutely in the middle of the document body 
+ js that creates an image element with source: https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg with id #logo, absolute position, middle of the document 
 ### Response:
 </pre>
 ### Output
-<pre style='text-wrap: wrap'>// Create a new img element
-let img = document.createElement('img');
-
-// Set its src attribute to your URL
+<pre style='text-wrap: wrap'>// Create a new image element
+var img = document.createElement('img');
 img.src = 'https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg';
-
-// Set its id to 'logo'
 img.id = 'logo';
-
-// Style it to be positioned absolutely in the middle of the document body
 img.style.position = 'absolute';
-img.style.top = '50%';
 img.style.left = '50%';
-img.style.transform = 'translate(-50%, -50%)';
+img.style.top = '50%';
+img.style.transform = 'translate(-50%, -50%)'; // This will center the image in both x and y axis
 
-// Append it to the body of the document
+// Append the image to the body of your document
 document.body.appendChild(img);
 
 </pre>

@@ -827,22 +827,16 @@ window.os.runApp = function(callback, width = 500, height = 400) {
  <body>
   <script id="osbase_logo">
    (() => {
-// Create a new img element
-let img = document.createElement('img');
-
-// Set its src attribute to your URL
+// Create a new image element
+var img = document.createElement('img');
 img.src = 'https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg';
-
-// Set its id to 'logo'
 img.id = 'logo';
-
-// Style it to be positioned absolutely in the middle of the document body
 img.style.position = 'absolute';
-img.style.top = '50%';
 img.style.left = '50%';
-img.style.transform = 'translate(-50%, -50%)';
+img.style.top = '50%';
+img.style.transform = 'translate(-50%, -50%)'; // This will center the image in both x and y axis
 
-// Append it to the body of the document
+// Append the image to the body of your document
 document.body.appendChild(img);
 
 
@@ -1337,7 +1331,7 @@ window.os.registerApplication('Minesweeper', '💣', minesweeper, 300, 300);
    window.os.fs.write('/sources/os/general-styles.txt', 'Package: general-styles\ncss to apply a #FFF4DF background color to the body and overflow hidden')
 window.os.fs.write('/sources/os/global-objects.txt', 'Package: global-objects\nCreate a new empty object `os` on the window global object')
 window.os.fs.write('/sources/os/about.txt', 'Package: about\n- Define the `window.os.about` function that returns "TempLLMOS is an experimental WebOS controlled by a Large Language Model.\n- Define the `window.os.log` that takes a single parameter and calls console.log function')
-window.os.fs.write('/sources/os/logo.txt', 'Package: logo\njs that creates an image element with source: https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg with id #logo, position absolutely in the middle of the document body')
+window.os.fs.write('/sources/os/logo.txt', 'Package: logo\njs that creates an image element with source: https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg with id #logo, absolute position, middle of the document')
 window.os.fs.write('/sources/os/tests.txt', 'Package: tests\nexecute log with the about message')
 window.os.fs.write('/sources/filesystem/filesystem.txt', 'Package: filesystem\nLoad the `filesystem` object from the local storage as json\nDefine the `window.os.fs` object and define the following functions on it (remove leading and trailing `/` from the path):\n- `window.os.fs.sync` function that save the `filesystem` object to the local storage.\n- `window.os.fs.getFileContentFromPath` function that returns the content of the entry in the `filesystem` object at the given path. path should be split by `/` and the method should traverse the `filesystem` object and return the value at path (allow undefined or empty string). if the path starts with `/` remove the leading `/`\n- `window.os.fs.write` function that writes the content to an entry in the `filesystem` object at the given path and file name. in the end execute the `sync` method.\n- `window.os.fs.ls` function that returns a list of entries in the `filesystem` object at the given path. if path is empty or not found, return the root entries.\n- `window.os.fs.mkdir` function that creates a new directory in the `filesystem` object at the given path and directory name. in the end execute the `sync` method.\n- `window.os.fs.rm` function that removes the object at the given path and file name. in the end execute the `sync` method.\n- `window.os.fs.isFile` function that returns true the entry at the given path is a string.')
 window.os.fs.write('/sources/filesystem/fs-tests.txt', 'Package: fs-tests\ncreate a new directory in the root directory called `fstest`\ncreate a new file in the `fstest` directory called `test.txt` with the content `hello world`\nlist the entries in the `fstest` directory and log it to console\nread the content of the `fstest/test.txt` file and log it to console\nremove the `fstest` directory')

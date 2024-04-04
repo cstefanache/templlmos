@@ -1,6 +1,6 @@
 {
-    "crc": 4044929589,
-    "compiled_instruction": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\nGiven the following already defined functions:\n \n\n js that creates an image element with source: https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg with id #logo, position absolutely in the middle of the document body \n### Response:\n",
-    "output": "// Create a new img element\nlet img = document.createElement('img');\n\n// Set its src attribute to your URL\nimg.src = 'https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg';\n\n// Set its id to 'logo'\nimg.id = 'logo';\n\n// Style it to be positioned absolutely in the middle of the document body\nimg.style.position = 'absolute';\nimg.style.top = '50%';\nimg.style.left = '50%';\nimg.style.transform = 'translate(-50%, -50%)';\n\n// Append it to the body of the document\ndocument.body.appendChild(img);\n\n",
+    "crc": 1011848826,
+    "compiled_instruction": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\nGiven the following already defined functions:\n \n\n js that creates an image element with source: https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg with id #logo, absolute position, middle of the document \n### Response:\n",
+    "output": "// Create a new image element\nvar img = document.createElement('img');\nimg.src = 'https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg';\nimg.id = 'logo';\nimg.style.position = 'absolute';\nimg.style.left = '50%';\nimg.style.top = '50%';\nimg.style.transform = 'translate(-50%, -50%)'; // This will center the image in both x and y axis\n\n// Append the image to the body of your document\ndocument.body.appendChild(img);\n\n",
     "library": ""
 }

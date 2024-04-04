@@ -1,0 +1,18 @@
+# TempLLMOS
+-
+# What is TempLLMOS
+### Is an experimental OS that is managed by an LLM
+-
+# Issue 1
+## Stability
+The output of the script might be totally different by changing a single word in the prompt.
+-
+# Issue 2
+## CPU vs GPU output
+Different output between GPU and CPU served models
+-
+# Issue 3
+## Tends to use JQuery "A LOT"
+Because the js developers relied on JQuery too much to interract with the browser so does the model
+-
+Thank you
