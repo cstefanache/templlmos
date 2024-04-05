@@ -1,4 +1,4 @@
-# TempLLM OS
+# 🏛️ TempLLM OS
 
 `TempLLMOS` is a WebOS entirely described in natural language and seamlessly compiled into JavaScript using an LLM.
 
@@ -10,7 +10,7 @@
 Outated animation of the OS
 
 
-# Sample
+# 🥇 Sample
 Here is how to code a PhotoBooth Application that takes snapshots and saves them into the Virtual FS
 ```
 #include filesystem
@@ -29,7 +29,7 @@ run application with photoBooth function reference callback
 
 ![Image](assets/photobooth.png)
 
-# Give it a try:
+# 🏃‍➡️ Give it a try:
 
 There are two working modes for the experimental os: Static runtime where the precompiled code is present and injected in the root HTML and the dynamic realtime compiler mode where a server that hosts a LLM model is published that allows the user to compile new apps at runtime.
 
@@ -49,10 +49,14 @@ for MAC runtime you can benefit from GPU inference and install llama-cpp with ME
 CMAKE_ARGS="-DLLAMA_METAL=on" python3 -m pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
 ```
 
-## Next Steps
+## ✅ Next Steps
 
 - [ ] Increase output stability
 - [ ] Fix CPU vs. GPU generation differences
 - [ ] Better WebUI
 - [ ] Window Management & Taskbar
 - [ ] Fine tune model on JS Only
+
+## ❤️ Contribute
+
+We believe in the power of collaboration and welcome contributions from developers of all skill levels. Whether it's fixing bugs, improving documentation, or suggesting new features, your help makes a big difference!
