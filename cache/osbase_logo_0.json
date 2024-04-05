@@ -1,6 +1,6 @@
 {
-    "crc": 1011848826,
-    "compiled_instruction": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\nGiven the following already defined functions:\n \n\n js that creates an image element with source: https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg with id #logo, absolute position, middle of the document \n### Response:\n",
-    "output": "// Create a new image element\nvar img = document.createElement('img');\nimg.src = 'https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg';\nimg.id = 'logo';\nimg.style.position = 'absolute';\nimg.style.left = '50%';\nimg.style.top = '50%';\nimg.style.transform = 'translate(-50%, -50%)'; // This will center the image in both x and y axis\n\n// Append the image to the body of your document\ndocument.body.appendChild(img);\n\n",
+    "crc": 2930795687,
+    "compiled_instruction": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\nGiven the following already defined functions:\n \n\n js that creates an image element with source: https://github.com/cstefanache/templlmos/blob/main/assets/logos.png?raw=true with id #logo, absolute position, middle of the body document, give it 20% opacity \n### Response:\n",
+    "output": "// Create a new image element\nlet img = document.createElement('img');\nimg.src = 'https://github.com/cstefanache/templlmos/blob/main/assets/logos.png?raw=true?raw=true';\nimg.id = 'logo';\nimg.style.position = 'absolute';\nimg.style.left = '50%';\nimg.style.top = '50%';\nimg.style.transform = 'translate(-50%, -50%)'; // To center the image in the middle of its container\nimg.style.opacity = '0.2'; // Set opacity to 20%\n\n// Append the image to the body of the document\ndocument.body.appendChild(img);\n\n",
     "library": ""
 }

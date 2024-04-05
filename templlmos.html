@@ -650,6 +650,29 @@ button {
     background-color: transparent;
 }
   </style>
+  <style id="gui_notification-styles">
+   .notification-wrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.notification {
+    position: relative;
+    width: 200px;
+    padding: 10px;
+    margin-top: 5px;
+    word-wrap: break-word;
+    box-shadow: 2px 2px 0 0 rgba(0,0,0,0.5);
+    border: 2px solid black;
+    border-radius: 5px;
+    background-color: white;
+}
+  </style>
   <script id="registry_extension">
    (() => {
 // Assuming window.os is already defined
@@ -828,15 +851,16 @@ window.os.runApp = function(callback, width = 500, height = 400) {
   <script id="osbase_logo">
    (() => {
 // Create a new image element
-var img = document.createElement('img');
-img.src = 'https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg';
+let img = document.createElement('img');
+img.src = 'https://github.com/cstefanache/templlmos/blob/main/assets/logos.png?raw=true?raw=true';
 img.id = 'logo';
 img.style.position = 'absolute';
 img.style.left = '50%';
 img.style.top = '50%';
-img.style.transform = 'translate(-50%, -50%)'; // This will center the image in both x and y axis
+img.style.transform = 'translate(-50%, -50%)'; // To center the image in the middle of its container
+img.style.opacity = '0.2'; // Set opacity to 20%
 
-// Append the image to the body of your document
+// Append the image to the body of the document
 document.body.appendChild(img);
 
 
@@ -911,6 +935,38 @@ fetch('/ping')
             setInterval(fetchContent, 1000);
         }
     });
+
+
+})()
+  </script>
+  <script id="gui_notification">
+   (() => {
+// Firstly, create a root container div element with the class 'notification-wrapper'
+let notificationWrapper = document.createElement('div');
+notificationWrapper.className = 'notification-wrapper';
+document.body.appendChild(notificationWrapper); // Assuming you want to append it to body, but you can change this as per your requirement
+
+// Now define your 'notification' function on 'window.os.gui' object
+if (!window.os) { window.os = {}; } // If 'os' object doesn't exist, create it
+if (!window.os.gui) { window.os.gui = {}; } // If 'gui' object doesn't exist in 'os', create it
+window.os.gui.notification = function(message) {
+    // Create a new DOM element with the class 'notification'
+    let notificationElement = document.createElement('div');
+    notificationElement.className = 'notification';
+    
+    // Create a 'span' containing the message parameter and append it to 'notification'
+    let messageElement = document.createElement('span');
+    messageElement.textContent = message; // Set the message as text content of span
+    notificationElement.appendChild(messageElement);
+    
+    // Append 'notification' to '.notification-wrapper'
+    notificationWrapper.appendChild(notificationElement);
+    
+    // Set a timeout of 2000ms to remove 'notification' from parent after 2 seconds
+    setTimeout(function() {
+        notificationWrapper.removeChild(notificationElement);
+    }, 2000);
+};
 
 
 })()
@@ -1130,6 +1186,70 @@ window.os.registerApplication('Browser', '📂', browser, 450, 400);
 
 })()
   </script>
+  <script id="apps_photobooth">
+   (() => {
+function createPhotoBooth() {
+    // Create root DOM element
+    const rootElement = document.createElement('div');
+    
+    // Append video element with autoplay on
+    const videoElement = document.createElement('video');
+    videoElement.autoplay = true;
+    videoElement.width = 400; // Set width of video element
+    videoElement.height = 300; // Set height of video element
+    rootElement.appendChild(videoElement);
+    
+    // Add button with text 'Take Snapshot'
+    const buttonElement = document.createElement('button');
+    buttonElement.innerText = 'Take Snapshot';
+    buttonElement.onclick = () => takeSnapshot(videoElement); // Call takeSnapshot function when button is clicked
+    rootElement.appendChild(buttonElement);
+    
+    // Request access to camera
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => videoElement.srcObject = stream)
+        .catch(err => console.error('Error accessing camera', err));
+    
+    return rootElement;
+}
+
+function takeSnapshot(videoElement) {
+    // Create canvas element
+    const canvasElement = document.createElement('canvas');
+    canvasElement.width = videoElement.videoWidth; // Set width of canvas element to match video element's width
+    canvasElement.height = videoElement.videoHeight; // Set height of canvas element to match video element's height
+    
+    // Draw video frame on canvas
+    const context = canvasElement.getContext('2d');
+    context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+    
+    // Convert canvas image to data URL
+    const imageDataUrl = canvasElement.toDataURL('image/png');
+    
+    // Generate timestamp for filename
+    const timestamp = Date.now();
+    
+    // Generate path for image save
+    const path = `photobooth/image+${timestamp}.png`;
+    
+    // Save image data URL to file
+    window.os.fs.write(path, imageDataUrl);
+    
+    // Notify user of successful save
+    window.os.gui.notification(`Snapshot saved to ${path}`);
+}
+
+window.os.registerApplication(
+    'Photobooth',  // title
+    '📸',  // emoji
+    createPhotoBooth,  // callback
+    410,  // width
+    360  // height
+);
+
+
+})()
+  </script>
   <script id="apps_image">
    (() => {
 /**
@@ -1331,7 +1451,7 @@ window.os.registerApplication('Minesweeper', '💣', minesweeper, 300, 300);
    window.os.fs.write('/sources/os/general-styles.txt', 'Package: general-styles\ncss to apply a #FFF4DF background color to the body and overflow hidden')
 window.os.fs.write('/sources/os/global-objects.txt', 'Package: global-objects\nCreate a new empty object `os` on the window global object')
 window.os.fs.write('/sources/os/about.txt', 'Package: about\n- Define the `window.os.about` function that returns "TempLLMOS is an experimental WebOS controlled by a Large Language Model.\n- Define the `window.os.log` that takes a single parameter and calls console.log function')
-window.os.fs.write('/sources/os/logo.txt', 'Package: logo\njs that creates an image element with source: https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg with id #logo, absolute position, middle of the document')
+window.os.fs.write('/sources/os/logo.txt', 'Package: logo\njs that creates an image element with source: https://github.com/cstefanache/templlmos/blob/main/assets/logos.png?raw=true with id #logo, absolute position, middle of the body document, give it 20% opacity')
 window.os.fs.write('/sources/os/tests.txt', 'Package: tests\nexecute log with the about message')
 window.os.fs.write('/sources/filesystem/filesystem.txt', 'Package: filesystem\nLoad the `filesystem` object from the local storage as json\nDefine the `window.os.fs` object and define the following functions on it (remove leading and trailing `/` from the path):\n- `window.os.fs.sync` function that save the `filesystem` object to the local storage.\n- `window.os.fs.getFileContentFromPath` function that returns the content of the entry in the `filesystem` object at the given path. path should be split by `/` and the method should traverse the `filesystem` object and return the value at path (allow undefined or empty string). if the path starts with `/` remove the leading `/`\n- `window.os.fs.write` function that writes the content to an entry in the `filesystem` object at the given path and file name. in the end execute the `sync` method.\n- `window.os.fs.ls` function that returns a list of entries in the `filesystem` object at the given path. if path is empty or not found, return the root entries.\n- `window.os.fs.mkdir` function that creates a new directory in the `filesystem` object at the given path and directory name. in the end execute the `sync` method.\n- `window.os.fs.rm` function that removes the object at the given path and file name. in the end execute the `sync` method.\n- `window.os.fs.isFile` function that returns true the entry at the given path is a string.')
 window.os.fs.write('/sources/filesystem/fs-tests.txt', 'Package: fs-tests\ncreate a new directory in the root directory called `fstest`\ncreate a new file in the `fstest` directory called `test.txt` with the content `hello world`\nlist the entries in the `fstest` directory and log it to console\nread the content of the `fstest/test.txt` file and log it to console\nremove the `fstest` directory')
@@ -1349,6 +1469,8 @@ window.os.fs.write('/sources/gui/titleBar.txt', 'Package: titleBar\nDefine a fun
 window.os.fs.write('/sources/gui/toolbar.txt', 'Package: toolbar\ncreate function `createToolbar` on the `window.os.gui` object and generate jsdoc that takes one HTMLElement parameter `win`\n- create a root DOM element with the class `.toolbar`\n- append the root DOM element to the `.toolbarPlaceholder` from `win` HTML element\n- create internal function `addButton` that takes two parameters: text and callback that adds a button to the root DOM element with the text parameter and call the callback when the button is clicked\n- return internal addButton function')
 window.os.fs.write('/sources/gui/window.txt', 'Package: window\nDefine a function `createWindow` on the `window.os.gui` object that takes four parameters: emoji, title, width and height that are defaulting to 400 and 300, respectively if not passed and have the following functionality:\n- create a root DOM element with the class `.window`, set the width and height only, and add it to document body in the middle of the document\n- call bringToFront on the root element\n- add and empty div with class `titlePlaceholder` to the root DOM element\n- add and empty div with class `toolbarPlaceholder` to the root DOM element\n- add and empty div with class `contentPlaceholder` to the root DOM element\n- add and empty div with class `statusPlaceholder` to the root DOM element\n- add a resize handle to the root DOM element with class `resizeHandle`\n- add titleBar to `.titlePlaceholder` having the text `emoji + title` and close callback removes root DOM element from the document body\n- make root element draggable by the `.titlePlaceholder` element\n- make root element resizable by the `resizeHandle` element\n- set root DOM element left position document width divided by 2 minus width divided by 2\n- set root DOM element top position document height divided by 2 minus height divided by 2\n- return root DOM element\nDefine a function called `attachToWindow` on the `window.os.gui` object that takes two parameters: windowElement and contentElement that takes the contentElement and appends it to the `.contentPlaceholder` of the windowElement')
 window.os.fs.write('/sources/gui/gui-styles.txt', 'Package: gui-styles\ncss style for a .titleBar class to follow the following rules:\n- orange background color, a black bottom border of 1px solid\n- display of flex, a justify-content of space-between, an align-items of center\n- monospaced black small text\n- 5px horizontal padding, 0 vertical padding\n- 2px black border bottom\n- render buttons flat, no border, no background, a cursor of pointer, font size of 6, 5px padding\n- do not allow text selection\ncss style for a .window class to follow the following rules:\n- white background color\n- disable text selection\n- a border of 2px solid black\n- a border-radius of 8px\n- hidden overflow\n- a box-shadow of 4px 4px 0 0 rgba(0,0,0,0.5)\n- absolute position\n- display of flex and flex-direction of column\n- inner .contentPlaceholder class should have a padding of 5px, flex-grow of 1 and overflow of auto\n- inner .statusPlaceholder class should have  a border-top of 1px solid black and a monospaced small text\ncss style for a  `.resizeHandle` class with the following rules:\n- a width and height of 0px\n- an absolute position\n- a bottom and right of 0\n- a cursor of se-resize\n- border width: 0 0 10px 10px\n- border style: solid\n- `border-color: transparent transparent #ff7200 transparent`\n- transform: rotate(0deg)\ncss style for `.toolbar` class to follow the following rules:\n- a padding of 2px\n- a background of antique white\n- a margin-bottom of 2px\n- a border-bottom of 1px solid black\n- a display of flex\n- a justify-content of flex-start\ninner buttons have:\n - no border\n - cursor pointer\n - transparent background')
+window.os.fs.write('/sources/gui/notification-styles.txt', 'Package: notification-styles\ncss style for a .notification-wrapper class to follow the following rules:\n- an absolute position\n- a top of 0\n- a right of 0\n- a z-index of 1000\n- a display of flex\n- a justify-content of center\n- a flex-direction of column\ncss style for a .notification class to follow the following rules:\n- white background, a black border of 1px solid\n- a black border of 2px solid\n- width width of 200px\n- word wrap\n- padding of 10px\n- a border-radius of 5px\n- a box-shadow of 2px 2px 0 0 rgba(0,0,0,0.5)\n- a top margin of 5px\n- a position of relative')
+window.os.fs.write('/sources/gui/notification.txt', 'Package: notification\ncrate a root container div element having the class `.notification-wrapper`\nDefine a function `notification` on the `window.os.gui` object that takes a single parameter message and has the following functionality:\n- create a root DOM element with the class `.notification`\n- add to the root DOM element a `span` containing the message parameter\n- append the root DOM element to .notification-wrapper\n- set a timeout of 2000ms to remove the root DOM element from parent')
 window.os.fs.write('/sources/gui/tests.txt', 'Package: tests\ncreate an element h1 with text `hello world!` and attach to a window with title `Hello World` and emoji `🌍` having 300x200 size\ncreate an element h1 with text `good bye world!` and attach to a window with title `Good Bye` and emoji `👋` having 300x200 size\ncreate a h3 element with the text "here\ncreate a window with title `Toolbar` and emoji `🛠`\ncreate a toolbar on window and add button with text `👋` that alerts `clicked` on callback\nattach the h3 element to the window')
 window.os.fs.write('/sources/registry/extension.txt', 'Package: extension\ncreate a new function `registerExtension` on `window.os` object that takes an extension, an emoji and a callback function with the following functionality:\n - stores on the `window.os.registry` object the extension as key and emoji and callback as value')
 window.os.fs.write('/sources/registry/app-icon.txt', 'Package: app-icon\ncreate jsdoc and function `getOSIcon` on `window.os` object having a path and callback parameter with the following functionality:\n- create a root element `div` having the class `icon`\n- save isFile to constant\n- add a span element with class `emoji` and content 📄 if isFile, 📁 otherwise\n- add a div element with class title containing the name from path\n- extract extension from path and search if is registered in the `window.os.registry` object\n- sets `currentCallback` to function parameter callback\n- if extension is registered reads stores it in a `extData` property and:\n   - adds span element with class `app-emoji` with the content of `extData.emoji` \n   - sets the `currentCallback` to a function that calls `extData.callback` with the path\n- exit condition and add click listener to the root element that calls `currentCallback` with the path\n- return the root element')
@@ -1360,6 +1482,7 @@ window.os.fs.write('/sources/apps/editor.txt', 'Package: editor\nCreate a `edito
 window.os.fs.write('/sources/apps/browser.txt', 'Package: browser\n1. Create a `browser` function that takes a win and path defaulting to "" parameter:\n - create a container dom element with class `browser`\n - set browserPath to path or `""` if path is undefined or not string\n - generate internal load function that takes path parameter:\n   - set browserPath to path\n   - removes all children of the container element\n   - if path is not empty, create a new `div` with class icon, inner element `.emoji` with internal span element having content "🔙"  and class `emoji` and on click call load with `path.split("/").slice(0, -1).join("/")`\n   - ls all files in the path and for each item:\n      - call `getOsIcon` with path+"/"+item and load function as callback\n      - add a checkbox with value path+"/"+item that prevent event bubbling\n - execute load on browserPath variable\n - create toolbar\n - call `addButton` on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name\n - call `addButton` on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and "" as content\n - call `addButton` on the toolbar with `🗑️` text and list all the selected checkbox values, removes them and calls load on the current path\n - return dom element\nCall register application with "Browser" title, 📂 as emoji, browser and 450x400 size')
 window.os.fs.write('/sources/apps/assistant-styles.txt', 'Package: assistant-styles\nstyle .chat class to have display flex and flex-direction column\nstyle .results class to have 100% width and 300px height, overflow-y scroll and margin 10px\nstyle .results pre to have white-space pre-wrap')
 window.os.fs.write('/sources/apps/assistant.txt', 'Package: assistant\nCreate a `assistant` function that takes a parent parameter:\n - create a root dom element with class `chat`\n - create a div element with 100% width and 300px height with class `results`\n - create an input element with 100% width\n - add a button with `➡️` text and on click:\n   - save the input value to instruction variable and clear the input\n   - POST the json having instruction and full as true to `/`, on response add pre tag with the response text content to the results\n return dom element\ncall register application with "Assistant" title, 👨🏽‍⚕️ as emoji, already defined `assistant` function reference and 400x400 size')
+window.os.fs.write('/sources/apps/photobooth.txt', 'Package: photobooth\ncreate a local photoBooth function that takes no parameters:\n- create a root dom element, do not style it\n- append browser webcam capture video element with autoplay on\n- add a button with text "Take Snapshot" that takes an image snapshot of the video and saves it to "photobooth/image+{timestamp}.png" and notify the user: "Snapshot saved to {path}"\n- return root dom element\ncall register application with "Photobooth" title, 📸 as emoji, function reference and 410x360 size')
 window.os.fs.write('/sources/apps/image.txt', 'Package: image\nCreate a local `imageViewer` and generate jsdoc for it function that takes two parameters: `unused` and `path`  with the following functionality:\nreads file content as base64 string from the path to a variable `content`\nremove data:image/png;base64, or data:image/jpeg;base64 from the content\ncreate image element with src to content\nmake the image fill the entire parent content\nreturn image element\ncall register application with "Image Viewer" title, 🖼️ as emoji, `imageViewer` function reference and 650x520 size and [png,jpg,jpeg] as extensions')
 window.os.fs.write('/sources/development/run.txt', 'Package: run\ncreate a new function `window.os.runApp` object that takes a callback, width and height defaulting to 500 and 400, having the following functionality:\n  - creates a new window instance with the `Development` title , 🔥 emoji, width and height and saves it to a constant\n  - attach to window the result of calling the callback with the window instance')
 window.os.fs.write('/sources/development/ide.txt', 'Package: ide\nCreate `compile` function that takes a source parameter and:\n - remove the script tag with id `run-script` if exists\n - fetch post  to `/` with a json having {instruction: source}, and on response create a script tag with id `run-script` and add the response text content to the script tag\n - add end function comment\n1. Create an `ide` function that takes a win and path parameter: \n - create a root dom element with class `ide`\n - create a textarea element with 100% width and 500px height\n - if path is not empty, read the file content and set it to the textarea\n - create toolbar on win\n - add button on the toolbar with `▶️` text and on click execute `compile` function with textarea content\n - add button on the toolbar with `💾` text and on click fs.write textarea content to the path if path is defined, prompt for the path otherwise\n - return dom element\n2. Call register application with "IDE" title, 🧠 as emoji, already defined `ide` function reference and 800x600 size and register for ["script"] extensions')

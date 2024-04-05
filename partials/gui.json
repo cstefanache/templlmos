@@ -153,6 +153,53 @@
                     " - transparent background"
                 ]
             ]
+        },       
+        "notification-styles": {
+            "to": "head",
+            "tag": "style",
+            "instructions": [
+                [
+                    "css style for a .notification-wrapper class to follow the following rules:",
+                    "- an absolute position",
+                    "- a top of 0",
+                    "- a right of 0",
+                    "- a z-index of 1000",
+                    "- a display of flex",
+                    "- a justify-content of center",
+                    "- a flex-direction of column"
+                ],
+                [
+                    "css style for a .notification class to follow the following rules:",
+                    "- white background, a black border of 1px solid",
+                    "- a black border of 2px solid",
+                    "- width width of 200px",
+                    "- word wrap",
+                    "- padding of 10px",
+                    "- a border-radius of 5px",
+                    "- a box-shadow of 2px 2px 0 0 rgba(0,0,0,0.5)",
+                    "- a top margin of 5px",
+                    "- a position of relative"
+                ]
+            ]
+        },
+        "notification": {
+            "disabled": false,
+            "to": "body",
+            "tag": "script",
+            "rebuild": false,
+            "preventRebuild": false,
+            "library": true,
+            "instructions": [
+                [
+                    "crate a root container div element having the class `.notification-wrapper`",
+                    "Define a function `notification` on the `window.os.gui` object that takes a single parameter message and has the following functionality:",
+                    "- create a root DOM element with the class `.notification`",
+                    "- add to the root DOM element a `span` containing the message parameter",
+                    "- append the root DOM element to .notification-wrapper",
+                    "- set a timeout of 2000ms to remove the root DOM element from parent"
+                
+                ]
+            ]
         },
         "tests": {
             "disabled": true,

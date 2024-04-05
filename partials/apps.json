@@ -130,6 +130,28 @@
                 ]
             ]
         },
+        "photobooth": {
+            "disabled": false,
+            "rebuild": false,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "filesystem",
+                "registry",
+                "notification"
+            ],
+            "instructions": [
+                [
+                    "create a local photoBooth function that takes no parameters:",
+                    "- create a root dom element, do not style it",
+                    "- append browser webcam capture video element with autoplay on",
+                    "- add a button with text 'Take Snapshot' that takes an image snapshot of the video and saves it to 'photobooth/image+{timestamp}.png' and notify the user: 'Snapshot saved to {path}'",
+                    "- return root dom element"
+                ],[
+                    "call register application with 'Photobooth' title, 📸 as emoji, function reference and 410x360 size"
+                ]
+            ]
+        },
         "image": {
             "disabled": false,
             "rebuild": false,

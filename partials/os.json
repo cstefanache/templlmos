@@ -42,7 +42,7 @@
             ],
             "instructions": [
                 [
-                    "js that creates an image element with source: https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg with id #logo, absolute position, middle of the document"
+                    "js that creates an image element with source: https://github.com/cstefanache/templlmos/blob/main/assets/logos.png?raw=true with id #logo, absolute position, middle of the body document, give it 20% opacity"
                 ]
             ]
         },
