@@ -5,6 +5,7 @@ import time
 import re
 
 from src.llm import LLM
+from src.chatgpt import ChatGPT
 from src.compiler import Compiler
 
 from http.server import BaseHTTPRequestHandler, HTTPServer, ThreadingHTTPServer
@@ -22,7 +23,8 @@ descriptor = args.descriptor
 with open(descriptor, "r") as read_file:
     data = json.load(read_file)
 
-llm = LLM(data["models"])
+# llm = LLM(data["models"])
+llm = ChatGPT()
 
 print("Avaialble models:")
 print(llm.runtime_models.keys())

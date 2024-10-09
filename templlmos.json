@@ -12,6 +12,9 @@
         }
     ],
     "partials": [
+        "chatgpt_os.json"
+    ],
+    "_partials": [
         "os.json",
         "filesystem.json",
         "desktop.json",
