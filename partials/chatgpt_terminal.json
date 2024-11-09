@@ -87,7 +87,9 @@
                     "     - input.terminal-input-text",
                     "define inner function called output that takes two parameters: value and color with default value white. The function prepends a div with class terminal-line having color style as provided in the function and the value as text to the terminal-output div. if the value is a list then prepend each item in the list as a separate div",
                     "when the user hits the enter key on the input take the content call the output function with the content prefixed with `[%current_time%]` and color yellow, call `output` with the resul of calling `execute` function with the value of the input, clear the input and focus it again"
-                ],
+                ]
+            ],
+            "old": [
                 [
                     "append to the body the dom element resulted from executing the terminal function"
                 ]

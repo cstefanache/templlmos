@@ -14,7 +14,8 @@
     "partials": [
         "chatgpt_os.json",
         "chatgpt_filesystem.json",
-        "chatgpt_terminal.json"
+        "chatgpt_terminal.json",
+        "chatgpt_presenter.json"
     ],
     "_partials": [
         "os.json",

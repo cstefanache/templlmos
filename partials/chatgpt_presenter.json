@@ -1,0 +1,74 @@
+{
+    "presenter": {
+        "presenter-styles": {
+            "disabled": false,
+            "to": "head",
+            "tag": "style",
+            "instructions": [
+                [
+                    ".presenter class with 100% width and height, white background, black color, monospace font-family, hidden overflow, flex display and column flex-direction",
+                    ".presenter .header class with display flex, row flex-direction, 20px height, padding 10px, align-items center and justify-content space-between, yellow background and black color text",
+                    ".presenter .header img with 100% height",
+                    ".presenter .header p with margin 0",
+                    ".presenter .content class with display flex, position realtive, flex 1, padding 10px, overflow hidden, white background",
+                    ".presenter .footer class with display flex, row-reverse flex-direction,, 20px height, padding 10px, align-items center and justify-content space-between",
+                    ".presenter .slide should have an absolute position, white background color, 100% width and height, hidden overflow, display flex and column flex-direction"
+                ],
+                [
+                    ".slide content should be centered with align-items center and justify-content center and text centered",
+                    ".slide h1 with font-size 5em",
+                    ".slide h2 with font-size 1.5em",
+                    ".slide pre with white-space pre-wrap and background-color #201e30, white text, padding 5, margin 0 auto, max-width 720 and text-align left"
+                ]
+            ]
+        },
+        "presenter-logic": {
+            "to": "body",
+            "tag": "script",
+            "disabled": false,
+            "rebuild": false,
+            "library": false,
+            "dependencies": [
+                "filesystem"
+            ],
+            "instructions": [
+                [
+                    "define a function called getSlideDOMElement that takes an array of strings as an argument",
+                    "iterate the array and for each item:",
+                    " split item by `\\n`",
+                    "   iterate the split result and for each line:",
+                    "     create a slide div element with class slide",
+                    "     generate html dom elements corresponding to the markdown syntax with headers, text, image and backtick as pre support and append them to the slide element",
+                    "   append the slide element to the result array",
+                    "return the result array"
+                ],
+                [
+                    "define a function called getPresenterLayout that creates the following dom structure of divs:",
+                    " .presenter",
+                    "   .header",
+                    "     img[`https://www.itdays.ro/public/images/logo-gri.png`]",
+                    "     p`INNOVATION, PROGRAMMING AND TECHNOLOGIES`",
+                    "   .content",
+                    "   .footer",
+                    "     img[`https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg`]",
+                    "and return the .presenter element"
+                ],
+                [
+                    "define a function called readFileContent that takes a path as an argument",
+                    " read the file provided in the argument and merge the output in a single string"
+                ],
+                [
+                    "define a function called presenter on window.apps that takes a string as an argument with default value '/itdays.md'",
+                    "gets the root element by executing getPresenterLayout and gets .content child as local reference", 
+                    "execute readFileContent with the argument and store value",
+                    "execute getSlideDOMElement with the stored value split by `---` and append elements of result to the content element",
+                    "starting with index 0, if the user presses arrow keys navigate through the slides by showing the slide at index",
+                    "append the root element to the body"
+                ],
+                [
+                    "execute window.apps.presenter()"
+                ]
+            ]
+        }
+    }
+}

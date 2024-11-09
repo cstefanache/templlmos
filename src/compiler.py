@@ -361,7 +361,7 @@ class Compiler:
             print(presentation)
 
             html["body"]["_children_"].append(
-                f"<script>window.os.fs.write('/presentation.md', '{presentation}')</script>")
+                f"<script>window.os.fs.write('/itdays.md', '{presentation}')</script>")
 
         with open(f"{DEBUG}/compiled.json", "w") as file:
             json.dump(html, file, indent=4)

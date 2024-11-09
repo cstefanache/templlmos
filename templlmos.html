@@ -206,6 +206,89 @@ window.os = {};
     outline: none;
 }
   </style>
+  <style id="presenter_presenter-styles">
+   .presenter {
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    color: black;
+    font-family: monospace;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.presenter .header {
+    display: flex;
+    flex-direction: row;
+    height: 20px;
+    padding: 10px;
+    align-items: center;
+    justify-content: space-between;
+    background-color: yellow;
+    color: black;
+}
+
+.presenter .header img {
+    height: 100%;
+}
+
+.presenter .header p {
+    margin: 0;
+}
+
+.presenter .content {
+    display: flex;
+    position: relative;
+    flex: 1;
+    padding: 10px;
+    overflow: hidden;
+    background-color: white;
+}
+
+.presenter .footer {
+    display: flex;
+    flex-direction: row-reverse;
+    height: 20px;
+    padding: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.presenter .slide {
+    position: absolute;
+    background-color: white;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+.slide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.slide h1 {
+    font-size: 5em;
+}
+
+.slide h2 {
+    font-size: 1.5em;
+}
+
+.slide pre {
+    white-space: pre-wrap;
+    background-color: #201e30;
+    color: white;
+    padding: 5px;
+    margin: 0 auto;
+    max-width: 720px;
+    text-align: left;
+}
+  </style>
  </head>
  <body>
   <span id="osbase_logo">
@@ -351,7 +434,127 @@ window.apps.terminal = function() {
 
     return terminal;
 };
-document.body.appendChild(window.apps.terminal());
+
+})()
+  </script>
+  <script id="presenter_presenter-logic">
+   (() => {
+function getSlideDOMElement(slides) {
+    const result = [];
+
+    slides.forEach(item => {
+        const lines = item.split('\n');
+        const slideElement = document.createElement('div');
+        slideElement.className = 'slide';
+
+        lines.forEach(line => {
+            let element;
+
+            if (line.startsWith('# ')) {
+                element = document.createElement('h1');
+                element.textContent = line.slice(2);
+            } else if (line.startsWith('## ')) {
+                element = document.createElement('h2');
+                element.textContent = line.slice(3);
+            } else if (line.startsWith('### ')) {
+                element = document.createElement('h3');
+                element.textContent = line.slice(4);
+            } else if (line.startsWith('![')) {
+                const altText = line.match(/!\[(.*?)\]/)[1];
+                const src = line.match(/\((.*?)\)/)[1];
+                element = document.createElement('img');
+                element.alt = altText;
+                element.src = src;
+            } else if (line.startsWith('`')) {
+                element = document.createElement('pre');
+                element.textContent = line.slice(1, -1);
+            } else {
+                element = document.createElement('p');
+                element.textContent = line;
+            }
+
+            slideElement.appendChild(element);
+        });
+
+        result.push(slideElement);
+    });
+
+    return result;
+}
+function getPresenterLayout() {
+    const presenter = document.createElement('div');
+    presenter.className = 'presenter';
+
+    const header = document.createElement('div');
+    header.className = 'header';
+
+    const headerImage = document.createElement('img');
+    headerImage.src = 'https://www.itdays.ro/public/images/logo-gri.png';
+    header.appendChild(headerImage);
+
+    const headerText = document.createElement('p');
+    headerText.textContent = 'INNOVATION, PROGRAMMING AND TECHNOLOGIES';
+    header.appendChild(headerText);
+
+    presenter.appendChild(header);
+
+    const content = document.createElement('div');
+    content.className = 'content';
+    presenter.appendChild(content);
+
+    const footer = document.createElement('div');
+    footer.className = 'footer';
+
+    const footerImage = document.createElement('img');
+    footerImage.src = 'https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg';
+    footer.appendChild(footerImage);
+
+    presenter.appendChild(footer);
+
+    return presenter;
+}
+function readFileContent(path) {
+    if (window.os.fs.isValidPath(path)) {
+        const lines = window.os.fs.read(path);
+        if (lines) {
+            return lines.join('\n');
+        }
+    }
+    return '';
+}
+window.apps = window.apps || {};
+
+window.apps.presenter = function(path = '/itdays.md') {
+    const rootElement = getPresenterLayout();
+    const contentElement = rootElement.querySelector('.content');
+    const fileContent = readFileContent(path);
+    const slides = getSlideDOMElement(fileContent.split('---'));
+    
+    slides.forEach(slide => contentElement.appendChild(slide));
+    
+    let currentIndex = 0;
+    function showSlide(index) {
+        const allSlides = contentElement.children;
+        for (let i = 0; i < allSlides.length; i++) {
+            allSlides[i].style.display = (i === index) ? 'block' : 'none';
+        }
+    }
+    
+    showSlide(currentIndex);
+    
+    window.addEventListener('keydown', function(event) {
+        if (event.key === 'ArrowRight') {
+            currentIndex = (currentIndex + 1) % slides.length;
+            showSlide(currentIndex);
+        } else if (event.key === 'ArrowLeft') {
+            currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+            showSlide(currentIndex);
+        }
+    });
+    
+    document.body.appendChild(rootElement);
+};
+window.apps.presenter();
 
 })()
   </script>
@@ -364,10 +567,12 @@ window.os.fs.write('/sources/chatgpt_filesystem/outputs.txt', 'Package: outputs\
 window.os.fs.write('/sources/chatgpt_filesystem/utils.txt', 'Package: utils\nDefine a function `cat` on `window.os` namespace that takes a path as a parameter and returns the content of the file split by `\n` ')
 window.os.fs.write('/sources/chatgpt_filesystem/fs-tests.txt', 'Package: fs-tests\ncreate a new directory in the root directory called `fstest`\ncreate a new file in the `fstest` directory called `test.txt` with the content `hello world`\nlist the entries in the `fstest` directory and log it to console\nread the content of the `fstest/test.txt` file and log it to console\nremove the `fstest` directory')
 window.os.fs.write('/sources/chatgpt_terminal/terminal-style.txt', 'Package: terminal-style\ndefine a terminal class with the following css properties\n- width: 100%\n- height: 100%\n- background-color: black\n- color: white\n- font-family: monospace\n- overflow: hidden\n- display: flex\n- flex-direction: column\ndefine a terminal-output class with the following css properties\n- flex: 1\n- overflow-y: auto\n- padding: 10px\n- display: flex\n- flex-direction: column-reverse\ndefine a terminal-line class with the following css properties\n- display: flex\n- flex-direction: row\n- overflow-wrap: anywhere\ndefine a terminal-input class with the following css properties\n- display: flex\n- flex-direction: row\ndefine a terminal-input-text class with the following css properties\n- background-color: transparent\n- border: none\n- color: white\n- font-family: monospace\n- font-size: 16px\n- flex: 1\n- outline: none')
-window.os.fs.write('/sources/chatgpt_terminal/terminal-runtime.txt', 'Package: terminal-runtime\nkeep a local variable called currentPath with value "/"\ndefine a local function `cd` that takes a string parameter and sets currentPath to it\ndefine a local function `pwd` that returns the parent scope defined currentPath\ndefine and object called bin and referece functions from objects:\n - window.os.fs\n - `cd` and `pwd` functions\ncurrentPath is defined in parent scope\ndefine a function `execute` that takes a string parameter and:\n - splits the string by space but keeps in a single element if it is in quotes\n - set path to currentPath\n - the first element is the command and prepend `bin.` to it\n - if the second element exists:\n    - if it does not start with `/`, prepend `currentPath` to it and assign it to path after calling `getPath` on it\n    - if it starts with `/`, assign it to path after calling `getPath` on it\n - return eval of `command` with `path` and rest of the parameters from the list as string arguments\n - if the eval throws an error, return the error message\ndefine a function `terminal` on window.apps that creates a root element with class terminal and returns it at the end\ncreate the following dom structure:\n - .terminal\n   - .terminal-output\n     - .terminal-line with text "Welcome to TempLLM OS"\n   - .terminal-input\n     - .prefix with text ">"\n     - input.terminal-input-text\ndefine inner function called output that takes two parameters: value and color with default value white. The function prepends a div with class terminal-line having color style as provided in the function and the value as text to the terminal-output div. if the value is a list then prepend each item in the list as a separate div\nwhen the user hits the enter key on the input take the content call the output function with the content prefixed with `[%current_time%]` and color yellow, call `output` with the resul of calling `execute` function with the value of the input, clear the input and focus it again\nappend to the body the dom element resulted from executing the terminal function')
+window.os.fs.write('/sources/chatgpt_terminal/terminal-runtime.txt', 'Package: terminal-runtime\nkeep a local variable called currentPath with value "/"\ndefine a local function `cd` that takes a string parameter and sets currentPath to it\ndefine a local function `pwd` that returns the parent scope defined currentPath\ndefine and object called bin and referece functions from objects:\n - window.os.fs\n - `cd` and `pwd` functions\ncurrentPath is defined in parent scope\ndefine a function `execute` that takes a string parameter and:\n - splits the string by space but keeps in a single element if it is in quotes\n - set path to currentPath\n - the first element is the command and prepend `bin.` to it\n - if the second element exists:\n    - if it does not start with `/`, prepend `currentPath` to it and assign it to path after calling `getPath` on it\n    - if it starts with `/`, assign it to path after calling `getPath` on it\n - return eval of `command` with `path` and rest of the parameters from the list as string arguments\n - if the eval throws an error, return the error message\ndefine a function `terminal` on window.apps that creates a root element with class terminal and returns it at the end\ncreate the following dom structure:\n - .terminal\n   - .terminal-output\n     - .terminal-line with text "Welcome to TempLLM OS"\n   - .terminal-input\n     - .prefix with text ">"\n     - input.terminal-input-text\ndefine inner function called output that takes two parameters: value and color with default value white. The function prepends a div with class terminal-line having color style as provided in the function and the value as text to the terminal-output div. if the value is a list then prepend each item in the list as a separate div\nwhen the user hits the enter key on the input take the content call the output function with the content prefixed with `[%current_time%]` and color yellow, call `output` with the resul of calling `execute` function with the value of the input, clear the input and focus it again')
+window.os.fs.write('/sources/chatgpt_presenter/presenter-styles.txt', 'Package: presenter-styles\n.presenter class with 100% width and height, white background, black color, monospace font-family, hidden overflow, flex display and column flex-direction\n.presenter .header class with display flex, row flex-direction, 20px height, padding 10px, align-items center and justify-content space-between, yellow background and black color text\n.presenter .header img with 100% height\n.presenter .header p with margin 0\n.presenter .content class with display flex, position realtive, flex 1, padding 10px, overflow hidden, white background\n.presenter .footer class with display flex, row-reverse flex-direction,, 20px height, padding 10px, align-items center and justify-content space-between\n.presenter .slide should have an absolute position, white background color, 100% width and height, hidden overflow, display flex and column flex-direction\n.slide content should be centered with align-items center and justify-content center and text centered\n.slide h1 with font-size 5em\n.slide h2 with font-size 1.5em\n.slide pre with white-space pre-wrap and background-color #201e30, white text, padding 5, margin 0 auto, max-width 720 and text-align left')
+window.os.fs.write('/sources/chatgpt_presenter/presenter-logic.txt', 'Package: presenter-logic\ndefine a function called getSlideDOMElement that takes an array of strings as an argument\niterate the array and for each item:\n split item by `\n`\n   iterate the split result and for each line:\n     create a slide div element with class slide\n     generate html dom elements corresponding to the markdown syntax with headers, text, image and backtick as pre support and append them to the slide element\n   append the slide element to the result array\nreturn the result array\ndefine a function called getPresenterLayout that creates the following dom structure of divs:\n .presenter\n   .header\n     img[`https://www.itdays.ro/public/images/logo-gri.png`]\n     p`INNOVATION, PROGRAMMING AND TECHNOLOGIES`\n   .content\n   .footer\n     img[`https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg`]\nand return the .presenter element\ndefine a function called readFileContent that takes a path as an argument\n read the file provided in the argument and merge the output in a single string\ndefine a function called presenter on window.apps that takes a string as an argument with default value "/itdays.md"\ngets the root element by executing getPresenterLayout and gets .content child as local reference\nexecute readFileContent with the argument and store value\nexecute getSlideDOMElement with the stored value split by `---` and append elements of result to the content element\nstarting with index 0, if the user presses arrow keys navigate through the slides by showing the slide at index\nappend the root element to the body\nexecute window.apps.presenter()')
   </script>
   <script>
-   window.os.fs.write('/presentation.md', '# Introduction\n\n## Hello World\n\n# What\n\n## Can LLM Write Good OS?\n\n### Don"t know\n\n# First\n\n## Can LLM Write Bad OS?\n\n### Let"s try')
+   window.os.fs.write('/itdays.md', '`Load the "filesystem" object from the local storage as json, if it does not exist create an empty object with a property "about.txt" with the content "Welcome to TempLLMOS"`,\n`Define the following functions on the window.os.fs object:`,\n` "sync" - save the filesystem object to the local storage that will be called by the other functions that modify the filesystem object`,\n` "ls" - returns a list of entries in the filesystem object at the given path`,\n` "mkdir" - creates an empty object at the given path`,\n` "rm" - removes the object at the given path`,\n` "write" - writes the content to an entry in the filesystem object at the given path`,\n` "read" - reads an entry split by \\n in the filesystem object at the given path, last element in path is the file name`\n---\n# LLMs: A Paradigm Shift in Operating Systems\n![image](https://avatars.githubusercontent.com/u/3071201?s=96&v=4)\n## cornel stefanache\n### cto@ascentcore\n### co-creator@monkeyuser.com\n---\n# Can LLM Write Good OS?\n---\n# Can LLM Write Bad OS?\n---\n# Let there be storage\n\n<code>\ntest\n</code>')
   </script>
  </body>
 </html>
