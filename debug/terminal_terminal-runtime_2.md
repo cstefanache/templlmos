@@ -7,49 +7,49 @@
 You are a code generator that produces JavaScript code exclusively using vanilla JavaScript that will execute in a browser window. When responding to queries, provide only valid and complete JavaScript code without any additional explanations or comments. Do not include any frameworks or libraries such as jQuery, React, or others. Follow best practices for vanilla JavaScript and ensure compatibility with modern browsers. Do not write node or server-side code.. For each function, provide a brief description of its purpose in jsdoc format.
 
 Given the following implemented functions:
-    /**
-     * Processes and returns a path by taking into account '..', '//' and '/'.
-     * @param {string} path - The path to process.
-     * @returns {string|null} - The processed path or null if invalid.
-     */
+/**
+ * Processes and returns a path by taking into account '..', '//' and '/'.
+ * @param {string} path - The path to process.
+ * @returns {string|null} - The processed path or null if invalid.
+ */
 window.os.fs.getPath = function(path) { ... }
-    /**
-     * Checks if the path is valid.
-     * @param {string} path - The path to check.
-     * @returns {boolean} - True if valid, false otherwise.
-     */
+/**
+ * Checks if the path is valid.
+ * @param {string} path - The path to check.
+ * @returns {boolean} - True if valid, false otherwise.
+ */
 window.os.fs.isValidPath = function(path) { ... }
-    /**
-     * Returns a list of entries in the filesystem object at the given path.
-     * @param {string} path - The path to list entries from.
-     * @returns {Array} - List of entries or an empty array if path is invalid.
-     */
+/**
+ * Returns a list of entries in the filesystem object at the given path.
+ * @param {string} path - The path to list entries from.
+ * @returns {Array} - An array of entries.
+ */
 window.os.fs.ls = function(path) { ... }
-    /**
-     * Creates an empty object at the given path.
-     * @param {string} path - The path to create the directory at.
-     */
+/**
+ * Creates an empty object at the given path.
+ * @param {string} path - The path where to create the object.
+ */
 window.os.fs.mkdir = function(path) { ... }
-    /**
-     * Removes the object at the given path.
-     * @param {string} path - The path to remove the object from.
-     */
+/**
+ * Removes the object at the given path.
+ * @param {string} path - The path of the object to remove.
+ */
 window.os.fs.rm = function(path) { ... }
-    /**
-     * Writes the content to an entry in the filesystem object at the given path.
-     * @param {string} path - The path to write the content to.
-     * @param {string} content - The content to write.
-     */
+/**
+ * Writes the content to an entry in the filesystem object at the given path.
+ * @param {string} path - The path where to write the content.
+ * @param {string} content - The content to write.
+ */
 window.os.fs.write = function(path, content) { ... }
-    /**
-     * Reads an entry in the filesystem object at the given path.
-     * @param {string} path - The path to read the content from.
-     * @returns {string|null} - The content of the file or null if not found.
-     */
+/**
+ * Reads an entry split by '\n' in the filesystem object at the given path.
+ * @param {string} path - The path of the file to read.
+ * @returns {Array|null} - An array of lines or null if not found.
+ */
 window.os.fs.read = function(path) { ... }
 
 /**
- * Changes the current directory to the specified path.
+ * Changes the current path to the specified path.
  * @param {string} path - The path to change to.
  */
 function cd(path) { ... }
@@ -81,7 +81,7 @@ when the user hits the enter key on the input take the content call the output f
 <pre style='text-wrap: wrap'>let currentPath = '/';
 
 /**
- * Changes the current directory to the specified path.
+ * Changes the current path to the specified path.
  * @param {string} path - The path to change to.
  */
 function cd(path) {
@@ -139,27 +139,31 @@ window.apps.terminal = function() {
 
     const terminalOutput = document.createElement('div');
     terminalOutput.className = 'terminal-output';
+    terminal.appendChild(terminalOutput);
+
     const welcomeLine = document.createElement('div');
     welcomeLine.className = 'terminal-line';
     welcomeLine.textContent = 'Welcome to TempLLM OS';
     terminalOutput.appendChild(welcomeLine);
-    terminal.appendChild(terminalOutput);
 
     const terminalInput = document.createElement('div');
     terminalInput.className = 'terminal-input';
-    const prefix = document.createElement('div');
+    terminal.appendChild(terminalInput);
+
+    const prefix = document.createElement('span');
     prefix.className = 'prefix';
     prefix.textContent = '>';
-    const input = document.createElement('input');
-    input.className = 'terminal-input-text';
     terminalInput.appendChild(prefix);
-    terminalInput.appendChild(input);
-    terminal.appendChild(terminalInput);
+
+    const inputText = document.createElement('input');
+    inputText.className = 'terminal-input-text';
+    terminalInput.appendChild(inputText);
 
     function output(value, color = 'white') {
         const line = document.createElement('div');
         line.className = 'terminal-line';
         line.style.color = color;
+
         if (Array.isArray(value)) {
             value.forEach(item => {
                 const itemLine = document.createElement('div');
@@ -173,15 +177,15 @@ window.apps.terminal = function() {
         }
     }
 
-    input.addEventListener('keydown', function(event) {
+    inputText.addEventListener('keydown', function(event) {
         if (event.key === 'Enter') {
             const currentTime = new Date().toLocaleTimeString();
-            const content = input.value;
+            const content = inputText.value;
             output(`[${currentTime}] ${content}`, 'yellow');
             const result = execute(content);
             output(result);
-            input.value = '';
-            input.focus();
+            inputText.value = '';
+            inputText.focus();
         }
     });
 
