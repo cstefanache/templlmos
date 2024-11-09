@@ -1,6 +1,0 @@
-{
-    "crc": 158205473,
-    "compiled_instruction": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\nGiven the following already defined functions:\n \n\n css style for `.toolbar` class to follow the following rules:\n- a padding of 2px\n- a background of antique white\n- a margin-bottom of 2px\n- a border-bottom of 1px solid black\n- a display of flex\n- a justify-content of flex-start\ninner buttons have:\n - no border\n - cursor pointer\n - transparent background \n### Response:\n",
-    "output": ".toolbar {\n    padding: 2px;\n    background-color: antiquewhite;\n    margin-bottom: 2px;\n    border-bottom: 1px solid black;\n    display: flex;\n    justify-content: flex-start;\n}\n\nbutton {\n    border: none;\n    cursor: pointer;\n    background-color: transparent;\n}\n\n",
-    "library": ""
-}

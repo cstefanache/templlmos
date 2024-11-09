@@ -1,0 +1,57 @@
+{
+    "osbase": {
+        "filesystem": {
+            "to": "head",
+            "tag": "script",
+            "rebuild": false,
+            "library": true,
+            "instructions": [
+                [
+                    "Load the `filesystem` object from the local storage as json, if it does not exist create an empty object with a property `about.txt` with the content `Welcome to TempLLMOS`",
+                    "Define the following functions on the window.os.fs object:",
+                    " `getPath` - process and return a path by taking into account `..`, `//` and `/`. return null if the path is invalid",
+                    " `isValidPath` - checks if the path is valid",
+                    " `ls` - returns a list of entries in the filesystem object at the given path",
+                    " `mkdir` - creates an empty object at the given path",
+                    " `rm` - removes the object at the given path",
+                    " `write` - writes the content to an entry in the filesystem object at the given path",
+                    " `read` - reads an entry in the filesystem object at the given path, last element in path is the file name"
+                ]
+            ]
+        },
+        "utils": {
+            "to": "head",
+            "tag": "script",
+            "disabled": "true",
+            "rebuild": false,
+            "library": true,
+            "dependencies": [
+                "filesystem"
+            ],
+            "instructions": [
+                [
+                    "Define a function `cat` on `window.os` namespace that takes a path as a parameter and returns the content of the file split by `\n` "
+                ]
+            ]
+        },
+        "fs-tests": {
+            "to": "body",
+            "tag": "script",
+            "disabled": true,
+            "rebuild": false,
+            "library": false,
+            "dependencies": [
+                "filesystem"
+            ],
+            "instructions": [
+                [
+                    "create a new directory in the root directory called `fstest`",
+                    "create a new file in the `fstest` directory called `test.txt` with the content `hello world`",
+                    "list the entries in the `fstest` directory and log it to console",
+                    "read the content of the `fstest/test.txt` file and log it to console",
+                    "remove the `fstest` directory"
+                ]
+            ]
+        }
+    }
+}

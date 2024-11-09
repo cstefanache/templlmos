@@ -1,6 +1,0 @@
-{
-    "crc": 3716358507,
-    "compiled_instruction": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\nGiven the following already defined functions:\n \n\n - Define the `window.os.about` function that returns 'TempLLMOS is an experimental WebOS controlled by a Large Language Model. \n### Response:\n",
-    "output": "/**\n * Returns information about the operating system.\n * @return {string} Information about the operating system.\n */\nwindow.os.about = function() {\n    return \"TempLLMOS is an experimental WebOS controlled by a Large Language Model.\";\n};\n\n",
-    "library": "/**\n * Returns information about the operating system.\n * @return {string} Information about the operating system.\n */\nwindow.os.about = function() { ... }\n"
-}

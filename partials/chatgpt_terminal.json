@@ -1,0 +1,97 @@
+{
+    "terminal": {
+        "terminal-style": {
+            "disabled": false,
+            "to": "head",
+            "tag": "style",
+            "instructions": [
+                [
+                    "define a terminal class with the following css properties",
+                    "- width: 100%",
+                    "- height: 100%",
+                    "- background-color: black",
+                    "- color: white",
+                    "- font-family: monospace",
+                    "- overflow: hidden",
+                    "- display: flex",
+                    "- flex-direction: column"
+                ],
+                [
+                    "define a terminal-output class with the following css properties",
+                    "- flex: 1",
+                    "- overflow-y: auto",
+                    "- padding: 10px",
+                    "- display: flex",
+                    "- flex-direction: column-reverse"
+                ],
+                [
+                    "define a terminal-line class with the following css properties",
+                    "- display: flex",
+                    "- flex-direction: row",
+                    "- overflow-wrap: anywhere"
+                ],
+                [
+                    "define a terminal-input class with the following css properties",
+                    "- display: flex",
+                    "- flex-direction: row"
+                ],
+                [
+                    "define a terminal-input-text class with the following css properties",
+                    "- background-color: transparent",
+                    "- border: none",
+                    "- color: white",
+                    "- font-family: monospace",
+                    "- font-size: 16px",
+                    "- flex: 1",
+                    "- outline: none"
+                ]
+            ]
+        },
+        "terminal-runtime": {
+            "to": "body",
+            "tag": "script",
+            "rebuild": false,
+            "library": true,
+            "dependencies": [
+                "filesystem"
+            ],
+            "instructions": [
+                [
+                    "keep a local variable called currentPath with value '/'",
+                    "define a local function `cd` that takes a string parameter and sets currentPath to it",
+                    "define a local function `pwd` that returns the parent scope defined currentPath",
+                    "define and object called bin and referece functions from objects:",
+                    " - window.os.fs",
+                    " - `cd` and `pwd` functions"
+                ],
+                [
+                    "currentPath is defined in parent scope",
+                    "define a function `execute` that takes a string parameter and:",
+                    " - splits the string by space",
+                    " - set path to currentPath",
+                    " - the first element is the command and prepend `bin.` to it",
+                    " - if the second element exists:",
+                    "    - if it does not start with `/`, prepend `currentPath` to it and assign it to path after calling `getPath` on it",
+                    "    - if it starts with `/`, assign it to path after calling `getPath` on it",
+                    " - return eval of `command` with `path` and rest of the parameters from the list as arguments",
+                    " - if the eval throws an error, return the error message"
+                ],
+                [
+                    "define a function `terminal` on window.apps that creates a root element with class terminal and returns it at the end",
+                    "create the following dom structure:",
+                    " - .terminal",
+                    "   - .terminal-output",
+                    "     - .terminal-line with text 'Welcome to TempLLM OS'",
+                    "   - .terminal-input",
+                    "     - .prefix with text '>'",
+                    "     - input.terminal-input-text",
+                    "define inner function called output that takes two parameters: value and color with default value white. The function prepends a div with class terminal-line having color style as provided in the function and the value as text to the terminal-output div. if the value is a list then prepend each item in the list as a separate div",
+                    "when the user hits the enter key on the input take the content call the output function with the content prefixed with `[%current_time%]` and color yellow, call `output` with the resul of calling `execute` function with the value of the input, clear the input and focus it again"
+                ],
+                [
+                    "append to the body the dom element resulted from executing the terminal function"
+                ]
+            ]
+        }
+    }
+}

@@ -1,6 +1,0 @@
-{
-    "crc": 4180337789,
-    "compiled_instruction": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\nGiven the following already defined functions:\n \n\n css to style .browser class to have display flex and flex-wrap wrap \n### Response:\n",
-    "output": ".browser {\n    display: flex;\n    flex-wrap: wrap;\n}\n\n",
-    "library": ""
-}

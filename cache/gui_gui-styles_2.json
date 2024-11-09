@@ -1,6 +1,0 @@
-{
-    "crc": 603560998,
-    "compiled_instruction": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\nGiven the following already defined functions:\n \n\n css style for a  `.resizeHandle` class with the following rules:\n- a width and height of 0px\n- an absolute position\n- a bottom and right of 0\n- a cursor of se-resize\n- border width: 0 0 10px 10px\n- border style: solid\n- `border-color: transparent transparent #ff7200 transparent`\n- transform: rotate(0deg) \n### Response:\n",
-    "output": ".resizeHandle {\n    position: absolute;\n    width: 0px;\n    height: 0px;\n    bottom: 0;\n    right: 0;\n    cursor: se-resize;\n    border-width: 0 0 10px 10px;\n    border-style: solid;\n    border-color: transparent transparent #ff7200 transparent;\n    transform: rotate(0deg);\n}\n\n",
-    "library": ""
-}

@@ -12,7 +12,9 @@
         }
     ],
     "partials": [
-        "chatgpt_os.json"
+        "chatgpt_os.json",
+        "chatgpt_filesystem.json",
+        "chatgpt_terminal.json"
     ],
     "_partials": [
         "os.json",
@@ -26,6 +28,9 @@
         "games.json"
     ],
     "skip": [
+        "chatgpt_desktop.json",
+        "chatgpt_gui.json",
+        "registry.json"
         
     ],
     "definition": {}

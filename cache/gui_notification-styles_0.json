@@ -1,6 +1,0 @@
-{
-    "crc": 2903782752,
-    "compiled_instruction": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\nGiven the following already defined functions:\n \n\n css style for a .notification-wrapper class to follow the following rules:\n- an absolute position\n- a top of 0\n- a right of 0\n- a z-index of 1000\n- a display of flex\n- a justify-content of center\n- a flex-direction of column \n### Response:\n",
-    "output": ".notification-wrapper {\n    position: absolute;\n    top: 0;\n    right: 0;\n    z-index: 1000;\n    display: flex;\n    justify-content: center;\n    flex-direction: column;\n}\n\n",
-    "library": ""
-}

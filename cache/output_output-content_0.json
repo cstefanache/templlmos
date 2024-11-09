@@ -1,6 +1,0 @@
-{
-    "crc": 1734694742,
-    "compiled_instruction": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\nGiven the following already defined functions:\n \n\n create a root container div element having the class `output-wrapper` and id `output-wrapper`\ncreate and append to root container a pre element having the class `output` and id `output` \n### Response:\n",
-    "output": "// Create a new div with class 'output-wrapper' and id 'output-wrapper'\nvar outputWrapper = document.createElement('div');\noutputWrapper.className = 'output-wrapper';\noutputWrapper.id = 'output-wrapper';\ndocument.body.appendChild(outputWrapper); // Append it to body or any other parent you want\n\n// Create a new pre with class 'output' and id 'output'\nvar output = document.createElement('pre');\noutput.className = 'output';\noutput.id = 'output';\noutputWrapper.appendChild(output); // Append it to outputWrapper\n\n",
-    "library": ""
-}

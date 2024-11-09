@@ -10,1484 +10,324 @@
    (() => {
 window.os = {};
 
-
-})()
-  </script>
-  <script id="osbase_about">
-   (() => {
-/**
- * Returns information about the operating system.
- * @return {string} Information about the operating system.
- */
-window.os.about = function() {
-    return "TempLLMOS is an experimental WebOS controlled by a Large Language Model.";
-};
-
-/**
- * Logs a message to the console.
- * @param {string} message - The message to be logged.
- */
-window.os.log = function(message) {
-    console.log(message);
-};
-
-
 })()
   </script>
   <script id="osbase_filesystem">
    (() => {
-// Load the filesystem object from localStorage
-let filesystem = JSON.parse(localStorage.getItem('filesystem')) || {};
-
-// Define window.os.fs
-if (!window.os) {
-    window.os = {};
-}
-if (!window.os.fs) {
-    window.os.fs = {};
-}
-
-/**
- * Save the filesystem object to localStorage
- */
-window.os.fs.sync = function() {
-    localStorage.setItem('filesystem', JSON.stringify(filesystem));
-}
-
-/**
- * Get file content at given path
- * @param {string} path - The path to the file
- * @returns {string|undefined} - The content of the file or undefined if not found
- */
-window.os.fs.getFileContentFromPath = function(path) {
-    path = path.replace(/^\/|\/$/g, '').split('/');
-    let current = filesystem;
-    for (let dir of path) {
-        if (!current[dir]) {
-            return undefined;
-        }
-        current = current[dir];
-    }
-    return typeof current === 'string' ? current : undefined;
-}
-
-/**
- * Write content to a file at given path
- * @param {string} path - The path to the file
- * @param {string} content - The content to write to the file
- */
-window.os.fs.write = function(path, content) {
-    path = path.replace(/^\/|\/$/g, '').split('/');
-    let current = filesystem;
-    for (let dir of path.slice(0, -1)) {
-        if (!current[dir]) {
-            current[dir] = {};
-        }
-        current = current[dir];
-    }
-    current[path[path.length - 1]] = content;
-    this.sync();
-}
-
-/**
- * List entries at given path
- * @param {string} path - The path to list entries at
- * @returns {Array} - An array of entries at the path or root if path is not found
- */
-window.os.fs.ls = function(path = '') {
-    path = path.replace(/^\/|\/$/g, '').split('/');
-    let current = filesystem;
-    for (let dir of path) {
-        if (!current[dir]) {
-            return Object.keys(filesystem);
-        }
-        current = current[dir];
-    }
-    return Object.keys(current);
-}
-
-/**
- * Create a directory at given path
- * @param {string} path - The path to create a directory at
- */
-window.os.fs.mkdir = function(path) {
-    path = path.replace(/^\/|\/$/g, '').split('/');
-    let current = filesystem;
-    for (let dir of path) {
-        if (!current[dir]) {
-            current[dir] = {};
-        }
-        current = current[dir];
-    }
-    this.sync();
-}
-
-/**
- * Remove a file or directory at given path
- * @param {string} path - The path to remove at
- */
-window.os.fs.rm = function(path) {
-    path = path.replace(/^\/|\/$/g, '').split('/');
-    let current = filesystem;
-    let parent = filesystem;
-    for (let dir of path.slice(0, -1)) {
-        if (!current[dir]) {
-            return; // Path not found
-        }
-        parent = current;
-        current = current[dir];
-    }
-    delete parent[path[path.length - 1]];
-    this.sync();
-}
-
-/**
- * Check if a path is a file
- * @param {string} path - The path to check
- * @returns {boolean} - True if path is a file, false otherwise
- */
-window.os.fs.isFile = function(path) {
-    path = path.replace(/^\/|\/$/g, '').split('/');
-    let current = filesystem;
-    for (let dir of path) {
-        if (!current[dir]) {
-            return false; // Path not found or not a file
-        }
-        current = current[dir];
-    }
-    return typeof current === 'string'; // Check if current is a string (file)
-}
-
-
-})()
-  </script>
-  <style id="desktop_content-style">
-   #desktop_content {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    overflow-y: hidden;
-    padding: 10px;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-    align-content: flex-start;
-}
-  </style>
-  <style id="desktop_styles">
-   /* Style for .icon class */
-.icon {
-    width: 64px;
-    min-height: 64px;
-    text-align: center;
-    margin: 5px;
-    cursor: pointer;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Style for .emoji class */
-.emoji {
-    display: block;
-    font-size: 30px;
-    inline-block;
-    position: relative;
-}
-
-/* Style for .title class */
-.title {
-    display: block;
-    font-size: 8px;
-    font-family: monospace;
-    color: black;
-    padding: 5px;
-    word-wrap: break-word;
-    border: 2px solid black;
-    border-radius: 5px;
-    background-color: white;
-}
-
-/* Style for .app-emoji class */
-.app-emoji {
-    position: absolute;
-    right: 12px;
-    top: 20px;
-}
-
-/* Style for checkbox */
-input[type="checkbox"] {
-    position: absolute;
-    left: 2px;
-    top: -6px;
-    width: 8px;
-    height: 8px;
-}
-  </style>
-  <script id="desktop_icon">
-   (() => {
-// Check if window.os exists, if not create it
-if (!window.os) {
-    window.os = {};
-}
-
-/**
- * Create an icon element with an emoji and a tooltip.
- * @param {HTMLElement} parent - The parent element to append this icon to.
- * @param {string} emoji - The emoji to display in this icon.
- * @param {string} title - The tooltip text to display when hovering over this icon.
- * @param {function} callback - The callback to call when this icon is clicked.
- */
-window.os.icon = function(parent, emoji, title, callback) {
-    // Create root DOM element with class .icon
-    var icon = document.createElement('div');
-    icon.classList.add('icon');
-    
-    // Create span with class .emoji and add it to icon
-    var emojiSpan = document.createElement('span');
-    emojiSpan.classList.add('emoji');
-    emojiSpan.textContent = emoji;
-    icon.appendChild(emojiSpan);
-    
-    // Create span with class .title and add it to icon
-    var titleSpan = document.createElement('span');
-    titleSpan.classList.add('title');
-    titleSpan.textContent = title;
-    icon.appendChild(titleSpan);
-    
-    // Add click event listener to icon
-    icon.addEventListener('click', callback);
-    
-    // Append icon to parent
-    parent.appendChild(icon);
-};
-
-
-})()
-  </script>
-  <script id="desktop_desktop-app">
-   (() => {
-/**
- * Adds an application to the desktop content.
- * @param {string} emoji - The emoji to display in this application's icon.
- * @param {string} title - The tooltip text to display when hovering over this application's icon.
- * @param {function} callback - The callback to call when this application's icon is clicked.
- */
-window.os.addApp = function(emoji, title, callback) {
-    window.os.icon(document.querySelector('#desktop_content'), emoji, title, callback);
-};
-
-
-})()
-  </script>
-  <style id="output_output-styles">
-   .output-wrapper {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 40%;
-    max-width: 500px;
-    height: 100vh; /* viewport height */
-}
-
-.output {
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* semi-transparent black */
-    color: white; /* white text */
-    white-space: pre-wrap; /* text wrap */
-    font-size: 12px;
-    padding: 10px; /* padding */
-    margin: 0; /* no margins */
-    overflow: auto; /* scroll if content overflows */
-}
-  </style>
-  <script id="gui_draggable">
-   (() => {
-if (!window.os) {
-    window.os = {};
-}
-if (!window.os.gui) {
-    window.os.gui = {};
-}
-
-/**
- * Makes an element draggable by a given handle element.
- * @param {HTMLElement} root - The element to be made draggable.
- * @param {HTMLElement} dragHandleHTMLElement - The handle element to initiate the drag operation.
- */
-window.os.gui.makeDraggable = function(root, dragHandleHTMLElement) {
-    let isDragging = false;
-    let offsetX = 0;
-    let offsetY = 0;
-    
-    const handleMouseDown = (event) => {
-        isDragging = true;
-        offsetX = event.clientX - root.getBoundingClientRect().left;
-        offsetY = event.clientY - root.getBoundingClientRect().top;
-        
-        document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', handleMouseUp);
+(function() {
+    // Load filesystem from local storage or create default
+    let filesystem = JSON.parse(localStorage.getItem('filesystem')) || {
+        'about.txt': 'Welcome to TempLLMOS'
     };
-    
-    const handleMouseMove = (event) => {
-        if (isDragging) {
-            const x = event.clientX - offsetX;
-            const y = event.clientY - offsetY;
-            
-            // Prevent the element from being dragged off the screen
-            const boundingRect = document.body.getBoundingClientRect();
-            const rootRect = root.getBoundingClientRect();
-            if (x < boundingRect.left || y < boundingRect.top || x + rootRect.width > boundingRect.right || y + rootRect.height > boundingRect.bottom) {
+    localStorage.setItem('filesystem', JSON.stringify(filesystem));
+
+    window.os = window.os || {};
+    window.os.fs = {};
+
+    /**
+     * Processes and returns a path by taking into account '..', '//' and '/'.
+     * @param {string} path - The path to process.
+     * @returns {string|null} - The processed path or null if invalid.
+     */
+    window.os.fs.getPath = function(path) {
+        const parts = path.split('/').filter(Boolean);
+        const stack = [];
+        for (const part of parts) {
+            if (part === '..') {
+                if (stack.length > 0) {
+                    stack.pop();
+                } else {
+                    return null;
+                }
+            } else if (part !== '.' && part !== '') {
+                stack.push(part);
+            }
+        }
+        return '/' + stack.join('/');
+    };
+
+    /**
+     * Checks if the path is valid.
+     * @param {string} path - The path to check.
+     * @returns {boolean} - True if valid, false otherwise.
+     */
+    window.os.fs.isValidPath = function(path) {
+        return typeof path === 'string' && path.startsWith('/');
+    };
+
+    /**
+     * Returns a list of entries in the filesystem object at the given path.
+     * @param {string} path - The path to list entries from.
+     * @returns {Array} - List of entries or an empty array if path is invalid.
+     */
+    window.os.fs.ls = function(path) {
+        const processedPath = this.getPath(path);
+        if (!this.isValidPath(processedPath)) return [];
+        const parts = processedPath.split('/').filter(Boolean);
+        let current = filesystem;
+        for (const part of parts) {
+            if (current[part]) {
+                current = current[part];
+            } else {
+                return [];
+            }
+        }
+        return Object.keys(current);
+    };
+
+    /**
+     * Creates an empty object at the given path.
+     * @param {string} path - The path to create the directory at.
+     */
+    window.os.fs.mkdir = function(path) {
+        const processedPath = this.getPath(path);
+        if (!this.isValidPath(processedPath)) return;
+        const parts = processedPath.split('/').filter(Boolean);
+        let current = filesystem;
+        for (const part of parts) {
+            if (!current[part]) {
+                current[part] = {};
+            }
+            current = current[part];
+        }
+        localStorage.setItem('filesystem', JSON.stringify(filesystem));
+    };
+
+    /**
+     * Removes the object at the given path.
+     * @param {string} path - The path to remove the object from.
+     */
+    window.os.fs.rm = function(path) {
+        const processedPath = this.getPath(path);
+        if (!this.isValidPath(processedPath)) return;
+        const parts = processedPath.split('/').filter(Boolean);
+        let current = filesystem;
+        for (let i = 0; i < parts.length - 1; i++) {
+            if (current[parts[i]]) {
+                current = current[parts[i]];
+            } else {
                 return;
             }
-            
-            root.style.left = `${x}px`;
-            root.style.top = `${y}px`;
         }
+        delete current[parts[parts.length - 1]];
+        localStorage.setItem('filesystem', JSON.stringify(filesystem));
     };
-    
-    const handleMouseUp = () => {
-        isDragging = false;
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-    };
-    
-    dragHandleHTMLElement.addEventListener('mousedown', handleMouseDown);
-};
 
-/**
-* Makes an element resizable by a given handle element.
-* @param {HTMLElement} root - The element to be made resizable.
-* @param {HTMLElement} resizeHandleHTMLElement - The handle element to initiate the resize operation.
-*/
-window.os.gui.makeResizable = function(root, resizeHandleHTMLElement) {
-    let startWidth = root.offsetWidth;
-    let startHeight = root.offsetHeight;
-    let startX;
-    let startY;
-    
-    resizeHandleHTMLElement.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        startX = e.clientX;
-        startY = e.clientY;
-        
-        document.addEventListener('mousemove', resize);
-        document.addEventListener('mouseup', stopResize);
-    });
-    
-    function resize(e) {
-        let width = startWidth + (e.clientX - startX);
-        let height = startHeight + (e.clientY - startY);
-        
-        // Ensure width and height are not negative
-        width = Math.max(width, 0);
-        height = Math.max(height, 0);
-        
-        // Update width and height of root element
-        root.style.width = width + 'px';
-        root.style.height = height + 'px';
-    }
-    
-    function stopResize() {
-        // Update starting width and height on mouseup
-        startWidth = root.offsetWidth;
-        startHeight = root.offsetHeight;
-        
-        // Remove event listeners
-        document.removeEventListener('mousemove', resize);
-        document.removeEventListener('mouseup', stopResize);
-    }
-};
-
-/**
-* Brings the specified DOM node to the front of its siblings.
-* @param {HTMLElement} rootDOMNode - The DOM node to bring to front.
-*/
-window.os.gui.bringToFront = function(rootDOMNode) {
-    // Internal function to bring to front
-    var bringToFront = function() {
-        // Get all elements with same class as rootDOMNode
-        var siblings = document.getElementsByClassName(rootDOMNode.className);
-        // Iterate through them and set z-index to 0
-        for (var i = 0; i < siblings.length; i++) {
-            siblings[i].style.zIndex = 0;
-        }
-        // Set z-index of rootDOMNode to 1
-        rootDOMNode.style.zIndex = 1;
-    };
-    
-    // Call internal function on mousedown event of rootDOMNode
-    rootDOMNode.addEventListener('mousedown', bringToFront);
-    
-    // Call internal function immediately to bring to front on load
-    bringToFront();
-};
-
-
-})()
-  </script>
-  <script id="gui_titleBar">
-   (() => {
-// Assuming window.os is an existing object with gui as its property
-if (!window.os) {
-    window.os = {};
-}
-if (!window.os.gui) {
-    window.os.gui = {};
-}
-
-/**
- * Creates a title bar with a title and a close button.
- * @param {HTMLElement} parentElement - The DOM element to append this title bar to.
- * @param {string} title - The title to display in the title bar.
- * @param {function} close - The callback to call when the close button is clicked.
- */
-window.os.gui.titleBar = function(parentElement, title, close) {
-    // Create root element
-    var root = document.createElement('div');
-    root.classList.add('titleBar');
-    
-    // Create title span
-    var titleSpan = document.createElement('span');
-    titleSpan.textContent = title;
-    root.appendChild(titleSpan);
-    
-    // Create close button
-    var closeButton = document.createElement('button');
-    closeButton.textContent = '❌';
-    closeButton.classList.add('close');
-    closeButton.addEventListener('click', close); // Add click event listener to close button
-    root.appendChild(closeButton);
-    
-    // Append root to parent element
-    parentElement.appendChild(root);
-};
-
-
-})()
-  </script>
-  <script id="gui_toolbar">
-   (() => {
-/**
- * Create a toolbar with a button inside it.
- * @param {HTMLElement} win - The window element to add toolbar to.
- * @returns {function(string, function): void} - The addButton function.
- */
-window.os.gui.createToolbar = function(win) {
-    // Create a root DOM element with class .toolbar
-    var toolbar = document.createElement('div');
-    toolbar.className = 'toolbar';
-    
-    // Append the root DOM element to .toolbarPlaceholder from win HTML element
-    win.querySelector('.toolbarPlaceholder').appendChild(toolbar);
-    
     /**
-     * Add a button to the toolbar with a specific text and callback when clicked.
-     * @param {string} text - The text to display on the button.
-     * @param {function} callback - The callback to call when the button is clicked.
+     * Writes the content to an entry in the filesystem object at the given path.
+     * @param {string} path - The path to write the content to.
+     * @param {string} content - The content to write.
      */
-    var addButton = function(text, callback) {
-        // Create a button element with text parameter
-        var button = document.createElement('button');
-        button.textContent = text;
-        
-        // Add event listener to call callback when button is clicked
-        button.addEventListener('click', callback);
-        
-        // Append button to toolbar root element
-        toolbar.appendChild(button);
+    window.os.fs.write = function(path, content) {
+        const processedPath = this.getPath(path);
+        if (!this.isValidPath(processedPath)) return;
+        const parts = processedPath.split('/').filter(Boolean);
+        let current = filesystem;
+        for (let i = 0; i < parts.length - 1; i++) {
+            if (!current[parts[i]]) {
+                current[parts[i]] = {};
+            }
+            current = current[parts[i]];
+        }
+        current[parts[parts.length - 1]] = content;
+        localStorage.setItem('filesystem', JSON.stringify(filesystem));
     };
-    
-    // Return addButton function
-    return addButton;
-};
 
-
-})()
-  </script>
-  <script id="gui_window">
-   (() => {
-/**
-* Create a new window with given emoji, title, width and height.
-* @param {string} emoji - The emoji to display in the window's title bar.
-* @param {string} title - The title to display in the window's title bar.
-* @param {number} [width=400] - The width of the window in pixels.
-* @param {number} [height=300] - The height of the window in pixels.
-* @return {HTMLElement} The root DOM element of the newly created window.
-*/
-window.os.gui.createWindow = function(emoji, title, width = 400, height = 300) {
-    // Create root DOM element
-    const root = document.createElement('div');
-    root.className = 'window';
-    root.style.width = `${width}px`;
-    root.style.height = `${height}px`;
-    document.body.appendChild(root);
-    
-    // Bring to front
-    window.os.gui.bringToFront(root);
-    
-    // Create placeholders for title bar, toolbar, content, status
-    ['titlePlaceholder', 'toolbarPlaceholder', 'contentPlaceholder', 'statusPlaceholder'].forEach(className => {
-        const placeholder = document.createElement('div');
-        placeholder.className = className;
-        root.appendChild(placeholder);
-    });
-    
-    // Create resize handle
-    const resizeHandle = document.createElement('div');
-    resizeHandle.className = 'resizeHandle';
-    root.appendChild(resizeHandle);
-    
-    // Create title bar
-    window.os.gui.titleBar(root.querySelector('.titlePlaceholder'), emoji + ' ' + title, () => document.body.removeChild(root));
-    
-    // Make window draggable by title bar
-    window.os.gui.makeDraggable(root, root.querySelector('.titlePlaceholder'));
-    
-    // Make window resizable by resize handle
-    window.os.gui.makeResizable(root, resizeHandle);
-    
-    // Position window in center of document
-    root.style.position = 'absolute';
-    root.style.left = `${window.innerWidth / 2 - width / 2}px`;
-    root.style.top = `${window.innerHeight / 2 - height / 2}px`;
-    
-    return root;
-};
-
-/**
-* Attach content to an existing window.
-* @param {HTMLElement} windowElement - The window to attach content to.
-* @param {HTMLElement} contentElement - The content to attach to the window.
-*/
-window.os.gui.attachToWindow = function(windowElement, contentElement) {
-    // Find the .contentPlaceholder element in the windowElement
-    var contentPlaceholder = windowElement.querySelector('.contentPlaceholder');
-    
-    // Append the contentElement to the .contentPlaceholder element
-    contentPlaceholder.appendChild(contentElement);
-};
-
+    /**
+     * Reads an entry in the filesystem object at the given path.
+     * @param {string} path - The path to read the content from.
+     * @returns {string|null} - The content of the file or null if not found.
+     */
+    window.os.fs.read = function(path) {
+        const processedPath = this.getPath(path);
+        if (!this.isValidPath(processedPath)) return null;
+        const parts = processedPath.split('/').filter(Boolean);
+        let current = filesystem;
+        for (const part of parts) {
+            if (current[part]) {
+                current = current[part];
+            } else {
+                return null;
+            }
+        }
+        return current;
+    };
+})();
 
 })()
   </script>
-  <style id="gui_gui-styles">
-   /* Define styles for .titleBar */
-.titleBar {
-    background-color: orange;
-    border-bottom: 1px solid black;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  <style id="terminal_terminal-style">
+   .terminal {
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    color: white;
     font-family: monospace;
-    font-size: small;
-    padding: 0px 5px;
-    border-bottom: 2px solid black;
-    user-select: none; /* Prevent text selection */
-}
-
-/* Define styles for buttons */
-.titleBar button {
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-size: 6px;
-    padding: 5px;
-}
-
-.window {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    border: 2px solid black;
-    border-radius: 8px;
-    box-shadow: 4px 4px 0 0 rgba(0,0,0,0.5);
     overflow: hidden;
-    background-color: white;
-    -webkit-user-select: none; /* Safari */
-    -ms-user-select: none; /* IE 10+ */
-    user-select: none; /* Standard syntax */
-}
-
-.contentPlaceholder {
-    padding: 5px;
-    flex-grow: 1;
-    overflow: auto;
-}
-
-.statusPlaceholder {
-    border-top: 1px solid black;
-    font-family: monospace;
-    font-size: small;
-}
-
-.resizeHandle {
-    position: absolute;
-    width: 0px;
-    height: 0px;
-    bottom: 0;
-    right: 0;
-    cursor: se-resize;
-    border-width: 0 0 10px 10px;
-    border-style: solid;
-    border-color: transparent transparent #ff7200 transparent;
-    transform: rotate(0deg);
-}
-
-.toolbar {
-    padding: 2px;
-    background-color: antiquewhite;
-    margin-bottom: 2px;
-    border-bottom: 1px solid black;
     display: flex;
-    justify-content: flex-start;
-}
-
-button {
-    border: none;
-    cursor: pointer;
-    background-color: transparent;
-}
-  </style>
-  <style id="gui_notification-styles">
-   .notification-wrapper {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
     flex-direction: column;
 }
-
-.notification {
-    position: relative;
-    width: 200px;
+.terminal-output {
+    flex: 1;
+    overflow-y: auto;
     padding: 10px;
-    margin-top: 5px;
-    word-wrap: break-word;
-    box-shadow: 2px 2px 0 0 rgba(0,0,0,0.5);
-    border: 2px solid black;
-    border-radius: 5px;
-    background-color: white;
-}
-  </style>
-  <script id="registry_extension">
-   (() => {
-// Assuming window.os is already defined
-if (!window.os) {
-    window.os = {};
-}
-
-// Assuming window.os.registry is already defined
-if (!window.os.registry) {
-    window.os.registry = {};
-}
-
-/**
- * Register an extension with its corresponding emoji and callback.
- * @param {string} extension - The name of the extension to register.
- * @param {string} emoji - The corresponding emoji for this extension.
- * @param {function} callback - The callback to be executed when this extension is used.
- */
-window.os.registerExtension = function(extension, emoji, callback) {
-    window.os.registry[extension] = {emoji: emoji, callback: callback};
-};
-
-
-})()
-  </script>
-  <script id="registry_app-icon">
-   (() => {
-/**
- * Create an icon element for a file or directory at given path
- * @param {string} path - The path to the file or directory
- * @param {function} callback - The callback to call when the icon is clicked
- * @returns {HTMLElement} - The icon element
- */
-window.os.getOSIcon = function(path, callback) {
-    const isFile = window.os.fs.isFile(path);
-    const rootElement = document.createElement('div');
-    rootElement.classList.add('icon');
-    
-    const emojiElement = document.createElement('span');
-    emojiElement.classList.add('emoji');
-    emojiElement.textContent = isFile ? '📄' : '📁';
-    rootElement.appendChild(emojiElement);
-    
-    const titleElement = document.createElement('div');
-    titleElement.classList.add('title');
-    titleElement.textContent = path.split('/').pop(); // Assuming path is a Unix-like path
-    rootElement.appendChild(titleElement);
-    
-    const ext = path.split('.').pop(); // Assuming path has an extension
-    const extData = window.os.registry[ext];
-    if (extData) {
-        const appEmojiElement = document.createElement('span');
-        appEmojiElement.classList.add('app-emoji');
-        appEmojiElement.textContent = extData.emoji;
-        rootElement.appendChild(appEmojiElement);
-        
-        let currentCallback = path => extData.callback(path); // Closure for path
-        rootElement.addEventListener('click', () => currentCallback(path));
-    } else {
-        let currentCallback = path => callback(path); // Closure for path
-        rootElement.addEventListener('click', () => currentCallback(path));
-    }
-    
-    return rootElement;
-};
-
-
-})()
-  </script>
-  <script id="registry_registry">
-   (() => {
-/**
- * Register an application on the desktop.
- * 
- * @param {string} title - The tooltip text to display when hovering over this application's icon.
- * @param {string} emoji - The emoji to display in this application's icon.
- * @param {function} callback - The callback to call when this application's icon is clicked.
- * @param {number} [width=400] - The width of the application's window in pixels.
- * @param {number} [height=400] - The height of the application's window in pixels.
- * @param {Array<string>} [extensions] - The file extensions to register for this application.
- */
-window.os.registerApplication = function(title, emoji, callback, width = 400, height = 400, extensions) {
-    const execute = (...params) => {
-        const windowInstance = window.os.gui.createWindow(emoji, title, width, height);
-        window.os.gui.attachToWindow(windowInstance, callback(windowInstance, ...params));
-    };
-    
-    if (extensions) {
-        extensions.forEach(extension => {
-            // Assuming `registerExtension` is also available on `window.os` object
-            // and it takes an extension, emoji and callback as parameters
-            window.os.registerExtension(extension, emoji, execute);
-        });
-    }
-    
-    // Add application to desktop
-    window.os.addApp(emoji, title, () => execute());
-};
-
-
-})()
-  </script>
-  <style id="apps_styles">
-   .browser {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column-reverse;
 }
-  </style>
-  <script id="development_run">
-   (() => {
-/**
- * Run an application in a new window.
- * @param {function} callback - The callback to run in the new window.
- * @param {number} [width=500] - The width of the window in pixels.
- * @param {number} [height=400] - The height of the window in pixels.
- */
-window.os.runApp = function(callback, width = 500, height = 400) {
-    // Create a new window instance
-    const appWindow = window.os.gui.createWindow('🔥', 'Development', width, height);
-    
-    // Attach content to the window
-    const contentElement = callback(appWindow);
-    window.os.gui.attachToWindow(appWindow, contentElement);
-};
-
-
-})()
-  </script>
-  <style id="games_styles">
-   .gmroot {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: 2px;
-    padding: 4px;
-    background-color: white;
-}
-
-.row {
+.terminal-line {
     display: flex;
     flex-direction: row;
-    align-items: center;
-    justify-content: center;
+    overflow-wrap: anywhere;
 }
-
-.cell {
-    width: 22px;
-    height: 22px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid darkgray;
-    border-radius: 2px;
-    margin: 1px;
+.terminal-input {
+    display: flex;
+    flex-direction: row;
+}
+.terminal-input-text {
+    background-color: transparent;
+    border: none;
+    color: white;
     font-family: monospace;
-}
-
-.cell.visited {
-    background-color: white;
-    border: 1px solid white;
-}
-
-.score {
-    margin: 4px;
-    font-family: monospace;
-    font-weight: bold;
-    text-align: center;
-    background-color: white;
-    border: 2px solid white;
-    border-radius: 2px;
+    font-size: 16px;
+    flex: 1;
+    outline: none;
 }
   </style>
  </head>
  <body>
-  <script id="osbase_logo">
+  <span id="osbase_logo">
+   <svg height="100" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);" viewbox="0 0 100 100" width="100">
+    <g fill="none" stroke="black" stroke-width="2">
+     <polygon points="50,10 90,40 10,40">
+     </polygon>
+     <rect height="40" width="40" x="30" y="40">
+     </rect>
+     <line x1="50" x2="50" y1="40" y2="80">
+     </line>
+     <line x1="30" x2="70" y1="60" y2="60">
+     </line>
+    </g>
+    <text fill="black" font-family="Arial" font-size="8" text-anchor="middle" x="50" y="95">
+     TempLLM OS
+    </text>
+   </svg>
+  </span>
+  <script id="terminal_terminal-runtime">
    (() => {
-// Create a new image element
-let img = document.createElement('img');
-img.src = 'https://github.com/cstefanache/templlmos/blob/main/assets/logos.png?raw=true?raw=true';
-img.id = 'logo';
-img.style.position = 'absolute';
-img.style.left = '50%';
-img.style.top = '50%';
-img.style.transform = 'translate(-50%, -50%)'; // To center the image in the middle of its container
-img.style.opacity = '0.2'; // Set opacity to 20%
+let currentPath = '/';
 
-// Append the image to the body of the document
-document.body.appendChild(img);
-
-
-})()
-  </script>
-  <script id="osbase_tests">
-   (() => {
 /**
- * Executes log with about message.
+ * Changes the current directory to the specified path.
+ * @param {string} path - The path to change to.
  */
-function executeLogWithAbout() {
-    window.os.log(window.os.about());
+function cd(path) {
+    currentPath = path;
 }
 
-
-})()
-  </script>
-  <script id="osbase_fs-tests">
-   (() => {
-// Create a new directory in the root directory called `fstest`
-window.os.fs.mkdir('fstest');
-
-// Create a new file in the `fstest` directory called `test.txt` with the content `hello world`
-window.os.fs.write('fstest/test.txt', 'hello world');
-
-// List the entries in the `fstest` directory and log it to console
-console.log(window.os.fs.ls('fstest'));
-
-// Read the content of the `fstest/test.txt` file and log it to console
-console.log(window.os.fs.getFileContentFromPath('fstest/test.txt'));
-
-// Remove the `fstest` directory 
-window.os.fs.rm('fstest');
-
-
-})()
-  </script>
-  <div id="desktop_content">
-  </div>
-  <script id="output_output-window">
-   (() => {
-// Create a root container div element with class 'output-wrapper' and id 'output-wrapper'
-let rootContainer = document.createElement('div');
-rootContainer.className = 'output-wrapper';
-rootContainer.id = 'output-wrapper';
-document.body.appendChild(rootContainer);
-
-// Create and append to root container a pre element with class 'output' and id 'output'
-let output = document.createElement('pre');
-output.className = 'output';
-output.id = 'output';
-rootContainer.appendChild(output);
-
-// Store empty string in a variable 'content'
-let content = '';
-
-// Create an internal function fetches the content from '/output' if the data differs from the content
-async function fetchContent() {
-    let response = await fetch('/output');
-    let newContent = await response.text();
-    if (newContent !== content) {
-        content = newContent;
-        output.innerHTML = content; // Set innerHTML of the pre element to the fetched content
-        output.scrollTop = output.scrollHeight; // Scroll output to bottom
-    }
+/**
+ * Returns the current working directory.
+ * @returns {string} - The current path.
+ */
+function pwd() {
+    return currentPath;
 }
 
-// Call /ping and if the response is 200 then set an interval to call the internal function every 1000ms
-fetch('/ping')
-    .then(response => {
-        if (response.status === 200) {
-            setInterval(fetchContent, 1000);
-        }
-    });
-
-
-})()
-  </script>
-  <script id="gui_notification">
-   (() => {
-// Firstly, create a root container div element with the class 'notification-wrapper'
-let notificationWrapper = document.createElement('div');
-notificationWrapper.className = 'notification-wrapper';
-document.body.appendChild(notificationWrapper); // Assuming you want to append it to body, but you can change this as per your requirement
-
-// Now define your 'notification' function on 'window.os.gui' object
-if (!window.os) { window.os = {}; } // If 'os' object doesn't exist, create it
-if (!window.os.gui) { window.os.gui = {}; } // If 'gui' object doesn't exist in 'os', create it
-window.os.gui.notification = function(message) {
-    // Create a new DOM element with the class 'notification'
-    let notificationElement = document.createElement('div');
-    notificationElement.className = 'notification';
-    
-    // Create a 'span' containing the message parameter and append it to 'notification'
-    let messageElement = document.createElement('span');
-    messageElement.textContent = message; // Set the message as text content of span
-    notificationElement.appendChild(messageElement);
-    
-    // Append 'notification' to '.notification-wrapper'
-    notificationWrapper.appendChild(notificationElement);
-    
-    // Set a timeout of 2000ms to remove 'notification' from parent after 2 seconds
-    setTimeout(function() {
-        notificationWrapper.removeChild(notificationElement);
-    }, 2000);
+const bin = {
+    getPath: window.os.fs.getPath,
+    isValidPath: window.os.fs.isValidPath,
+    ls: window.os.fs.ls,
+    mkdir: window.os.fs.mkdir,
+    rm: window.os.fs.rm,
+    write: window.os.fs.write,
+    read: window.os.fs.read,
+    cd: cd,
+    pwd: pwd
 };
-
-
-})()
-  </script>
-  <script id="registry_hello-world">
-   (() => {
 /**
- * Create a root element div having an h1 child element with 'Hello World' text
- * If path is defined append a pre element containing the content of reading the file at the path
- * @param {HTMLElement} parent - The parent element to append the created elements to
- * @param {string} [path] - The path to a file to read its content from
- * @returns {HTMLElement} - The root element containing h1 and pre elements
+ * Executes a command with the given parameters, processing the path accordingly.
+ * @param {string} commandString - The command string to execute.
+ * @returns {any} - The result of the command execution or an error message.
  */
-function helloWorld(parent, path) {
-    // Create root div element
-    const root = document.createElement('div');
-    
-    // Create h1 element with 'Hello World' text
-    const h1 = document.createElement('h1');
-    h1.textContent = 'Hello World';
-    root.appendChild(h1);
-    
-    // If path is provided, create pre element with file content
-    if (path) {
-        const pre = document.createElement('pre');
-        pre.textContent = window.os.fs.getFileContentFromPath(path);
-        root.appendChild(pre);
-    }
-    
-    // Append root element to parent
-    parent.appendChild(root);
-    
-    return root;
-}
+function execute(commandString) {
+    const args = commandString.split(' ');
+    let path = currentPath;
+    const command = 'bin.' + args[0];
 
-// Register application with 'hello world' title, 👋 as emoji, helloWorld function and 300x200 size
-window.os.registerApplication('hello world', '👋', helloWorld, 300, 200);
-
-
-})()
-  </script>
-  <script id="apps_simple-run">
-   (() => {
-/**
- * Create a chat application with a root DOM element and input element.
- * 
- * @param {HTMLElement} parent - The parent element where the chat application will be appended.
- */
-function application(parent) {
-    // Create a root DOM element with class 'chat'
-    const chat = document.createElement('div');
-    chat.className = 'chat';
-    parent.appendChild(chat);
-
-    // Create an input element with 100% width
-    const input = document.createElement('input');
-    input.style.width = '100%';
-    chat.appendChild(input);
-
-    // Variable to save input value
-    let instruction = '';
-
-    // Event listener for keyup event on input element
-    input.addEventListener('keyup', async (event) => {
-        // If enter key is pressed
-        if (event.key === 'Enter') {
-            // Save input value to instruction variable and clear input
-            instruction = event.target.value;
-            event.target.value = '';
-            
-            // POST instruction and full as false to '/'
-            const response = await fetch('/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ instruction: instruction, full: false })
-            });
-            
-            // Get response text content
-            const content = await response.text();
-            
-            // Create a script tag with id 'run-script' and add response content to it
-            const script = document.createElement('script');
-            script.id = 'run-script';
-            script.textContent = content;
-            document.body.appendChild(script);
-        }
-    });
-    
-    // Return root DOM element
-    return chat;
-}
-
-window.os.registerApplication('Run', '▶️', application, 400, 70);
-
-
-})()
-  </script>
-  <script id="apps_editor">
-   (() => {
-function editor(win, path) {
-    // Create a div element with class 'editor'
-    const editorDiv = document.createElement('div');
-    editorDiv.className = 'editor';
-    
-    // Create a textarea element with 100% width and height
-    const textarea = document.createElement('textarea');
-    textarea.style.width = '100%';
-    textarea.style.height = '100%';
-    
-    // Add textarea to editorDiv
-    editorDiv.appendChild(textarea);
-    
-    // Create toolbar on win parameter
-    const addButton = window.os.gui.createToolbar(win);
-    
-    // If path is not empty, read file content and set it to textarea
-    if (path) {
-        const content = window.os.fs.getFileContentFromPath(path);
-        if (content) textarea.value = content;
-    }
-    
-    // Add button on toolbar with '💾' text that saves textarea content to path if path is defined, prompt for path otherwise
-    addButton('💾', () => {
-        const newPath = path || window.prompt('Enter a path');
-        if (newPath) window.os.fs.write(newPath, textarea.value);
-    });
-    
-    // Return editorDiv
-    return editorDiv;
-}
-
-// Register application with 'Editor' title, ✍️ as emoji, editor function reference and 400x450 size for [txt,doc] extensions 
-window.os.registerApplication('Editor', '✍️', editor, 400, 450, ['txt', 'doc']);
-
-
-})()
-  </script>
-  <script id="apps_browser">
-   (() => {
-function browser(win, path='') {
-    // Create a container dom element with class `browser`
-    const container = document.createElement('div');
-    container.classList.add('browser');
-    
-    // Set browserPath to path or `''` if path is undefined or not string
-    let browserPath = (typeof path === 'string') ? path : '';
-    
-    // Generate internal load function that takes path parameter
-    const load = (path) => {
-        // Set browserPath to path
-        browserPath = path;
-        
-        // Removes all children of the container element
-        while (container.firstChild) {
-            container.removeChild(container.firstChild);
-        }
-        
-        // If path is not empty, create a new `div` with class icon, inner element `.emoji` with internal span element having content '🔙'  and class `emoji` and on click call load with `path.split('/').slice(0, -1).join('/')`
-        if (path !== '') {
-            const backButtonDiv = document.createElement('div');
-            backButtonDiv.classList.add('icon');
-            const backButtonSpan = document.createElement('span');
-            backButtonSpan.classList.add('emoji');
-            backButtonSpan.textContent = '🔙';
-            backButtonSpan.addEventListener('click', () => load(path.split('/').slice(0, -1).join('/')));
-            backButtonDiv.appendChild(backButtonSpan);
-            container.appendChild(backButtonDiv);
-        }
-        
-        // ls all files in the path and for each item: call `getOsIcon` with path+'/'+item and load function as callback
-        window.os.fs.ls(path).forEach(item => {
-            const iconElement = window.os.getOSIcon(path+'/'+item, () => load(path+'/'+item));
-            const checkboxElement = document.createElement('input');
-            checkboxElement.type = 'checkbox';
-            checkboxElement.value = path+'/'+item;
-            checkboxElement.addEventListener('click', (event) => event.stopPropagation()); // prevent event bubbling
-            iconElement.appendChild(checkboxElement);
-            container.appendChild(iconElement);
-        });
-    };
-    
-    // Execute load on browserPath variable
-    load(browserPath);
-    
-    // Create toolbar
-    const toolbar = window.os.gui.createToolbar(win);
-    
-    // Call `addButton` on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name
-    toolbar('📁', () => {
-        const name = prompt('Enter directory name');
-        if (name) window.os.fs.mkdir(browserPath + '/' + name);
-        load(browserPath);
-    });
-    
-    // Call `addButton` on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and '' as content
-    toolbar('📄', () => {
-        const name = prompt('Enter file name');
-        if (name) window.os.fs.write(browserPath + '/' + name, '');
-        load(browserPath);
-    });
-    
-    // Call `addButton` on the toolbar with `🗑️` text and list all the selected checkbox values, removes them and calls load on the current path
-    toolbar('🗑️', () => {
-        const checkboxes = container.querySelectorAll('input[type=checkbox]:checked');
-        checkboxes.forEach(checkbox => {
-            window.os.fs.rm(checkbox.value);
-            checkbox.parentNode.removeChild(checkbox); // remove checkbox from its parent node
-        });
-        load(browserPath);
-    });
-    
-    return container;
-}
-
-window.os.registerApplication('Browser', '📂', browser, 450, 400);
-
-
-})()
-  </script>
-  <script id="apps_photobooth">
-   (() => {
-function createPhotoBooth() {
-    // Create root DOM element
-    const rootElement = document.createElement('div');
-    
-    // Append video element with autoplay on
-    const videoElement = document.createElement('video');
-    videoElement.autoplay = true;
-    videoElement.width = 400; // Set width of video element
-    videoElement.height = 300; // Set height of video element
-    rootElement.appendChild(videoElement);
-    
-    // Add button with text 'Take Snapshot'
-    const buttonElement = document.createElement('button');
-    buttonElement.innerText = 'Take Snapshot';
-    buttonElement.onclick = () => takeSnapshot(videoElement); // Call takeSnapshot function when button is clicked
-    rootElement.appendChild(buttonElement);
-    
-    // Request access to camera
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream => videoElement.srcObject = stream)
-        .catch(err => console.error('Error accessing camera', err));
-    
-    return rootElement;
-}
-
-function takeSnapshot(videoElement) {
-    // Create canvas element
-    const canvasElement = document.createElement('canvas');
-    canvasElement.width = videoElement.videoWidth; // Set width of canvas element to match video element's width
-    canvasElement.height = videoElement.videoHeight; // Set height of canvas element to match video element's height
-    
-    // Draw video frame on canvas
-    const context = canvasElement.getContext('2d');
-    context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-    
-    // Convert canvas image to data URL
-    const imageDataUrl = canvasElement.toDataURL('image/png');
-    
-    // Generate timestamp for filename
-    const timestamp = Date.now();
-    
-    // Generate path for image save
-    const path = `photobooth/image+${timestamp}.png`;
-    
-    // Save image data URL to file
-    window.os.fs.write(path, imageDataUrl);
-    
-    // Notify user of successful save
-    window.os.gui.notification(`Snapshot saved to ${path}`);
-}
-
-window.os.registerApplication(
-    'Photobooth',  // title
-    '📸',  // emoji
-    createPhotoBooth,  // callback
-    410,  // width
-    360  // height
-);
-
-
-})()
-  </script>
-  <script id="apps_image">
-   (() => {
-/**
- * Generate an image viewer for a given path
- * @param {string} unused - Unused parameter (not used in this implementation)
- * @param {string} path - The path of the image file to view
- * @returns {HTMLImageElement} - The generated image element
- */
-function imageViewer(unused, path) {
-    // Read file content as base64 string from path
-    let content = window.os.fs.getFileContentFromPath(path);
-    
-    // Remove "data:image/png;base64," or "data:image/jpeg;base64," from content
-    content = content.replace(/^data:image\/(png|jpeg);base64,/, '');
-    
-    // Create image element with src set to content
-    let imgElement = document.createElement('img');
-    imgElement.src = `data:image/png;base64,${content}`; // assuming it's a PNG image
-    
-    // Make the image fill the entire parent content (assuming parent is body)
-    imgElement.style.width = '100%';
-    imgElement.style.height = '100%';
-    
-    return imgElement;
-}
-
-window.os.registerApplication(
-    'Image Viewer', 
-    '🖼️', 
-    imageViewer, 
-    650, 
-    520, 
-    ['png', 'jpg', 'jpeg']
-);
-
-
-})()
-  </script>
-  <script id="development_ide">
-   (() => {
-/**
- * Compile a source code string into a runnable script.
- * 
- * @param {string} source - The source code string to compile.
- */
-function compile(source) {
-    // Remove existing 'run-script' script tag if exists
-    let existingScriptTag = document.getElementById('run-script');
-    if (existingScriptTag) {
-        existingScriptTag.parentNode.removeChild(existingScriptTag);
-    }
-    
-    // Fetch POST request with source code as JSON data
-    fetch('/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({instruction: source})
-    })
-    .then(response => response.text())
-    .then(data => {
-        // Create a new script tag with id 'run-script' and add response text content to it
-        let newScriptTag = document.createElement('script');
-        newScriptTag.id = 'run-script';
-        newScriptTag.textContent = data;
-        document.body.appendChild(newScriptTag);
-    })
-    .catch(error => console.error('Error:', error));
-}
-
-function ide(win, path) {
-    // Create root element
-    const ideRoot = document.createElement('div');
-    ideRoot.classList.add('ide');
-    
-    // Create textarea element
-    const textarea = document.createElement('textarea');
-    textarea.style.width = '100%';
-    textarea.style.height = '500px';
-    
-    // If path is not empty, read file content and set it to textarea
-    if (path) {
-        const content = window.os.fs.getFileContentFromPath(path);
-        if (content) textarea.value = content;
-    }
-    
-    // Create toolbar on win
-    const addButton = window.os.gui.createToolbar(win);
-    
-    // Add buttons on toolbar
-    addButton('▶️', () => compile(textarea.value)); // Execute compile on click
-    addButton('💾', () => { // Save on click
-        if (path) {
-            window.os.fs.write(path, textarea.value);
+    if (args[1]) {
+        if (!args[1].startsWith('/')) {
+            path = window.os.fs.getPath(currentPath + '/' + args[1]);
         } else {
-            path = prompt('Please enter a path');
-            if (path) window.os.fs.write(path, textarea.value);
+            path = window.os.fs.getPath(args[1]);
+        }
+    }
+
+    try {
+        return eval(`${command}('${path}'${args.slice(2).map(arg => `, '${arg}'`).join('')})`);
+    } catch (error) {
+        return error.message;
+    }
+}
+window.apps = window.apps || {};
+
+window.apps.terminal = function() {
+    const terminal = document.createElement('div');
+    terminal.className = 'terminal';
+
+    const terminalOutput = document.createElement('div');
+    terminalOutput.className = 'terminal-output';
+    const welcomeLine = document.createElement('div');
+    welcomeLine.className = 'terminal-line';
+    welcomeLine.textContent = 'Welcome to TempLLM OS';
+    terminalOutput.appendChild(welcomeLine);
+    terminal.appendChild(terminalOutput);
+
+    const terminalInput = document.createElement('div');
+    terminalInput.className = 'terminal-input';
+    const prefix = document.createElement('div');
+    prefix.className = 'prefix';
+    prefix.textContent = '>';
+    const input = document.createElement('input');
+    input.className = 'terminal-input-text';
+    terminalInput.appendChild(prefix);
+    terminalInput.appendChild(input);
+    terminal.appendChild(terminalInput);
+
+    function output(value, color = 'white') {
+        const line = document.createElement('div');
+        line.className = 'terminal-line';
+        line.style.color = color;
+        if (Array.isArray(value)) {
+            value.forEach(item => {
+                const itemLine = document.createElement('div');
+                itemLine.textContent = item;
+                itemLine.style.color = color;
+                terminalOutput.prepend(itemLine);
+            });
+        } else {
+            line.textContent = value;
+            terminalOutput.prepend(line);
+        }
+    }
+
+    input.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            const currentTime = new Date().toLocaleTimeString();
+            const content = input.value;
+            output(`[${currentTime}] ${content}`, 'yellow');
+            const result = execute(content);
+            output(result);
+            input.value = '';
+            input.focus();
         }
     });
-    
-    // Append textarea to root element
-    ideRoot.appendChild(textarea);
-    
-    return ideRoot;
-}
 
-// Register application
-window.os.registerApplication('IDE', '🧠', ide, 800, 600, ['script']);
-
-
-})()
-  </script>
-  <script id="games_minesweper">
-   (() => {
-function minesweeper() {
-    // Create root element
-    const root = document.createElement('div');
-    root.className = 'gmroot';
-    
-    // Create matrix of size 8x8 with values 0
-    const matrix = Array(8).fill().map(() => Array(8).fill(0));
-    
-    // Pick 10 random cells and set their value to -40 and increase the number value of the neighbouring cells
-    let mines = [];
-    for (let i = 0; i < 10; i++) {
-        let x = Math.floor(Math.random() * 8);
-        let y = Math.floor(Math.random() * 8);
-        mines.push({x, y});
-        matrix[x][y] = -40;
-        for (let dx = -1; dx <= 1; dx++) {
-            for (let dy = -1; dy <= 1; dy++) {
-                if (dx === 0 && dy === 0) continue;
-                let nx = x + dx;
-                let ny = y + dy;
-                if (nx >= 0 && nx < 8 && ny >= 0 && ny < 8) matrix[nx][ny]++;
-            }
-        }
-    }
-    
-    // Set score to 64
-    let score = 64;
-    
-    // Add score div
-    const scoreDiv = document.createElement('div');
-    scoreDiv.className = 'score';
-    scoreDiv.textContent = `Discovered: ${score}`;
-    root.appendChild(scoreDiv);
-    
-    // Add matrix rows
-    for (let i = 0; i < 8; i++) {
-        const rowDiv = document.createElement('div');
-        rowDiv.className = 'row';
-        for (let j = 0; j < 8; j++) {
-            const cellDiv = document.createElement('div');
-            cellDiv.className = 'cell';
-            cellDiv.textContent = ' ';
-            cellDiv.dataset.x = i;
-            cellDiv.dataset.y = j;
-            cellDiv.addEventListener('click', () => reveal(i, j));
-            rowDiv.appendChild(cellDiv);
-        }
-        root.appendChild(rowDiv);
-    }
-    
-    // Define reveal function
-    const reveal = (x, y) => {
-        let cellDiv = document.querySelector(`div[data-x="${x}"][data-y="${y}"]`);
-        if (cellDiv.classList.contains('visited')) return;
-        let value = matrix[x][y];
-        cellDiv.textContent = value < 0 ? '💣' : value;
-        cellDiv.classList.add('visited');
-        if (value < 0) {
-            alert('Game Over');
-            return;
-        } else if (value === 0) {
-            for (let dx = -1; dx <= 1; dx++) {
-                for (let dy = -1; dy <= 1; dy++) {
-                    if (dx === 0 && dy === 0) continue;
-                    let nx = x + dx;
-                    let ny = y + dy;
-                    if (nx >= 0 && nx < 8 && ny >= 0 && ny < 8) reveal(nx, ny);
-                }
-            }
-        }
-        score--;
-        scoreDiv.textContent = `Discovered: ${score}`;
-    };
-    
-    return root;
+    return terminal;
 };
-
-window.os.registerApplication('Minesweeper', '💣', minesweeper, 300, 300);
-
+document.body.appendChild(window.apps.terminal());
 
 })()
   </script>
   <script>
-   window.os.fs.write('/sources/os/general-styles.txt', 'Package: general-styles\ncss to apply a #FFF4DF background color to the body and overflow hidden')
-window.os.fs.write('/sources/os/global-objects.txt', 'Package: global-objects\nCreate a new empty object `os` on the window global object')
-window.os.fs.write('/sources/os/about.txt', 'Package: about\n- Define the `window.os.about` function that returns "TempLLMOS is an experimental WebOS controlled by a Large Language Model.\n- Define the `window.os.log` that takes a single parameter and calls console.log function')
-window.os.fs.write('/sources/os/logo.txt', 'Package: logo\njs that creates an image element with source: https://github.com/cstefanache/templlmos/blob/main/assets/logos.png?raw=true with id #logo, absolute position, middle of the body document, give it 20% opacity')
-window.os.fs.write('/sources/os/tests.txt', 'Package: tests\nexecute log with the about message')
-window.os.fs.write('/sources/filesystem/filesystem.txt', 'Package: filesystem\nLoad the `filesystem` object from the local storage as json\nDefine the `window.os.fs` object and define the following functions on it (remove leading and trailing `/` from the path):\n- `window.os.fs.sync` function that save the `filesystem` object to the local storage.\n- `window.os.fs.getFileContentFromPath` function that returns the content of the entry in the `filesystem` object at the given path. path should be split by `/` and the method should traverse the `filesystem` object and return the value at path (allow undefined or empty string). if the path starts with `/` remove the leading `/`\n- `window.os.fs.write` function that writes the content to an entry in the `filesystem` object at the given path and file name. in the end execute the `sync` method.\n- `window.os.fs.ls` function that returns a list of entries in the `filesystem` object at the given path. if path is empty or not found, return the root entries.\n- `window.os.fs.mkdir` function that creates a new directory in the `filesystem` object at the given path and directory name. in the end execute the `sync` method.\n- `window.os.fs.rm` function that removes the object at the given path and file name. in the end execute the `sync` method.\n- `window.os.fs.isFile` function that returns true the entry at the given path is a string.')
-window.os.fs.write('/sources/filesystem/fs-tests.txt', 'Package: fs-tests\ncreate a new directory in the root directory called `fstest`\ncreate a new file in the `fstest` directory called `test.txt` with the content `hello world`\nlist the entries in the `fstest` directory and log it to console\nread the content of the `fstest/test.txt` file and log it to console\nremove the `fstest` directory')
-window.os.fs.write('/sources/desktop/content-style.txt', 'Package: content-style\ncss style the `#desktop_content` id to match the following rules:\nabsolute position, fixed size, 100% width, 100% height, overflow-y hidden, padding of 10px, display flex, flex-wrap wrap, flex-direction column, align content: flex start')
-window.os.fs.write('/sources/desktop/content.txt', 'Package: content')
-window.os.fs.write('/sources/desktop/styles.txt', 'Package: styles\ncss style the `.icon` class to match the following rules:\n1. 64px width, 64px min height, text-align center, margin of 5px, pointer cursor, position relative, display flex with a column flex direction\n2. containing `.emoji` class should be a block, have a font-size of 30px and inline-block display, position relative\n3. containing `.title` class should be a block, have a font-size of 8px, monospaced font, black text, padding of 5px, allow word-wrap to break word, black rounded border with white background\n4. containing `.app-emoji` class should be absolutely positioned  12px on the right of the icon and 20px top\n5. containing checkbox should be absolutely positioned  2px on the left of the icon and -6px top, with a 8px width and 8px height')
-window.os.fs.write('/sources/desktop/icon.txt', 'Package: icon\nDefine a function called `icon` on `window.os` namespace that takes three parameters: parent, emoji, title and a callback:\n- create a root DOM element with the class `.icon` and add it to `parent`\n- add a span with the class `.emoji` and the emoji as its content\n- add a span with the class `.title` and the title as its content\n- when the icon is clicked, call the callback')
-window.os.fs.write('/sources/desktop/desktop-app.txt', 'Package: desktop-app\nDefine a function called `addApp` on `window.os` namespace that takes four parameters: emoji, title and a callback:\n- call `icon` with element at `#desktop_content`, emoji, title and the callback as parameters')
-window.os.fs.write('/sources/desktop/tests.txt', 'Package: tests\ncall addApp 10 times for 10 different emojis and random titles and callback to log the title when clicked')
-window.os.fs.write('/sources/output/output-styles.txt', 'Package: output-styles\nstyle .output-wrapper class having a fixed position having top and right to 0 and width 40%  and max-width of 500px and 100% height of the screen\nstyle .output class having:\n - 100% width and height\n - a semi-transparent black background\n - white text\n - text wrap\n - font size of 12px\n - padding of 10px and 0 margins\n - overflow auto')
-window.os.fs.write('/sources/output/output-window.txt', 'Package: output-window\nuse browser fetch for API requests\ncrate a root container div element having the class `output-wrapper` and id `output-wrapper`\ncreate and append to root container a pre element having the class `output` and id `output`\nstore empty string in a variable `content`\ncreate an internal function fetches the content from "/output" if the data differes from the content: sets the innerHTML of the pre element to the fetched content and  scroll output to bottom\ncalls /ping and if the response is 200 then set an interval to call the internal function every 1000ms')
-window.os.fs.write('/sources/gui/draggable.txt', 'Package: draggable\nImplement `makeDraggable` on `window.os.gui` object that takes two parameters root and dragHandleHTMLElement with the following functionality:\n - change absolute position of root by dragging the dragHandleHTMLElement\nImplement `makeResizable` on `window.os.gui` object  that takes two parameters: root, resizeHandleHTMLElement with the following functionality:` \n - resize (both width and height) the root HTMLElement element by dragging the resizeHandle DOM element.\n - update starting width and height on mouseup\nImplement `bringToFront` on `window.os.gui` object that taskes a single parameter: rootDOMNode  with the following functionality:\n- creates an internal function that:\n  * takes all elements with the same class as rootDomNode\n  * iterate through them and sets the z-index to 0 and at the end sets the z-index of rootDOMNode to 1\n- adds a mousedown event listener to rootDOMNode that calls the internal function\n- call the internal function')
-window.os.fs.write('/sources/gui/gui-tests.txt', 'Package: gui-tests')
-window.os.fs.write('/sources/gui/titleBar.txt', 'Package: titleBar\nDefine a function `titleBar` on the `window.os.gui` object that takes two parameter: parentElement (DOM element), title (string), and a callback `close` and has the following functionality:\n- create a root DOM element with the class `.titleBar`\n- add to the root DOM element a `span` containing the title parameter\n- add to the root DOM element a `button` with the text `❌` and class `close` that calls the close callback\n- append the root DOM element to parentElement')
-window.os.fs.write('/sources/gui/toolbar.txt', 'Package: toolbar\ncreate function `createToolbar` on the `window.os.gui` object and generate jsdoc that takes one HTMLElement parameter `win`\n- create a root DOM element with the class `.toolbar`\n- append the root DOM element to the `.toolbarPlaceholder` from `win` HTML element\n- create internal function `addButton` that takes two parameters: text and callback that adds a button to the root DOM element with the text parameter and call the callback when the button is clicked\n- return internal addButton function')
-window.os.fs.write('/sources/gui/window.txt', 'Package: window\nDefine a function `createWindow` on the `window.os.gui` object that takes four parameters: emoji, title, width and height that are defaulting to 400 and 300, respectively if not passed and have the following functionality:\n- create a root DOM element with the class `.window`, set the width and height only, and add it to document body in the middle of the document\n- call bringToFront on the root element\n- add and empty div with class `titlePlaceholder` to the root DOM element\n- add and empty div with class `toolbarPlaceholder` to the root DOM element\n- add and empty div with class `contentPlaceholder` to the root DOM element\n- add and empty div with class `statusPlaceholder` to the root DOM element\n- add a resize handle to the root DOM element with class `resizeHandle`\n- add titleBar to `.titlePlaceholder` having the text `emoji + title` and close callback removes root DOM element from the document body\n- make root element draggable by the `.titlePlaceholder` element\n- make root element resizable by the `resizeHandle` element\n- set root DOM element left position document width divided by 2 minus width divided by 2\n- set root DOM element top position document height divided by 2 minus height divided by 2\n- return root DOM element\nDefine a function called `attachToWindow` on the `window.os.gui` object that takes two parameters: windowElement and contentElement that takes the contentElement and appends it to the `.contentPlaceholder` of the windowElement')
-window.os.fs.write('/sources/gui/gui-styles.txt', 'Package: gui-styles\ncss style for a .titleBar class to follow the following rules:\n- orange background color, a black bottom border of 1px solid\n- display of flex, a justify-content of space-between, an align-items of center\n- monospaced black small text\n- 5px horizontal padding, 0 vertical padding\n- 2px black border bottom\n- render buttons flat, no border, no background, a cursor of pointer, font size of 6, 5px padding\n- do not allow text selection\ncss style for a .window class to follow the following rules:\n- white background color\n- disable text selection\n- a border of 2px solid black\n- a border-radius of 8px\n- hidden overflow\n- a box-shadow of 4px 4px 0 0 rgba(0,0,0,0.5)\n- absolute position\n- display of flex and flex-direction of column\n- inner .contentPlaceholder class should have a padding of 5px, flex-grow of 1 and overflow of auto\n- inner .statusPlaceholder class should have  a border-top of 1px solid black and a monospaced small text\ncss style for a  `.resizeHandle` class with the following rules:\n- a width and height of 0px\n- an absolute position\n- a bottom and right of 0\n- a cursor of se-resize\n- border width: 0 0 10px 10px\n- border style: solid\n- `border-color: transparent transparent #ff7200 transparent`\n- transform: rotate(0deg)\ncss style for `.toolbar` class to follow the following rules:\n- a padding of 2px\n- a background of antique white\n- a margin-bottom of 2px\n- a border-bottom of 1px solid black\n- a display of flex\n- a justify-content of flex-start\ninner buttons have:\n - no border\n - cursor pointer\n - transparent background')
-window.os.fs.write('/sources/gui/notification-styles.txt', 'Package: notification-styles\ncss style for a .notification-wrapper class to follow the following rules:\n- an absolute position\n- a top of 0\n- a right of 0\n- a z-index of 1000\n- a display of flex\n- a justify-content of center\n- a flex-direction of column\ncss style for a .notification class to follow the following rules:\n- white background, a black border of 1px solid\n- a black border of 2px solid\n- width width of 200px\n- word wrap\n- padding of 10px\n- a border-radius of 5px\n- a box-shadow of 2px 2px 0 0 rgba(0,0,0,0.5)\n- a top margin of 5px\n- a position of relative')
-window.os.fs.write('/sources/gui/notification.txt', 'Package: notification\ncrate a root container div element having the class `.notification-wrapper`\nDefine a function `notification` on the `window.os.gui` object that takes a single parameter message and has the following functionality:\n- create a root DOM element with the class `.notification`\n- add to the root DOM element a `span` containing the message parameter\n- append the root DOM element to .notification-wrapper\n- set a timeout of 2000ms to remove the root DOM element from parent')
-window.os.fs.write('/sources/gui/tests.txt', 'Package: tests\ncreate an element h1 with text `hello world!` and attach to a window with title `Hello World` and emoji `🌍` having 300x200 size\ncreate an element h1 with text `good bye world!` and attach to a window with title `Good Bye` and emoji `👋` having 300x200 size\ncreate a h3 element with the text "here\ncreate a window with title `Toolbar` and emoji `🛠`\ncreate a toolbar on window and add button with text `👋` that alerts `clicked` on callback\nattach the h3 element to the window')
-window.os.fs.write('/sources/registry/extension.txt', 'Package: extension\ncreate a new function `registerExtension` on `window.os` object that takes an extension, an emoji and a callback function with the following functionality:\n - stores on the `window.os.registry` object the extension as key and emoji and callback as value')
-window.os.fs.write('/sources/registry/app-icon.txt', 'Package: app-icon\ncreate jsdoc and function `getOSIcon` on `window.os` object having a path and callback parameter with the following functionality:\n- create a root element `div` having the class `icon`\n- save isFile to constant\n- add a span element with class `emoji` and content 📄 if isFile, 📁 otherwise\n- add a div element with class title containing the name from path\n- extract extension from path and search if is registered in the `window.os.registry` object\n- sets `currentCallback` to function parameter callback\n- if extension is registered reads stores it in a `extData` property and:\n   - adds span element with class `app-emoji` with the content of `extData.emoji` \n   - sets the `currentCallback` to a function that calls `extData.callback` with the path\n- exit condition and add click listener to the root element that calls `currentCallback` with the path\n- return the root element')
-window.os.fs.write('/sources/registry/registry.txt', 'Package: registry\ncreate a new function `registerApplication` on the `window.os` object and jsdoc that takes a title, emoji, callback, width=400 and height = 400 and a an array of extensions being undefined by default having the following functionality:\n- define an internal `execute` that takes a spread params:\n  - creates a new window instance with the title, emoji, width and height and saves it to a constant\n  - attach to window the result of calling the callback with the window instance and spread params\n- if extensions is defined, call `registerExtension` for each extension with extension, emoji and the execute function\n- call addApp with the emoji, title and callback that calls the execute function with no parameters')
-window.os.fs.write('/sources/registry/hello-world.txt', 'Package: hello-world\nCreate a `helloWorld` function that takes a parent and path parameter:\n - creates and returns a root element `div` having an h1 child element with "Hello World" text\n - if path is defined append a pre element containing the content of reading the file at the path\n - returns the root element\nafter definition, register application with "hello world" title, 👋 as emoji, `helloWorld` function and 300x200 size')
-window.os.fs.write('/sources/apps/styles.txt', 'Package: styles\ncss to style .browser class to have display flex and flex-wrap wrap')
-window.os.fs.write('/sources/apps/simple-run.txt', 'Package: simple-run\nCreate an `application` function that takes a parent parameter having the following functionality:\n - create a root dom element with class `chat`\n - create an input element with 100% width with keyup event listener that on enter key press:\n   - save the input value to instruction variable and clear the input\n   - POST the json having instruction and full as false to `/`, on response add a script tag to the body with id `run-script` and add the response text content to the script tag\n - return dom element\ncall register application with "Run" title, ▶️ as emoji, already defined `application` function reference and 400x70 size')
-window.os.fs.write('/sources/apps/editor.txt', 'Package: editor\nCreate a `editor` function that takes a window and path parameter:\n - create a dom element with class `editor`\n - add a textarea element to the previously created element 100% width and 100% height\n - save reference to the textarea element\n - create toolbar on the `window` parameter\n - if path is not empty, read the file content and set it to the textarea\n - add button on the toolbar with `💾` text save textarea content to the path if path is defined, prompt for the path otherwise\n - return  dom element\n\ncall register application with "Editor" title, ✍️ as emoji, `editor` function reference and 400x450 size for [txt,doc] extensions')
-window.os.fs.write('/sources/apps/browser.txt', 'Package: browser\n1. Create a `browser` function that takes a win and path defaulting to "" parameter:\n - create a container dom element with class `browser`\n - set browserPath to path or `""` if path is undefined or not string\n - generate internal load function that takes path parameter:\n   - set browserPath to path\n   - removes all children of the container element\n   - if path is not empty, create a new `div` with class icon, inner element `.emoji` with internal span element having content "🔙"  and class `emoji` and on click call load with `path.split("/").slice(0, -1).join("/")`\n   - ls all files in the path and for each item:\n      - call `getOsIcon` with path+"/"+item and load function as callback\n      - add a checkbox with value path+"/"+item that prevent event bubbling\n - execute load on browserPath variable\n - create toolbar\n - call `addButton` on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name\n - call `addButton` on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and "" as content\n - call `addButton` on the toolbar with `🗑️` text and list all the selected checkbox values, removes them and calls load on the current path\n - return dom element\nCall register application with "Browser" title, 📂 as emoji, browser and 450x400 size')
-window.os.fs.write('/sources/apps/assistant-styles.txt', 'Package: assistant-styles\nstyle .chat class to have display flex and flex-direction column\nstyle .results class to have 100% width and 300px height, overflow-y scroll and margin 10px\nstyle .results pre to have white-space pre-wrap')
-window.os.fs.write('/sources/apps/assistant.txt', 'Package: assistant\nCreate a `assistant` function that takes a parent parameter:\n - create a root dom element with class `chat`\n - create a div element with 100% width and 300px height with class `results`\n - create an input element with 100% width\n - add a button with `➡️` text and on click:\n   - save the input value to instruction variable and clear the input\n   - POST the json having instruction and full as true to `/`, on response add pre tag with the response text content to the results\n return dom element\ncall register application with "Assistant" title, 👨🏽‍⚕️ as emoji, already defined `assistant` function reference and 400x400 size')
-window.os.fs.write('/sources/apps/photobooth.txt', 'Package: photobooth\ncreate a local photoBooth function that takes no parameters:\n- create a root dom element, do not style it\n- append browser webcam capture video element with autoplay on\n- add a button with text "Take Snapshot" that takes an image snapshot of the video and saves it to "photobooth/image+{timestamp}.png" and notify the user: "Snapshot saved to {path}"\n- return root dom element\ncall register application with "Photobooth" title, 📸 as emoji, function reference and 410x360 size')
-window.os.fs.write('/sources/apps/image.txt', 'Package: image\nCreate a local `imageViewer` and generate jsdoc for it function that takes two parameters: `unused` and `path`  with the following functionality:\nreads file content as base64 string from the path to a variable `content`\nremove data:image/png;base64, or data:image/jpeg;base64 from the content\ncreate image element with src to content\nmake the image fill the entire parent content\nreturn image element\ncall register application with "Image Viewer" title, 🖼️ as emoji, `imageViewer` function reference and 650x520 size and [png,jpg,jpeg] as extensions')
-window.os.fs.write('/sources/development/run.txt', 'Package: run\ncreate a new function `window.os.runApp` object that takes a callback, width and height defaulting to 500 and 400, having the following functionality:\n  - creates a new window instance with the `Development` title , 🔥 emoji, width and height and saves it to a constant\n  - attach to window the result of calling the callback with the window instance')
-window.os.fs.write('/sources/development/ide.txt', 'Package: ide\nCreate `compile` function that takes a source parameter and:\n - remove the script tag with id `run-script` if exists\n - fetch post  to `/` with a json having {instruction: source}, and on response create a script tag with id `run-script` and add the response text content to the script tag\n - add end function comment\n1. Create an `ide` function that takes a win and path parameter: \n - create a root dom element with class `ide`\n - create a textarea element with 100% width and 500px height\n - if path is not empty, read the file content and set it to the textarea\n - create toolbar on win\n - add button on the toolbar with `▶️` text and on click execute `compile` function with textarea content\n - add button on the toolbar with `💾` text and on click fs.write textarea content to the path if path is defined, prompt for the path otherwise\n - return dom element\n2. Call register application with "IDE" title, 🧠 as emoji, already defined `ide` function reference and 800x600 size and register for ["script"] extensions')
-window.os.fs.write('/sources/games/styles.txt', 'Package: styles\ncss style for a .gmroot class to follow the following rules:\n- `.gmroot` is a flex container with column direction, centered content, margin of 2px, padding of 4px, background color of white\n- `.row` is display flex with row direction, centered content\n- `.cell` classes in `.gmroot` be the size of 22px by 22px, inline flex with content centered vertically and horizontally, 2px rounded dark grey border 1px width, margin of 1px, monospace font\n- `.cell.visited` class to have a background color of white, 1px white border\n- `.score` class to have a margin of 4px, monospace font, bold, centered text, background color of white, 2px rounded white border')
-window.os.fs.write('/sources/games/minesweper.txt', 'Package: minesweper\nCreate a callback function `minesweeper` that:\n - creates a root dom element with the class `gmroot`\n - generate a matrix of 8x8 with values 0\n - pick a random of 10 cells and set their value to -40 and increase the number value of the neighbouring cells\n - set score to 64\n - add a div with the class `score` and the content `Discovered: 64` to the root dom element\n - iterate through the matrix and for each row add a div element with the class `.row` and for each item add a div with the class `cell`,  ` ` as content and add data-x and data-y as attributes. when the div is clicked call `reveal` function for the current x and y\n - define internal function reveal that:\n   - get div at x and y using data-x and data-y attributes\n   - if the div is already revealed return\n   - set the div content to the value of the cell and add class `.visited` to the div\n   - if the div has am integer value smaller than 0 set the div content to `💣` and call `alert` with the message `Game Over` and the title `💣 minesweeper`\n   - else decrease the score by 1 and update the score div content to `Discovered: ${score}`\n   - if the div has an integer value of 0 call `reveal` for all the neighbouring cells\n - return root element\nCall register application with "Minesweeper" title, 💣 as emoji, `minesweeper` callback function reference and 300x300 size')
   </script>
  </body>
 </html>

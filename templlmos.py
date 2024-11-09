@@ -24,10 +24,10 @@ with open(descriptor, "r") as read_file:
     data = json.load(read_file)
 
 # llm = LLM(data["models"])
-llm = ChatGPT()
+# print("Avaialble models:")
+# print(llm.runtime_models.keys())
 
-print("Avaialble models:")
-print(llm.runtime_models.keys())
+llm = ChatGPT()
 
 recompile = args.recompile
 

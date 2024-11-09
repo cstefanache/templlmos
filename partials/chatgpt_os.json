@@ -9,55 +9,21 @@
                 ]
             ]
         },
+        "logo": {
+            "to": "body",
+            "tag": "span",
+            "instructions": [
+                [
+                    "SVG dom element, fixed centered on the screen, with a width of 100px and height of 100px of a line art temple logo and the text that says 'TempLLM OS'"
+                ]
+            ]
+        },
         "global-objects": {
             "to": "head",
             "tag": "script",
             "instructions": [
                 [
                     "Create a new empty object `os` on the window global object"
-                ]
-            ]
-        },
-        "about": {
-            "to": "head",
-            "tag": "script",
-            "rebuild": false,
-            "library": true,
-            "instructions": [
-                [
-                    "- Define the `window.os.about` function that returns 'TempLLMOS is an experimental WebOS controlled by a Large Language Model."
-                ],
-                [
-                    "- Define the `window.os.log` that takes a single parameter and calls console.log function"
-                ]
-            ]
-        },
-        "logo": {
-            "to": "body",
-            "tag": "script",
-            "disabled": false,
-            "rebuild": false,
-            "library": false,
-            "dependencies": [
-            ],
-            "instructions": [
-                [
-                    "js that creates an image element with source: https://github.com/cstefanache/templlmos/blob/main/assets/logos.png?raw=true with id #logo, absolute position, middle of the body document, give it 20% opacity"
-                ]
-            ]
-        },
-        "tests": {
-            "to": "body",
-            "tag": "script",
-            "disabled": false,
-            "rebuild": false,
-            "library": false,
-            "dependencies": [
-                "about"
-            ],
-            "instructions": [
-                [
-                    "execute log with the about message"
                 ]
             ]
         }

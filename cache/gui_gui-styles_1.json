@@ -1,6 +1,0 @@
-{
-    "crc": 1587044924,
-    "compiled_instruction": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\nGiven the following already defined functions:\n \n\n css style for a .window class to follow the following rules:\n- white background color\n- disable text selection\n- a border of 2px solid black\n- a border-radius of 8px\n- hidden overflow\n- a box-shadow of 4px 4px 0 0 rgba(0,0,0,0.5)\n- absolute position\n- display of flex and flex-direction of column\n- inner .contentPlaceholder class should have a padding of 5px, flex-grow of 1 and overflow of auto\n- inner .statusPlaceholder class should have  a border-top of 1px solid black and a monospaced small text \n### Response:\n",
-    "output": ".window {\n    position: absolute;\n    display: flex;\n    flex-direction: column;\n    border: 2px solid black;\n    border-radius: 8px;\n    box-shadow: 4px 4px 0 0 rgba(0,0,0,0.5);\n    overflow: hidden;\n    background-color: white;\n    -webkit-user-select: none; /* Safari */\n    -ms-user-select: none; /* IE 10+ */\n    user-select: none; /* Standard syntax */\n}\n\n.contentPlaceholder {\n    padding: 5px;\n    flex-grow: 1;\n    overflow: auto;\n}\n\n.statusPlaceholder {\n    border-top: 1px solid black;\n    font-family: monospace;\n    font-size: small;\n}\n\n",
-    "library": ""
-}

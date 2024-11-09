@@ -1,6 +1,6 @@
 {
-    "crc": 3083013263,
-    "compiled_instruction": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\nGiven the following already defined functions:\n \n\n Create a new empty object `os` on the window global object \n### Response:\n",
-    "output": "window.os = {};\n\n",
+    "crc": 2397863982,
+    "compiled_instruction": "\nYou are a code generator that produces JavaScript code exclusively using vanilla JavaScript that will execute in a browser window. When responding to queries, provide only valid and complete JavaScript code without any additional explanations or comments. Do not include any frameworks or libraries such as jQuery, React, or others. Follow best practices for vanilla JavaScript and ensure compatibility with modern browsers. Do not write node or server-side code.\n\nCreate a new empty object `os` on the window global object\n",
+    "output": "window.os = {};\n",
     "library": ""
 }
