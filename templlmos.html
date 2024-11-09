@@ -14,131 +14,158 @@ window.os = {};
   </script>
   <script id="osbase_filesystem">
    (() => {
-// Load the filesystem object from local storage or create a default one
-const filesystem = JSON.parse(localStorage.getItem('filesystem')) || {
-    'about.txt': 'Welcome to TempLLMOS'
-};
-localStorage.setItem('filesystem', JSON.stringify(filesystem));
+(function() {
+    if (!window.os) {
+        window.os = {};
+    }
+    if (!window.os.fs) {
+        window.os.fs = {};
+    }
 
-// Define the os.fs object
-window.os = window.os || {};
-window.os.fs = {};
+    const fsKey = 'filesystem';
+    let filesystem = JSON.parse(localStorage.getItem(fsKey)) || {
+        'about.txt': 'Welcome to TempLLMOS'
+    };
 
-/**
- * Processes and returns a path by taking into account '..', '//' and '/'.
- * @param {string} path - The path to process.
- * @returns {string|null} - The processed path or null if invalid.
- */
-window.os.fs.getPath = function(path) {
-    const parts = path.split('/').filter(part => part !== '' && part !== '.');
-    const stack = [];
-    for (const part of parts) {
-        if (part === '..') {
-            if (stack.length > 0) {
-                stack.pop();
+    /**
+     * Saves the filesystem object to local storage.
+     * @function
+     */
+    window.os.fs.sync = function() {
+        localStorage.setItem(fsKey, JSON.stringify(filesystem));
+    };
+
+    /**
+     * Processes and returns a path, handling '..', '//' and '/'.
+     * @param {string} path - The path to process.
+     * @returns {string|null} - The processed path or null if invalid.
+     */
+    window.os.fs.getPath = function(path) {
+        const parts = path.split('/').filter(Boolean);
+        const stack = [];
+        for (const part of parts) {
+            if (part === '..') {
+                if (stack.length > 0) {
+                    stack.pop();
+                } else {
+                    return null;
+                }
+            } else {
+                stack.push(part);
+            }
+        }
+        return '/' + stack.join('/');
+    };
+
+    /**
+     * Checks if the path is valid.
+     * @param {string} path - The path to check.
+     * @returns {boolean} - True if valid, false otherwise.
+     */
+    window.os.fs.isValidPath = function(path) {
+        return typeof path === 'string' && path.startsWith('/');
+    };
+
+    /**
+     * Returns a list of entries in the filesystem object at the given path.
+     * @param {string} path - The path to list entries from.
+     * @returns {Array} - An array of entries.
+     */
+    window.os.fs.ls = function(path) {
+        const processedPath = this.getPath(path);
+        if (!this.isValidPath(processedPath)) return [];
+        const parts = processedPath.split('/').filter(Boolean);
+        let current = filesystem;
+        for (const part of parts) {
+            if (current[part]) {
+                current = current[part];
+            } else {
+                return [];
+            }
+        }
+        return Object.keys(current);
+    };
+
+    /**
+     * Creates an empty object at the given path.
+     * @param {string} path - The path to create the directory at.
+     */
+    window.os.fs.mkdir = function(path) {
+        const processedPath = this.getPath(path);
+        if (!this.isValidPath(processedPath)) return;
+        const parts = processedPath.split('/').filter(Boolean);
+        let current = filesystem;
+        for (const part of parts) {
+            if (!current[part]) {
+                current[part] = {};
+            }
+            current = current[part];
+        }
+        this.sync();
+    };
+
+    /**
+     * Removes the object at the given path.
+     * @param {string} path - The path to remove the object from.
+     */
+    window.os.fs.rm = function(path) {
+        const processedPath = this.getPath(path);
+        if (!this.isValidPath(processedPath)) return;
+        const parts = processedPath.split('/').filter(Boolean);
+        let current = filesystem;
+        for (let i = 0; i < parts.length - 1; i++) {
+            if (current[parts[i]]) {
+                current = current[parts[i]];
+            } else {
+                return;
+            }
+        }
+        delete current[parts[parts.length - 1]];
+        this.sync();
+    };
+
+    /**
+     * Writes the content to an entry in the filesystem object at the given path.
+     * @param {string} path - The path to write to.
+     * @param {string} content - The content to write.
+     */
+    window.os.fs.write = function(path, content) {
+        const processedPath = this.getPath(path);
+        if (!this.isValidPath(processedPath)) return;
+        const parts = processedPath.split('/').filter(Boolean);
+        let current = filesystem;
+        for (const part of parts.slice(0, -1)) {
+            if (!current[part]) {
+                current[part] = {};
+            }
+            current = current[part];
+        }
+        current[parts[parts.length - 1]] = content;
+        this.sync();
+    };
+
+    /**
+     * Reads an entry split by '\n' in the filesystem object at the given path.
+     * @param {string} path - The path to read from.
+     * @returns {Array|null} - An array of lines or null if not found.
+     */
+    window.os.fs.read = function(path) {
+        const processedPath = this.getPath(path);
+        if (!this.isValidPath(processedPath)) return null;
+        const parts = processedPath.split('/').filter(Boolean);
+        let current = filesystem;
+        for (const part of parts) {
+            if (current[part]) {
+                current = current[part];
             } else {
                 return null;
             }
-        } else {
-            stack.push(part);
         }
-    }
-    return '/' + stack.join('/');
-};
+        return current.split('\n');
+    };
 
-/**
- * Checks if the path is valid.
- * @param {string} path - The path to check.
- * @returns {boolean} - True if valid, false otherwise.
- */
-window.os.fs.isValidPath = function(path) {
-    return typeof path === 'string' && path.startsWith('/') && !path.includes('//');
-};
-
-/**
- * Returns a list of entries in the filesystem object at the given path.
- * @param {string} path - The path to list entries from.
- * @returns {Array} - An array of entries.
- */
-window.os.fs.ls = function(path) {
-    const currentDir = filesystem;
-    const parts = path.split('/').filter(part => part !== '');
-    for (const part of parts) {
-        if (currentDir[part]) {
-            currentDir = currentDir[part];
-        } else {
-            return [];
-        }
-    }
-    return Object.keys(currentDir);
-};
-
-/**
- * Creates an empty object at the given path.
- * @param {string} path - The path where to create the object.
- */
-window.os.fs.mkdir = function(path) {
-    const parts = path.split('/').filter(part => part !== '');
-    let currentDir = filesystem;
-    for (const part of parts) {
-        if (!currentDir[part]) {
-            currentDir[part] = {};
-        }
-        currentDir = currentDir[part];
-    }
-};
-
-/**
- * Removes the object at the given path.
- * @param {string} path - The path of the object to remove.
- */
-window.os.fs.rm = function(path) {
-    const parts = path.split('/').filter(part => part !== '');
-    let currentDir = filesystem;
-    for (let i = 0; i < parts.length - 1; i++) {
-        if (currentDir[parts[i]]) {
-            currentDir = currentDir[parts[i]];
-        } else {
-            return;
-        }
-    }
-    delete currentDir[parts[parts.length - 1]];
-};
-
-/**
- * Writes the content to an entry in the filesystem object at the given path.
- * @param {string} path - The path where to write the content.
- * @param {string} content - The content to write.
- */
-window.os.fs.write = function(path, content) {
-    const parts = path.split('/').filter(part => part !== '');
-    let currentDir = filesystem;
-    for (let i = 0; i < parts.length - 1; i++) {
-        if (!currentDir[parts[i]]) {
-            currentDir[parts[i]] = {};
-        }
-        currentDir = currentDir[parts[i]];
-    }
-    currentDir[parts[parts.length - 1]] = content;
-};
-
-/**
- * Reads an entry split by '\n' in the filesystem object at the given path.
- * @param {string} path - The path of the file to read.
- * @returns {Array|null} - An array of lines or null if not found.
- */
-window.os.fs.read = function(path) {
-    const parts = path.split('/').filter(part => part !== '');
-    let currentDir = filesystem;
-    for (const part of parts) {
-        if (currentDir[part]) {
-            currentDir = currentDir[part];
-        } else {
-            return null;
-        }
-    }
-    return currentDir.split('\n');
-};
+    window.os.fs.sync();
+})();
 
 })()
   </script>
@@ -201,11 +228,11 @@ window.os.fs.read = function(path) {
   <script id="osbase_outputs">
    (() => {
 const asciiArt = `
-TTTTT  EEEEE  M   M  PPPP   L     L      MM   MM      OOO   SSSS
-  T    E      MM MM  P   P  L     L      MMM MMM     O   O S
-  T    EEEE   M M M  PPPP   L     L      M M M M     O   O  SSSS
-  T    E      M   M  P      L     L      M   M M     O   O     S
-  T    EEEEE  M   M  P      LLLLL LLLLL  M   M M      OOO  SSSS
+TTTTT  EEEEE  M   M  PPPP   L     L      M   M      OOO   SSSS
+  T    E      MM MM  P   P  L     L     MM MM     O   O S
+  T    EEEE   M M M  PPPP   L     L     M M M     O   O  SSSS
+  T    E      M   M  P      L     L     M   M     O   O     S
+  T    EEEEE  M   M  P      LLLLL LLLLL M   M      OOO  SSSS
 `.replace(/ /g, '.');
 
 window.os.fs.write('/logo.txt', asciiArt);
@@ -217,7 +244,7 @@ window.os.fs.write('/logo.txt', asciiArt);
 let currentPath = '/';
 
 /**
- * Changes the current path to the specified path.
+ * Changes the current directory to the specified path.
  * @param {string} path - The path to change to.
  */
 function cd(path) {
@@ -233,6 +260,7 @@ function pwd() {
 }
 
 const bin = {
+    sync: window.os.fs.sync,
     getPath: window.os.fs.getPath,
     isValidPath: window.os.fs.isValidPath,
     ls: window.os.fs.ls,
@@ -245,24 +273,24 @@ const bin = {
 };
 /**
  * Executes a command with the given parameters, processing the path accordingly.
- * @param {string} commandString - The command string to execute.
+ * @param {string} input - The command string to execute.
  * @returns {any} - The result of the command execution or an error message.
  */
-function execute(commandString) {
-    const args = commandString.split(' ');
+function execute(input) {
+    const args = input.match(/(?:[^\s"]+|"[^"]*")+/g);
     let path = currentPath;
-    const command = 'bin.' + args[0];
-
+    const command = `bin.${args[0]}`;
+    
     if (args[1]) {
         if (!args[1].startsWith('/')) {
-            path = window.os.fs.getPath(currentPath + '/' + args[1]);
+            path = window.os.fs.getPath(`${currentPath}/${args[1]}`);
         } else {
             path = window.os.fs.getPath(args[1]);
         }
     }
 
     try {
-        return eval(`${command}('${path}'${args.slice(2).map(arg => `, '${arg}'`).join('')})`);
+        return eval(`${command}("${path}", ${args.slice(2).map(arg => `"${arg}"`).join(', ')})`);
     } catch (error) {
         return error.message;
     }
@@ -275,31 +303,27 @@ window.apps.terminal = function() {
 
     const terminalOutput = document.createElement('div');
     terminalOutput.className = 'terminal-output';
-    terminal.appendChild(terminalOutput);
-
     const welcomeLine = document.createElement('div');
     welcomeLine.className = 'terminal-line';
     welcomeLine.textContent = 'Welcome to TempLLM OS';
     terminalOutput.appendChild(welcomeLine);
+    terminal.appendChild(terminalOutput);
 
     const terminalInput = document.createElement('div');
     terminalInput.className = 'terminal-input';
-    terminal.appendChild(terminalInput);
-
-    const prefix = document.createElement('span');
+    const prefix = document.createElement('div');
     prefix.className = 'prefix';
     prefix.textContent = '>';
+    const input = document.createElement('input');
+    input.className = 'terminal-input-text';
     terminalInput.appendChild(prefix);
-
-    const inputText = document.createElement('input');
-    inputText.className = 'terminal-input-text';
-    terminalInput.appendChild(inputText);
+    terminalInput.appendChild(input);
+    terminal.appendChild(terminalInput);
 
     function output(value, color = 'white') {
         const line = document.createElement('div');
         line.className = 'terminal-line';
         line.style.color = color;
-
         if (Array.isArray(value)) {
             value.forEach(item => {
                 const itemLine = document.createElement('div');
@@ -313,15 +337,15 @@ window.apps.terminal = function() {
         }
     }
 
-    inputText.addEventListener('keydown', function(event) {
+    input.addEventListener('keydown', function(event) {
         if (event.key === 'Enter') {
             const currentTime = new Date().toLocaleTimeString();
-            const content = inputText.value;
+            const content = input.value;
             output(`[${currentTime}] ${content}`, 'yellow');
             const result = execute(content);
             output(result);
-            inputText.value = '';
-            inputText.focus();
+            input.value = '';
+            input.focus();
         }
     });
 
@@ -332,6 +356,18 @@ document.body.appendChild(window.apps.terminal());
 })()
   </script>
   <script>
+   window.os.fs.write('/sources/chatgpt_os/general-styles.txt', 'Package: general-styles\ncss to apply a #FFF4DF background color to the body and overflow hidden')
+window.os.fs.write('/sources/chatgpt_os/logo.txt', 'Package: logo\nSVG dom element, fixed centered on the screen, with a width of 100px and height of 100px of a line art temple logo and the text that says "TempLLM OS"')
+window.os.fs.write('/sources/chatgpt_os/global-objects.txt', 'Package: global-objects\nCreate a new empty object `os` on the window global object')
+window.os.fs.write('/sources/chatgpt_filesystem/filesystem.txt', 'Package: filesystem\nLoad the `filesystem` object from the local storage as json, if it does not exist create an empty object with a property `about.txt` with the content `Welcome to TempLLMOS`\nDefine the following functions on the window.os.fs object:\n `sync` - save the filesystem object to the local storage that will be called by the other functions that modify the filesystem object\n `getPath` - process and return a path by taking into account `..`, `//` and `/`. return null if the path is invalid\n `isValidPath` - checks if the path is valid\n `ls` - returns a list of entries in the filesystem object at the given path\n `mkdir` - creates an empty object at the given path\n `rm` - removes the object at the given path\n `write` - writes the content to an entry in the filesystem object at the given path\n `read` - reads an entry split by `\n` in the filesystem object at the given path, last element in path is the file name')
+window.os.fs.write('/sources/chatgpt_filesystem/outputs.txt', 'Package: outputs\ncall write with the path `/logo.txt` and ascii art of text `TempLLM OS` fill empty spaces with .')
+window.os.fs.write('/sources/chatgpt_filesystem/utils.txt', 'Package: utils\nDefine a function `cat` on `window.os` namespace that takes a path as a parameter and returns the content of the file split by `\n` ')
+window.os.fs.write('/sources/chatgpt_filesystem/fs-tests.txt', 'Package: fs-tests\ncreate a new directory in the root directory called `fstest`\ncreate a new file in the `fstest` directory called `test.txt` with the content `hello world`\nlist the entries in the `fstest` directory and log it to console\nread the content of the `fstest/test.txt` file and log it to console\nremove the `fstest` directory')
+window.os.fs.write('/sources/chatgpt_terminal/terminal-style.txt', 'Package: terminal-style\ndefine a terminal class with the following css properties\n- width: 100%\n- height: 100%\n- background-color: black\n- color: white\n- font-family: monospace\n- overflow: hidden\n- display: flex\n- flex-direction: column\ndefine a terminal-output class with the following css properties\n- flex: 1\n- overflow-y: auto\n- padding: 10px\n- display: flex\n- flex-direction: column-reverse\ndefine a terminal-line class with the following css properties\n- display: flex\n- flex-direction: row\n- overflow-wrap: anywhere\ndefine a terminal-input class with the following css properties\n- display: flex\n- flex-direction: row\ndefine a terminal-input-text class with the following css properties\n- background-color: transparent\n- border: none\n- color: white\n- font-family: monospace\n- font-size: 16px\n- flex: 1\n- outline: none')
+window.os.fs.write('/sources/chatgpt_terminal/terminal-runtime.txt', 'Package: terminal-runtime\nkeep a local variable called currentPath with value "/"\ndefine a local function `cd` that takes a string parameter and sets currentPath to it\ndefine a local function `pwd` that returns the parent scope defined currentPath\ndefine and object called bin and referece functions from objects:\n - window.os.fs\n - `cd` and `pwd` functions\ncurrentPath is defined in parent scope\ndefine a function `execute` that takes a string parameter and:\n - splits the string by space but keeps in a single element if it is in quotes\n - set path to currentPath\n - the first element is the command and prepend `bin.` to it\n - if the second element exists:\n    - if it does not start with `/`, prepend `currentPath` to it and assign it to path after calling `getPath` on it\n    - if it starts with `/`, assign it to path after calling `getPath` on it\n - return eval of `command` with `path` and rest of the parameters from the list as string arguments\n - if the eval throws an error, return the error message\ndefine a function `terminal` on window.apps that creates a root element with class terminal and returns it at the end\ncreate the following dom structure:\n - .terminal\n   - .terminal-output\n     - .terminal-line with text "Welcome to TempLLM OS"\n   - .terminal-input\n     - .prefix with text ">"\n     - input.terminal-input-text\ndefine inner function called output that takes two parameters: value and color with default value white. The function prepends a div with class terminal-line having color style as provided in the function and the value as text to the terminal-output div. if the value is a list then prepend each item in the list as a separate div\nwhen the user hits the enter key on the input take the content call the output function with the content prefixed with `[%current_time%]` and color yellow, call `output` with the resul of calling `execute` function with the value of the input, clear the input and focus it again\nappend to the body the dom element resulted from executing the terminal function')
+  </script>
+  <script>
+   window.os.fs.write('/presentation.md', '# Introduction\n\n## Hello World\n\n# What\n\n## Can LLM Write Good OS?\n\n### Don"t know\n\n# First\n\n## Can LLM Write Bad OS?\n\n### Let"s try')
   </script>
  </body>
 </html>

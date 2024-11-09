@@ -26,7 +26,8 @@ class Compiler:
         print(output)
         print("#"*80)
         if single_group:
-            result = re.search(r"```[a-z]+\n(.*?)```", output, re.DOTALL).group(1)
+            result = re.search(r"```[a-z]+\n(.*?)```",
+                               output, re.DOTALL).group(1)
             return result
         else:
             groups = re.findall(r"```[a-z]+\n(.*?)```", output, re.DOTALL)
@@ -96,13 +97,15 @@ class Compiler:
                         with open(cache_file_name, "r") as file:
                             cache_data = json.load(file)
                             if cache_data["crc"] == crc or preventRebuild:
-                                print(f"Using cache for {app}_{package_id}_{index}...")
+                                print(
+                                    f"Using cache for {app}_{package_id}_{index}...")
                                 skip_compilation = True
                                 output_src = cache_data["output"]
                                 package_src += cache_data["output"]
 
                     if not skip_compilation:
-                        print(f"----------[ {app} {package_id} {index} ]----------")
+                        print(
+                            f"----------[ {app} {package_id} {index} ]----------")
                         print(compiled_instruction)
                         result = self.llm.execute(
                             instruction, compiled_dependencies, to, tag, library
@@ -129,7 +132,8 @@ class Compiler:
                     with open(f"{DEBUG}/{app}_{package_id}_{index}.md", "w") as file:
                         file.write(f"## {app}_{package_id}_{index}\n")
                         file.write("### API\n")
-                        file.write(f"<pre style='text-wrap: wrap'>{local_api}</pre>\n")
+                        file.write(
+                            f"<pre style='text-wrap: wrap'>{local_api}</pre>\n")
 
                         file.write("### Instruction\n")
                         file.write(
@@ -184,7 +188,8 @@ class Compiler:
                 package_library_suffix = package.get(
                     "librarySuffix", app_library_suffix
                 )
-                package_deps_prefix = package.get("depsPrefix", app_deps_prefix)
+                package_deps_prefix = package.get(
+                    "depsPrefix", app_deps_prefix)
                 model = package.get("model", app_model)
                 dependencies = package.get("dependencies", [])
                 disabled = package.get("disabled", False)
@@ -221,7 +226,8 @@ class Compiler:
                 for index, instruction_set in enumerate(instructions):
                     local_api = ""
                     instruction = "\n".join(instruction_set)
-                    dep_prefix = prefix.replace("{deps}", compiled_dependencies)
+                    dep_prefix = prefix.replace(
+                        "{deps}", compiled_dependencies)
                     compiled_instruction = f"{dep_prefix} {instruction} {suffix}"
 
                     cache_file_name = f"{CACHE}/{app}_{package_id}_{index}.json"
@@ -236,13 +242,15 @@ class Compiler:
                         with open(cache_file_name, "r") as file:
                             cache_data = json.load(file)
                             if cache_data["crc"] == crc or preventRebuild:
-                                print(f"Using cache for {app}_{package_id}_{index}...")
+                                print(
+                                    f"Using cache for {app}_{package_id}_{index}...")
                                 skip_compilation = True
                                 output_src = cache_data["output"]
                                 package_src += cache_data["output"]
 
                     if not skip_compilation:
-                        print(f"----------[ {app} {package_id} {index} ]----------")
+                        print(
+                            f"----------[ {app} {package_id} {index} ]----------")
                         print(compiled_instruction)
                         result = self.llm.call_llm(
                             model, compiled_instruction, update_response=update_response
@@ -269,7 +277,8 @@ class Compiler:
                     with open(f"{DEBUG}/{app}_{package_id}_{index}.md", "w") as file:
                         file.write(f"## {app}_{package_id}_{index}\n")
                         file.write("### API\n")
-                        file.write(f"<pre style='text-wrap: wrap'>{local_api}</pre>\n")
+                        file.write(
+                            f"<pre style='text-wrap: wrap'>{local_api}</pre>\n")
 
                         file.write("### Instruction\n")
                         file.write(
@@ -328,11 +337,12 @@ class Compiler:
                         for instruction_set in package.get("instructions", []):
                             source.append("\n".join(instruction_set))
                         all_escaped_sources = (
-                            "\n".join(source).replace("'", '"').replace("\n", "\\n")
+                            "\n".join(source).replace(
+                                "'", '"').replace("\n", "\\n")
                         )
-                        continue
+                        # continue
                         sources.append(
-                            f"window.os.write('/sources/{partial[:-5]}/{package_id}.txt', '{all_escaped_sources}')"
+                            f"window.os.fs.write('/sources/{partial[:-5]}/{package_id}.txt', '{all_escaped_sources}')"
                         )
                 self.compile(
                     partial_data, html, self.api, update_response=update_response
@@ -340,6 +350,18 @@ class Compiler:
 
         gen = "\n".join(sources)
         html["body"]["_children_"].append(f"<script>{gen}</script>")
+
+        # read presentation.md file
+        with open("./presentation.md", "r") as file:
+            presentation = file.read()
+
+            presentation = presentation.replace(
+                "'", '"').replace("\n", "\\n")
+
+            print(presentation)
+
+            html["body"]["_children_"].append(
+                f"<script>window.os.fs.write('/presentation.md', '{presentation}')</script>")
 
         with open(f"{DEBUG}/compiled.json", "w") as file:
             json.dump(html, file, indent=4)

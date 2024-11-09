@@ -9,6 +9,7 @@
                 [
                     "Load the `filesystem` object from the local storage as json, if it does not exist create an empty object with a property `about.txt` with the content `Welcome to TempLLMOS`",
                     "Define the following functions on the window.os.fs object:",
+                    " `sync` - save the filesystem object to the local storage that will be called by the other functions that modify the filesystem object",
                     " `getPath` - process and return a path by taking into account `..`, `//` and `/`. return null if the path is invalid",
                     " `isValidPath` - checks if the path is valid",
                     " `ls` - returns a list of entries in the filesystem object at the given path",
