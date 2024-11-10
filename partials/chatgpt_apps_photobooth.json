@@ -1,0 +1,50 @@
+{
+    "apps": {
+        "photobooth": {
+            "disabled": false,
+            "rebuild": false,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "filesystem",
+                "registry",
+                "toolbar",
+                "notification"
+            ],
+            "instructions": [
+                [
+                    "create a local photoBooth function that takes a window parameter:",
+                    "- create a root dom element, do not style it",
+                    " - create toolbar on the `window` parameter",
+                    "- append browser webcam capture video element with autoplay on",
+                    "- add a button to the toolbar with `📸` text that takes an image snapshot of the video and saves it to 'photobooth/image+{timestamp}.png' and notify the user: 'Snapshot saved to {path}'",
+                    "- return root dom element"
+                ],[
+                    "call register application with 'Photobooth' title, 📸 as emoji, function reference and 410x360 size"
+                ]
+            ]
+        },
+        "image": {
+            "disabled": false,
+            "rebuild": false,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "filesystem",
+                "registry"
+            ],
+            "instructions": [
+                [
+                    "Create a local `imageViewer` and generate jsdoc for it function that takes two parameters: `unused` and `path`  with the following functionality:",
+                    "reads file content as base64 string from the path to a variable `content`",
+                    "remove data:image/png;base64, or data:image/jpeg;base64 from the content",
+                    "create image element with src to content",
+                    "make the image fill the entire parent content",
+                    "return image element"
+                ],[
+                    "call register application with 'Image Viewer' title, 🖼️ as emoji, `imageViewer` function reference, 650x520 size for [png,jpg,jpeg] extensions"
+                ]
+            ]
+        }
+    }
+}

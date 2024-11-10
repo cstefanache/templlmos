@@ -1,0 +1,29 @@
+{
+    "apps": {
+        "editor": {
+            "disabled": false,
+            "rebuild": false,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "filesystem",
+                "toolbar",
+                "registry"
+            ],
+            "instructions": [
+                [
+                    "Create a `editor` function that takes a window and path parameter:",
+                    " - create a dom element with class `editor`",
+                    " - add a textarea element to the previously created element 100% width and 100% height",
+                    " - save reference to the textarea element",
+                    " - create toolbar on the `window` parameter",
+                    " - if path is not empty, read the file content and set it to the textarea",
+                    " - add button to the toolbar with `💾` text save textarea content to the path if path is defined, prompt for the path otherwise",
+                    " - return  dom element",
+                    "",
+                    "call register application with 'Editor' title, ✍️ as emoji, `editor` function reference and 400x450 size for [txt,doc] extensions"
+                ]
+            ]
+        }
+    }
+}

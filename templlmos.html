@@ -180,6 +180,7 @@ window.os = {};
     flex-wrap: wrap;
     flex-direction: column;
     align-content: flex-start;
+    user-select: none; /* Disable selection */
 }
   </style>
   <style id="desktop_notification-styles">
@@ -1218,6 +1219,111 @@ window.os.registerApplication('Browser', '📂', browser, 450, 400);
 
 })()
   </script>
+  <script id="apps_editor">
+   (() => {
+function editor(win, path) {
+    const editorElement = document.createElement('div');
+    editorElement.className = 'editor';
+
+    const textarea = document.createElement('textarea');
+    textarea.style.width = '100%';
+    textarea.style.height = '100%';
+    editorElement.appendChild(textarea);
+
+    const toolbar = window.os.gui.createToolbar(win);
+
+    if (path) {
+        const content = window.os.fs.read(path);
+        if (content) {
+            textarea.value = content.join('\n');
+        }
+    }
+
+    toolbar('💾', function() {
+        const savePath = path || prompt('Enter the path to save the file:');
+        if (savePath) {
+            window.os.fs.write(savePath, textarea.value);
+        }
+    });
+
+    return editorElement;
+}
+
+window.os.registerApplication('Editor', '✍️', editor, 400, 450, ['txt', 'doc']);
+
+})()
+  </script>
+  <script id="apps_photobooth">
+   (() => {
+function photoBooth(win) {
+    const root = document.createElement('div');
+    const toolbar = window.os.gui.createToolbar(win);
+    
+    const video = document.createElement('video');
+    video.autoplay = true;
+    root.appendChild(video);
+    
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            video.srcObject = stream;
+        })
+        .catch(error => {
+            console.error('Error accessing webcam:', error);
+        });
+
+    toolbar('📸', () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0);
+        
+        const timestamp = Date.now();
+        const path = `photobooth/image+${timestamp}.png`;
+        canvas.toBlob(blob => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                window.os.fs.write(path, reader.result);
+                window.os.gui.notification(`Snapshot saved to ${path}`);
+            };
+            reader.readAsDataURL(blob);
+        });
+    });
+
+    return root;
+}
+window.os.registerApplication('Photobooth', '📸', photoBooth, 410, 360);
+
+})()
+  </script>
+  <script id="apps_image">
+   (() => {
+/**
+ * Creates an image viewer that displays an image from a given path.
+ * @param {any} unused - Unused parameter.
+ * @param {string} path - The path to the image file.
+ * @returns {HTMLImageElement} - The image element that displays the image.
+ */
+window.imageViewer = function(unused, path) {
+    const content = window.os.fs.read(path);
+    if (content) {
+        const base64Content = content.join('\n').replace(/^data:image\/(png|jpeg);base64,/, '');
+        const img = document.createElement('img');
+        img.src = 'data:image/png;base64,' + base64Content;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        return img;
+    }
+    return null;
+};
+
+// Register the image viewer application
+window.os.registerApplication('Image Viewer', '🖼️', window.imageViewer);
+window.os.registerApplication('Image Viewer', '🖼️', window.imageViewer, 650, 520, ['png', 'jpg', 'jpeg']);
+
+})()
+  </script>
   <script>
    window.os.fs.write('/sources/chatgpt_os/general-styles.txt', 'Package: general-styles\ncss to apply a #FFF4DF background color to the body and overflow hidden')
 window.os.fs.write('/sources/chatgpt_os/logo.txt', 'Package: logo\nSVG dom element, fixed centered on the screen, with a width of 100px and height of 100px of a line art temple logo and the text that says "TempLLM OS"')
@@ -1226,7 +1332,7 @@ window.os.fs.write('/sources/chatgpt_filesystem/filesystem.txt', 'Package: files
 window.os.fs.write('/sources/chatgpt_filesystem/outputs.txt', 'Package: outputs\ncall write with the path `/logo.txt` and ascii art of text `TempLLM OS` fill empty spaces with .')
 window.os.fs.write('/sources/chatgpt_filesystem/utils.txt', 'Package: utils\nDefine a function `cat` on `window.os` namespace that takes a path as a parameter and returns the content of the file split by `\n` ')
 window.os.fs.write('/sources/chatgpt_filesystem/fs-tests.txt', 'Package: fs-tests\ncreate a new directory in the root directory called `fstest`\ncreate a new file in the `fstest` directory called `test.txt` with the content `hello world`\nlist the entries in the `fstest` directory and log it to console\nread the content of the `fstest/test.txt` file and log it to console\nremove the `fstest` directory')
-window.os.fs.write('/sources/chatgpt_desktop/content-style.txt', 'Package: content-style\ncss style the `#desktop_content` id to match the following rules:\nabsolute position, fixed size, 100% width, 100% height, overflow-y hidden, padding of 10px, display flex, flex-wrap wrap, flex-direction column, align content: flex start')
+window.os.fs.write('/sources/chatgpt_desktop/content-style.txt', 'Package: content-style\ncss style the `#desktop_content` id to match the following rules:\nabsolute position, fixed size, 100% width, 100% height, overflow-y hidden, padding of 10px, display flex, flex-wrap wrap, flex-direction column, align content: flex start, disable selection')
 window.os.fs.write('/sources/chatgpt_desktop/content.txt', 'Package: content')
 window.os.fs.write('/sources/chatgpt_desktop/notification-styles.txt', 'Package: notification-styles\ncss style the `#desktop_notifications` id to match the following rules:\nabsolute position, fixed size, 100% width, 100% height, overflow-y hidden, padding of 10px, display flex, flex-wrap wrap, flex-direction column, align content: flex start\ncss style the `.notification` class to match the following rules:\nwidth of 100%, padding of 10px, margin of 5px, border-radius of 5px, background color of #f1f1f1, display flex, justify content space-between, align items center')
 window.os.fs.write('/sources/chatgpt_desktop/icon-styles.txt', 'Package: icon-styles\ncss style the `.icon` class to match the following rules:\n1. 64px width, 64px min height, text-align center, margin of 5px, pointer cursor, position relative, display flex with a column flex direction\n2. containing `.emoji` class should be a block, have a font-size of 30px and inline-block display, position relative\n3. containing `.title` class should be a block, have a font-size of 8px, monospaced font, black text, padding of 5px, allow word-wrap to break word, black rounded border with white background\n4. containing `.app-emoji` class should be absolutely positioned  12px on the right of the icon and 20px top\n5. containing checkbox should be absolutely positioned  2px on the left of the icon and -6px top, with a 8px width and 8px height')
@@ -1252,6 +1358,9 @@ window.os.fs.write('/sources/chatgpt_apps_presenter/presenter-styles.txt', 'Pack
 window.os.fs.write('/sources/chatgpt_apps_presenter/presenter-logic.txt', 'Package: presenter-logic\ndefine a function called getSlideDOMElement that takes an array of strings as an argument\niterate the array and for each item:\n split item by `\n`\n   iterate the split result and for each line:\n     create a slide div element with class slide\n     generate html dom elements corresponding to the markdown syntax with headers, text, image and backtick as pre support and append them to the slide element\n   append the slide element to the result array\nreturn the result array\ndefine a function called getPresenterLayout that creates the following dom structure of divs:\n .presenter\n   .header\n     img[`https://www.itdays.ro/public/images/logo-gri.png`]\n     p`INNOVATION, PROGRAMMING AND TECHNOLOGIES`\n   .content\n   .footer\n     img[`https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg`]\nand return the .presenter element\ndefine a function called readFileContentSync that takes a path as an argument\n read the file provided in the argument and merge the output in a single string\ndefine a function called presenter on window.apps that takes a windowInstance and path string with default value "/itdays.md" as arguments\ngets the root element by executing getPresenterLayout and gets .content child as local reference\nexecute readFileContentSync with the argument and store value\nexecute getSlideDOMElement with the stored value split by `---` and append elements of result to the content element\nstarting with index 0, if the user presses arrow keys navigate through the slides by showing the slide at index\nreturns the root element\ncall register application with "Presenter" title, 📽️ as emoji, presenter function reference and 1200x680 size for [md] extensions')
 window.os.fs.write('/sources/chatgpt_apps_browser/styles.txt', 'Package: styles\ncss to style .browser class to have display flex and flex-wrap wrap')
 window.os.fs.write('/sources/chatgpt_apps_browser/browser.txt', 'Package: browser\n1. Create a `browser` function that takes a win and path defaulting to "" parameter:\n - create a container dom element with class `browser`\n - set browserPath to path or `""` if path is undefined or not string\n - generate internal load function that takes path parameter:\n   - set browserPath to path\n   - removes all children of the container element\n   - if path is not empty, create a new `div` with class icon, inner element `.emoji` with internal span element having content "🔙"  and class `emoji` and on click call load with `path.split("/").slice(0, -1).join("/")`\n   - ls all files in the path and for each item:\n      - call `getOsIcon` with path+"/"+item and load function as callback\n      - add a checkbox with value path+"/"+item that prevent event bubbling\n - execute load on browserPath variable\n - create toolbar\n - call `addButton` on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name\n - call `addButton` on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and "" as content\n - call `addButton` on the toolbar with `🗑️` text and list all the selected checkbox values, removes them and calls load on the current path\n - return dom element\nCall register application with "Browser" title, 📂 as emoji, browser and 450x400 size')
+window.os.fs.write('/sources/chatgpt_apps_editor/editor.txt', 'Package: editor\nCreate a `editor` function that takes a window and path parameter:\n - create a dom element with class `editor`\n - add a textarea element to the previously created element 100% width and 100% height\n - save reference to the textarea element\n - create toolbar on the `window` parameter\n - if path is not empty, read the file content and set it to the textarea\n - add button to the toolbar with `💾` text save textarea content to the path if path is defined, prompt for the path otherwise\n - return  dom element\n\ncall register application with "Editor" title, ✍️ as emoji, `editor` function reference and 400x450 size for [txt,doc] extensions')
+window.os.fs.write('/sources/chatgpt_apps_photobooth/photobooth.txt', 'Package: photobooth\ncreate a local photoBooth function that takes a window parameter:\n- create a root dom element, do not style it\n - create toolbar on the `window` parameter\n- append browser webcam capture video element with autoplay on\n- add a button to the toolbar with `📸` text that takes an image snapshot of the video and saves it to "photobooth/image+{timestamp}.png" and notify the user: "Snapshot saved to {path}"\n- return root dom element\ncall register application with "Photobooth" title, 📸 as emoji, function reference and 410x360 size')
+window.os.fs.write('/sources/chatgpt_apps_photobooth/image.txt', 'Package: image\nCreate a local `imageViewer` and generate jsdoc for it function that takes two parameters: `unused` and `path`  with the following functionality:\nreads file content as base64 string from the path to a variable `content`\nremove data:image/png;base64, or data:image/jpeg;base64 from the content\ncreate image element with src to content\nmake the image fill the entire parent content\nreturn image element\ncall register application with "Image Viewer" title, 🖼️ as emoji, `imageViewer` function reference, 650x520 size for [png,jpg,jpeg] extensions')
   </script>
   <script>
    window.os.fs.write('/itdays.md', '`Load the "filesystem" object from the local storage as json, if it does not exist create an empty object with a property "about.txt" with the content "Welcome to TempLLMOS"`,\n`Define the following functions on the window.os.fs object:`,\n` "sync" - save the filesystem object to the local storage that will be called by the other functions that modify the filesystem object`,\n` "ls" - returns a list of entries in the filesystem object at the given path`,\n` "mkdir" - creates an empty object at the given path`,\n` "rm" - removes the object at the given path`,\n` "write" - writes the content to an entry in the filesystem object at the given path`,\n` "read" - reads an entry split by \\n in the filesystem object at the given path, last element in path is the file name`\n---\n# LLMs: A Paradigm Shift in Operating Systems\n![image](https://avatars.githubusercontent.com/u/3071201?s=96&v=4)\n## cornel stefanache\n### cto@ascentcore\n### co-creator@monkeyuser.com\n---\n# Can LLM Write Good OS?\n---\n# Can LLM Write Bad OS?\n---\n# Let there be storage\n\n<code>\ntest\n</code>')
