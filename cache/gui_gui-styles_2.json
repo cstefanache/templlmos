@@ -1,0 +1,6 @@
+{
+    "crc": 3070726152,
+    "compiled_instruction": "\nYou are a code generator that produces CSS code exclusively. When responding to queries, provide only valid and complete CSS code without any additional explanations or comments. Do not include any HTML, JavaScript, or commentary unless explicitly asked to. Follow best practices for CSS and ensure compatibility across modern browsers.\n\ncss style for a  `.resizeHandle` class with the following rules:\n- a width and height of 0px\n- an absolute position\n- a bottom and right of 0\n- a cursor of se-resize\n- border width: 0 0 10px 10px\n- border style: solid\n- `border-color: transparent transparent #ff7200 transparent`\n- transform: rotate(0deg)\n",
+    "output": ".resizeHandle {\n    width: 0;\n    height: 0;\n    position: absolute;\n    bottom: 0;\n    right: 0;\n    cursor: se-resize;\n    border-width: 0 0 10px 10px;\n    border-style: solid;\n    border-color: transparent transparent #ff7200 transparent;\n    transform: rotate(0deg);\n}\n",
+    "library": ""
+}

@@ -1,7 +1,7 @@
 ## terminal_terminal-runtime_0
 ### API
 <pre style='text-wrap: wrap'>/**
- * Changes the current directory to the specified path.
+ * Changes the current path to the specified path.
  * @param {string} path - The path to change to.
  */
 function cd(path) { ... }
@@ -62,6 +62,17 @@ window.os.fs.write = function(path, content) { ... }
      */
 window.os.fs.read = function(path) { ... }
 
+/**
+ * Registers a new application with a title, emoji, callback, dimensions, and optional extensions.
+ * @param {string} title - The title of the application.
+ * @param {string} emoji - The emoji to display for the application.
+ * @param {Function} callback - The function to call when the application is executed.
+ * @param {number} [width=400] - The width of the application window.
+ * @param {number} [height=400] - The height of the application window.
+ * @param {Array} [extensions=undefined] - An optional array of extensions to register with the application.
+ */
+window.os.registerApplication = function(title, emoji, callback, width = 400, height = 400, extensions = undefined) { ... }
+
 
 
 keep a local variable called currentPath with value '/'
@@ -75,7 +86,7 @@ define and object called bin and referece functions from objects:
 <pre style='text-wrap: wrap'>let currentPath = '/';
 
 /**
- * Changes the current directory to the specified path.
+ * Changes the current path to the specified path.
  * @param {string} path - The path to change to.
  */
 function cd(path) {

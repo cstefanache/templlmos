@@ -1,0 +1,85 @@
+{
+    "registry": {
+        "extension": {
+            "disabled": false,
+            "to": "head",
+            "tag": "script",
+            "rebuild": false,
+            "library": true,
+            "dependencies": [],
+            "instructions": [
+                [
+                    "create a new function `registerExtension` on `window.os` object that takes an extension, an emoji and a callback function with the following functionality:",
+                    " - stores on the `window.os.registry` object the extension as key and emoji and callback as value"
+                ]
+            ]
+        },
+        "app-icon": {
+            "disabled": false,
+            "to": "head",
+            "tag": "script",
+            "rebuild": false,
+            "library": true,
+            "dependencies": [
+                "filesystem"
+            ],
+            "instructions": [
+                [
+                    "create jsdoc and function `getOSIcon` on `window.os` object having a path and callback parameter with the following functionality:",
+                    "- create a root element `div` having the class `icon`",
+                    "- save isFile to constant",
+                    "- add a span element with class `emoji` and content 📄 if isFile, 📁 otherwise",
+                    "- add a div element with class title containing the name from path",
+                    "- extract extension from path and search if is registered in the `window.os.registry` object",
+                    "- sets `currentCallback` to function parameter callback",
+                    "- if extension is registered reads stores it in a `extData` property and:",
+                    "   - adds span element with class `app-emoji` with the content of `extData.emoji` ",
+                    "   - sets the `currentCallback` to a function that calls `extData.callback` with the path",
+                    "- exit condition and add click listener to the root element that calls `currentCallback` with the path",
+                    "- return the root element"
+                ]
+            ]
+        },
+        "registry": {
+            "disabled": false,
+            "to": "head",
+            "tag": "script",
+            "rebuild": false,
+            "library": true,
+            "dependencies": [
+                "window",
+                "desktop-app",
+                "app-icon"
+            ],
+            "instructions": [
+                [
+                    "create a new function `registerApplication` on the `window.os` object and jsdoc that takes a title, emoji, callback, width=400 and height = 400 and a an array of extensions being undefined by default having the following functionality:",
+                    "- define an internal `execute` that takes a spread params:",
+                    "  - creates a new window instance with the title, emoji, width and height and saves it to a constant",
+                    "  - attach to window the result of calling the callback with the window instance and spread params",
+                    "- if extensions is defined, call `registerExtension` for each extension with extension, emoji and the execute function",
+                    "- call addApp with the emoji, title and callback that calls the execute function with no parameters"
+                ]
+            ]
+        },
+        "hello-world": {
+            "disabled": false,
+            "preventRebuild": false,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "registry",
+                "filesystem"
+            ],
+            "instructions": [
+                [
+                    "Create a `helloWorld` function that takes a parent and path parameter:",
+                    " - creates and returns a root element `div` having an h1 child element with 'Hello World' text",
+                    " - if path is defined append a pre element containing the content of reading the file at the path",
+                    " - returns the root element",
+                    "after definition, register application with 'hello world' title, 👋 as emoji, `helloWorld` function and 300x200 size"
+                ]
+            ]
+        }
+    }
+}

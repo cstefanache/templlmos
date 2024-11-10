@@ -52,28 +52,38 @@ window.os.fs.write = function(path, content) { ... }
      */
 window.os.fs.read = function(path) { ... }
 
+/**
+ * Registers a new application with a title, emoji, callback, dimensions, and optional extensions.
+ * @param {string} title - The title of the application.
+ * @param {string} emoji - The emoji to display for the application.
+ * @param {Function} callback - The function to call when the application is executed.
+ * @param {number} [width=400] - The width of the application window.
+ * @param {number} [height=400] - The height of the application window.
+ * @param {Array} [extensions=undefined] - An optional array of extensions to register with the application.
+ */
+window.os.registerApplication = function(title, emoji, callback, width = 400, height = 400, extensions = undefined) { ... }
+
 function getSlideDOMElement(slides) { ... }
                 const altText = line.match(/!\[(.*?)\]/)[1];
                 const src = line.match(/\((.*?)\)/)[1];
 function getPresenterLayout() { ... }
-function readFileContent(path) { ... }
-window.apps.presenter = function(path = '/itdays.md') { ... }
+function readFileContentSync(path) { ... }
+window.apps.presenter = function(windowInstance, path = '/itdays.md') { ... }
 
 
-execute window.apps.presenter()
+call register application with 'Presenter' title, 📽️ as emoji, presenter function reference and 1200x680 size for [md] extensions
 </pre>
 ### Output
 <pre style='text-wrap: wrap'>function getSlideDOMElement(slides) {
     const result = [];
-
+    
     slides.forEach(item => {
         const lines = item.split('\n');
         const slideElement = document.createElement('div');
         slideElement.className = 'slide';
-
+        
         lines.forEach(line => {
             let element;
-
             if (line.startsWith('# ')) {
                 element = document.createElement('h1');
                 element.textContent = line.slice(2);
@@ -87,8 +97,8 @@ execute window.apps.presenter()
                 const altText = line.match(/!\[(.*?)\]/)[1];
                 const src = line.match(/\((.*?)\)/)[1];
                 element = document.createElement('img');
-                element.alt = altText;
                 element.src = src;
+                element.alt = altText;
             } else if (line.startsWith('`')) {
                 element = document.createElement('pre');
                 element.textContent = line.slice(1, -1);
@@ -96,13 +106,12 @@ execute window.apps.presenter()
                 element = document.createElement('p');
                 element.textContent = line;
             }
-
             slideElement.appendChild(element);
         });
-
+        
         result.push(slideElement);
     });
-
+    
     return result;
 }
 function getPresenterLayout() {
@@ -137,21 +146,17 @@ function getPresenterLayout() {
 
     return presenter;
 }
-function readFileContent(path) {
-    if (window.os.fs.isValidPath(path)) {
-        const lines = window.os.fs.read(path);
-        if (lines) {
-            return lines.join('\n');
-        }
+function readFileContentSync(path) {
+    const lines = window.os.fs.read(path);
+    if (lines) {
+        return lines.join('\n');
     }
     return '';
 }
-window.apps = window.apps || {};
-
-window.apps.presenter = function(path = '/itdays.md') {
+window.apps.presenter = function(windowInstance, path = '/itdays.md') {
     const rootElement = getPresenterLayout();
     const contentElement = rootElement.querySelector('.content');
-    const fileContent = readFileContent(path);
+    const fileContent = readFileContentSync(path);
     const slides = getSlideDOMElement(fileContent.split('---'));
     
     slides.forEach(slide => contentElement.appendChild(slide));
@@ -176,7 +181,7 @@ window.apps.presenter = function(path = '/itdays.md') {
         }
     });
     
-    document.body.appendChild(rootElement);
+    return rootElement;
 };
-window.apps.presenter();
+window.os.registerApplication('Presenter', '📽️', window.apps.presenter, 1200, 680, ['md']);
 </pre>

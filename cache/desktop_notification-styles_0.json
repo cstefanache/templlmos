@@ -1,0 +1,6 @@
+{
+    "crc": 2452147002,
+    "compiled_instruction": "\nYou are a code generator that produces CSS code exclusively. When responding to queries, provide only valid and complete CSS code without any additional explanations or comments. Do not include any HTML, JavaScript, or commentary unless explicitly asked to. Follow best practices for CSS and ensure compatibility across modern browsers.\n\ncss style the `#desktop_notifications` id to match the following rules:\nabsolute position, fixed size, 100% width, 100% height, overflow-y hidden, padding of 10px, display flex, flex-wrap wrap, flex-direction column, align content: flex start\ncss style the `.notification` class to match the following rules:\nwidth of 100%, padding of 10px, margin of 5px, border-radius of 5px, background color of #f1f1f1, display flex, justify content space-between, align items center\n",
+    "output": "#desktop_notifications {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    overflow-y: hidden;\n    padding: 10px;\n    display: flex;\n    flex-wrap: wrap;\n    flex-direction: column;\n    align-content: flex-start;\n}\n\n.notification {\n    width: 100%;\n    padding: 10px;\n    margin: 5px;\n    border-radius: 5px;\n    background-color: #f1f1f1;\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n",
+    "library": ""
+}

@@ -169,6 +169,546 @@ window.os = {};
 
 })()
   </script>
+  <style id="desktop_content-style">
+   #desktop_content {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow-y: hidden;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-content: flex-start;
+}
+  </style>
+  <style id="desktop_notification-styles">
+   #desktop_notifications {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow-y: hidden;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-content: flex-start;
+}
+
+.notification {
+    width: 100%;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 5px;
+    background-color: #f1f1f1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+  </style>
+  <style id="desktop_icon-styles">
+   .icon {
+    width: 64px;
+    min-height: 64px;
+    text-align: center;
+    margin: 5px;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.icon .emoji {
+    display: inline-block;
+    font-size: 30px;
+    position: relative;
+}
+
+.icon .title {
+    display: block;
+    font-size: 8px;
+    font-family: monospace;
+    color: black;
+    padding: 5px;
+    word-wrap: break-word;
+    border: 1px solid black;
+    background-color: white;
+    border-radius: 5px;
+}
+
+.icon .app-emoji {
+    position: absolute;
+    right: 12px;
+    top: 20px;
+}
+
+.icon input[type="checkbox"] {
+    position: absolute;
+    left: 2px;
+    top: -6px;
+    width: 8px;
+    height: 8px;
+}
+  </style>
+  <script id="desktop_icon">
+   (() => {
+(function() {
+    window.os = window.os || {};
+
+    /**
+     * Creates an icon element with an emoji and title, and attaches a click event.
+     * @param {HTMLElement} parent - The parent element to which the icon will be appended.
+     * @param {string} emoji - The emoji to display in the icon.
+     * @param {string} title - The title to display in the icon.
+     * @param {Function} callback - The function to call when the icon is clicked.
+     */
+    window.os.icon = function(parent, emoji, title, callback) {
+        var iconElement = document.createElement('div');
+        iconElement.className = 'icon';
+
+        var emojiElement = document.createElement('span');
+        emojiElement.className = 'emoji';
+        emojiElement.textContent = emoji;
+
+        var titleElement = document.createElement('span');
+        titleElement.className = 'title';
+        titleElement.textContent = title;
+
+        iconElement.appendChild(emojiElement);
+        iconElement.appendChild(titleElement);
+        parent.appendChild(iconElement);
+
+        iconElement.addEventListener('click', callback);
+    };
+})();
+
+})()
+  </script>
+  <script id="desktop_desktop-app">
+   (() => {
+/**
+ * Adds an application icon to the desktop with the specified emoji, title, and click callback.
+ * @param {string} emoji - The emoji to display in the icon.
+ * @param {string} title - The title to display in the icon.
+ * @param {Function} callback - The function to call when the icon is clicked.
+ */
+window.os.addApp = function(emoji, title, callback) {
+    const parent = document.getElementById('desktop_content');
+    window.os.icon(parent, emoji, title, callback);
+};
+
+})()
+  </script>
+  <script id="gui_draggable">
+   (() => {
+window.os = window.os || {};
+window.os.gui = window.os.gui || {};
+
+/**
+ * Makes an element draggable by changing its absolute position based on the dragging of a handle element.
+ * @param {HTMLElement} root - The element to be made draggable.
+ * @param {HTMLElement} dragHandleHTMLElement - The element that will be used to drag the root element.
+ */
+window.os.gui.makeDraggable = function(root, dragHandleHTMLElement) {
+    let offset = { x: 0, y: 0 };
+    let isDragging = false;
+
+    dragHandleHTMLElement.addEventListener('mousedown', function(e) {
+        isDragging = true;
+        offset.x = e.clientX - root.getBoundingClientRect().left;
+        offset.y = e.clientY - root.getBoundingClientRect().top;
+        document.body.style.userSelect = 'none'; // Prevent text selection
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (isDragging) {
+            root.style.position = 'absolute';
+            root.style.left = (e.clientX - offset.x) + 'px';
+            root.style.top = (e.clientY - offset.y) + 'px';
+        }
+    });
+
+    document.addEventListener('mouseup', function() {
+        isDragging = false;
+        document.body.style.userSelect = ''; // Restore text selection
+    });
+};
+/**
+ * Makes an element resizable by changing its width and height based on the dragging of a resize handle element.
+ * @param {HTMLElement} root - The element to be made resizable.
+ * @param {HTMLElement} resizeHandleHTMLElement - The element that will be used to resize the root element.
+ */
+window.os = window.os || {};
+window.os.gui = window.os.gui || {};
+
+window.os.gui.makeResizable = function(root, resizeHandleHTMLElement) {
+    let isResizing = false;
+    let lastDownX = 0;
+    let lastDownY = 0;
+    let startWidth = 0;
+    let startHeight = 0;
+
+    resizeHandleHTMLElement.addEventListener('mousedown', function(e) {
+        isResizing = true;
+        lastDownX = e.clientX;
+        lastDownY = e.clientY;
+        startWidth = parseInt(document.defaultView.getComputedStyle(root).width, 10);
+        startHeight = parseInt(document.defaultView.getComputedStyle(root).height, 10);
+        e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (!isResizing) return;
+        const width = startWidth + (e.clientX - lastDownX);
+        const height = startHeight + (e.clientY - lastDownY);
+        root.style.width = width + 'px';
+        root.style.height = height + 'px';
+    });
+
+    document.addEventListener('mouseup', function() {
+        isResizing = false;
+    });
+};
+/**
+ * Brings the specified DOM node to the front by adjusting its z-index.
+ * @param {HTMLElement} rootDOMNode - The element to be brought to the front.
+ */
+window.os.gui.bringToFront = function(rootDOMNode) {
+    const bringToFrontInternal = function() {
+        const elements = document.getElementsByClassName(rootDOMNode.className);
+        for (let i = 0; i < elements.length; i++) {
+            elements[i].style.zIndex = 0;
+        }
+        rootDOMNode.style.zIndex = 1;
+    };
+
+    rootDOMNode.addEventListener('mousedown', bringToFrontInternal);
+    bringToFrontInternal();
+};
+
+})()
+  </script>
+  <script id="gui_titleBar">
+   (() => {
+window.os = window.os || {};
+window.os.gui = window.os.gui || {};
+
+/**
+ * Creates a title bar with a title and a close button.
+ * @param {HTMLElement} parentElement - The parent DOM element to append the title bar to.
+ * @param {string} title - The title to display in the title bar.
+ * @param {Function} close - The callback function to call when the close button is clicked.
+ */
+window.os.gui.titleBar = function(parentElement, title, close) {
+    var titleBar = document.createElement('div');
+    titleBar.className = 'titleBar';
+
+    var titleSpan = document.createElement('span');
+    titleSpan.textContent = title;
+    titleBar.appendChild(titleSpan);
+
+    var closeButton = document.createElement('button');
+    closeButton.textContent = '❌';
+    closeButton.className = 'close';
+    closeButton.onclick = close;
+    titleBar.appendChild(closeButton);
+
+    parentElement.appendChild(titleBar);
+};
+
+})()
+  </script>
+  <script id="gui_toolbar">
+   (() => {
+window.os = window.os || {};
+window.os.gui = window.os.gui || {};
+
+/**
+ * Creates a toolbar and appends it to the specified window element.
+ * @param {HTMLElement} win - The window element to which the toolbar will be appended.
+ * @returns {function(string, function): void} - A function to add buttons to the toolbar.
+ */
+window.os.gui.createToolbar = function(win) {
+    const toolbar = document.createElement('div');
+    toolbar.className = 'toolbar';
+    const placeholder = win.querySelector('.toolbarPlaceholder');
+    if (placeholder) {
+        placeholder.appendChild(toolbar);
+    }
+
+    /**
+     * Adds a button to the toolbar.
+     * @param {string} text - The text to display on the button.
+     * @param {function} callback - The function to call when the button is clicked.
+     */
+    function addButton(text, callback) {
+        const button = document.createElement('button');
+        button.textContent = text;
+        button.addEventListener('click', callback);
+        toolbar.appendChild(button);
+    }
+
+    return addButton;
+};
+
+})()
+  </script>
+  <script id="gui_window">
+   (() => {
+/**
+ * Creates a new window with a title, emoji, and specified dimensions.
+ * @param {string} emoji - The emoji to display in the title.
+ * @param {string} title - The title of the window.
+ * @param {number} [width=400] - The width of the window.
+ * @param {number} [height=300] - The height of the window.
+ * @returns {HTMLElement} The created window element.
+ */
+window.os.gui.createWindow = function(emoji, title, width = 400, height = 300) {
+    const root = document.createElement('div');
+    root.className = 'window';
+    root.style.width = `${width}px`;
+    root.style.height = `${height}px`;
+    root.style.position = 'absolute';
+    root.style.left = `${(window.innerWidth / 2) - (width / 2)}px`;
+    root.style.top = `${(window.innerHeight / 2) - (height / 2)}px`;
+    
+    window.os.gui.bringToFront(root);
+    
+    const titlePlaceholder = document.createElement('div');
+    titlePlaceholder.className = 'titlePlaceholder';
+    root.appendChild(titlePlaceholder);
+    
+    const toolbarPlaceholder = document.createElement('div');
+    toolbarPlaceholder.className = 'toolbarPlaceholder';
+    root.appendChild(toolbarPlaceholder);
+    
+    const contentPlaceholder = document.createElement('div');
+    contentPlaceholder.className = 'contentPlaceholder';
+    root.appendChild(contentPlaceholder);
+    
+    const statusPlaceholder = document.createElement('div');
+    statusPlaceholder.className = 'statusPlaceholder';
+    root.appendChild(statusPlaceholder);
+    
+    const resizeHandle = document.createElement('div');
+    resizeHandle.className = 'resizeHandle';
+    root.appendChild(resizeHandle);
+    
+    window.os.gui.titleBar(titlePlaceholder, `${emoji} ${title}`, function() {
+        document.body.removeChild(root);
+    });
+    
+    window.os.gui.makeDraggable(root, titlePlaceholder);
+    window.os.gui.makeResizable(root, resizeHandle);
+    
+    document.body.appendChild(root);
+    return root;
+};
+/**
+ * Attaches a content element to the content placeholder of a window element.
+ * @param {HTMLElement} windowElement - The window element to which the content will be attached.
+ * @param {HTMLElement} contentElement - The content element to be appended to the window's content placeholder.
+ */
+window.os.gui.attachToWindow = function(windowElement, contentElement) {
+    const contentPlaceholder = windowElement.querySelector('.contentPlaceholder');
+    if (contentPlaceholder) {
+        contentPlaceholder.appendChild(contentElement);
+    }
+};
+
+})()
+  </script>
+  <style id="gui_gui-styles">
+   .titleBar {
+    background-color: orange;
+    border-bottom: 1px solid black;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: monospace;
+    color: black;
+    font-size: small;
+    padding: 0 5px;
+    border-bottom: 2px solid black;
+    user-select: none;
+}
+
+.titleBar button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 6px;
+    padding: 5px;
+}
+.window {
+    background-color: white;
+    user-select: none;
+    border: 2px solid black;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.5);
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+}
+
+.window .contentPlaceholder {
+    padding: 5px;
+    flex-grow: 1;
+    overflow: auto;
+}
+
+.window .statusPlaceholder {
+    border-top: 1px solid black;
+    font-family: monospace;
+    font-size: small;
+}
+.resizeHandle {
+    width: 0;
+    height: 0;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    cursor: se-resize;
+    border-width: 0 0 10px 10px;
+    border-style: solid;
+    border-color: transparent transparent #ff7200 transparent;
+    transform: rotate(0deg);
+}
+.toolbar {
+    padding: 2px;
+    background: antiquewhite;
+    margin-bottom: 2px;
+    border-bottom: 1px solid black;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.toolbar button {
+    border: none;
+    cursor: pointer;
+    background: transparent;
+}
+  </style>
+  <style id="gui_notification-styles">
+   .notification-wrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+.notification {
+    background-color: white;
+    border: 2px solid black; /* This will override the 1px border */
+    width: 200px;
+    word-wrap: break-word;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 2px 2px 0 0 rgba(0, 0, 0, 0.5);
+    margin-top: 5px;
+    position: relative;
+}
+  </style>
+  <script id="registry_extension">
+   (() => {
+// Ensure the window.os object and its registry are defined
+window.os = window.os || {};
+window.os.registry = window.os.registry || {};
+
+/**
+ * Registers an extension with an emoji and a callback function.
+ * @param {string} extension - The extension to register.
+ * @param {string} emoji - The emoji associated with the extension.
+ * @param {function} callback - The callback function to be executed for the extension.
+ */
+window.os.registerExtension = function(extension, emoji, callback) {
+    window.os.registry[extension] = {
+        emoji: emoji,
+        callback: callback
+    };
+};
+
+})()
+  </script>
+  <script id="registry_app-icon">
+   (() => {
+/**
+ * Creates an OS icon element for a given path and sets up a callback.
+ * @param {string} path - The path for which to create the icon.
+ * @param {function} callback - The callback function to be executed on click.
+ * @returns {HTMLElement} - The root icon element.
+ */
+window.os.getOSIcon = function(path, callback) {
+    const iconElement = document.createElement('div');
+    iconElement.className = 'icon';
+
+    const isFile = path.includes('.');
+    const emojiSpan = document.createElement('span');
+    emojiSpan.className = 'emoji';
+    emojiSpan.textContent = isFile ? '📄' : '📁';
+    iconElement.appendChild(emojiSpan);
+
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'title';
+    titleDiv.textContent = path.split('/').pop();
+    iconElement.appendChild(titleDiv);
+
+    const extension = isFile ? path.split('.').pop() : '';
+    const extData = window.os.registry ? window.os.registry[extension] : null;
+
+    let currentCallback = callback;
+
+    if (extData) {
+        const appEmojiSpan = document.createElement('span');
+        appEmojiSpan.className = 'app-emoji';
+        appEmojiSpan.textContent = extData.emoji;
+        iconElement.appendChild(appEmojiSpan);
+
+        currentCallback = function() {
+            extData.callback(path);
+        };
+    }
+
+    iconElement.addEventListener('click', function() {
+        currentCallback(path);
+    });
+
+    return iconElement;
+};
+
+})()
+  </script>
+  <script id="registry_registry">
+   (() => {
+/**
+ * Registers a new application with a title, emoji, callback, dimensions, and optional extensions.
+ * @param {string} title - The title of the application.
+ * @param {string} emoji - The emoji to display for the application.
+ * @param {Function} callback - The function to call when the application is executed.
+ * @param {number} [width=400] - The width of the application window.
+ * @param {number} [height=400] - The height of the application window.
+ * @param {Array} [extensions=undefined] - An optional array of extensions to register with the application.
+ */
+window.os.registerApplication = function(title, emoji, callback, width = 400, height = 400, extensions = undefined) {
+    const execute = (...params) => {
+        const windowInstance = window.os.gui.createWindow(emoji, title, width, height);
+        window.os.gui.attachToWindow(windowInstance, callback(windowInstance, ...params));
+    };
+
+    if (extensions) {
+        extensions.forEach(extension => {
+            window.os.registerExtension(extension, emoji, execute);
+        });
+    }
+
+    window.os.addApp(emoji, title, () => execute());
+};
+
+})()
+  </script>
   <style id="terminal_terminal-style">
    .terminal {
     width: 100%;
@@ -289,6 +829,12 @@ window.os = {};
     text-align: left;
 }
   </style>
+  <style id="apps_styles">
+   .browser {
+    display: flex;
+    flex-wrap: wrap;
+}
+  </style>
  </head>
  <body>
   <span id="osbase_logo">
@@ -322,12 +868,69 @@ window.os.fs.write('/logo.txt', asciiArt);
 
 })()
   </script>
+  <div id="desktop_content">
+  </div>
+  <script id="gui_notification">
+   (() => {
+// Create a root container div element with the class .notification-wrapper
+const notificationWrapper = document.createElement('div');
+notificationWrapper.className = 'notification-wrapper';
+document.body.appendChild(notificationWrapper);
+
+/**
+ * Displays a notification with the given message.
+ * @param {string} message - The message to display in the notification.
+ */
+window.os = window.os || {};
+window.os.gui = window.os.gui || {};
+window.os.gui.notification = function(message) {
+    const notificationElement = document.createElement('div');
+    notificationElement.className = 'notification';
+    
+    const messageSpan = document.createElement('span');
+    messageSpan.textContent = message;
+    
+    notificationElement.appendChild(messageSpan);
+    notificationWrapper.appendChild(notificationElement);
+    
+    setTimeout(() => {
+        notificationElement.remove();
+    }, 2000);
+};
+
+})()
+  </script>
+  <script id="registry_hello-world">
+   (() => {
+function helloWorld(parent, path) {
+    const root = document.createElement('div');
+    const heading = document.createElement('h1');
+    heading.textContent = 'Hello World';
+    root.appendChild(heading);
+
+    if (path) {
+        const content = window.os.fs.read(path);
+        if (content) {
+            const pre = document.createElement('pre');
+            pre.textContent = content.join('\n');
+            root.appendChild(pre);
+        }
+    }
+
+    parent.appendChild(root);
+    return root;
+}
+
+window.os.registerApplication('hello world', '👋', helloWorld, 300, 200);
+
+})()
+  </script>
   <script id="terminal_terminal-runtime">
    (() => {
 let currentPath = '/';
 
 /**
- * Changes the current directory to the specified path.
+ * Changes the current path to the specified path.
  * @param {string} path - The path to change to.
  */
 function cd(path) {
@@ -355,25 +958,21 @@ const bin = {
     pwd: pwd
 };
 /**
- * Executes a command with the given parameters, processing the path accordingly.
- * @param {string} input - The command string to execute.
+ * Executes a command with the given parameters, processing the input string.
+ * @param {string} input - The command input string to execute.
  * @returns {any} - The result of the command execution or an error message.
  */
 function execute(input) {
-    const args = input.match(/(?:[^\s"]+|"[^"]*")+/g);
+    const args = input.match(/(?:[^\s"]+|"[^"]*")+/g).map(arg => arg.replace(/(^"|"$)/g, ''));
     let path = currentPath;
     const command = `bin.${args[0]}`;
-    
+
     if (args[1]) {
-        if (!args[1].startsWith('/')) {
-            path = window.os.fs.getPath(`${currentPath}/${args[1]}`);
-        } else {
-            path = window.os.fs.getPath(args[1]);
-        }
+        path = args[1].startsWith('/') ? window.os.fs.getPath(args[1]) : window.os.fs.getPath(`${currentPath}/${args[1]}`);
     }
 
     try {
-        return eval(`${command}("${path}", ${args.slice(2).map(arg => `"${arg}"`).join(', ')})`);
+        return eval(`${command}('${path}', ${args.slice(2).map(arg => `'${arg}'`).join(', ')})`);
     } catch (error) {
         return error.message;
     }
@@ -404,17 +1003,18 @@ window.apps.terminal = function() {
     terminal.appendChild(terminalInput);
 
     function output(value, color = 'white') {
-        const line = document.createElement('div');
-        line.className = 'terminal-line';
-        line.style.color = color;
         if (Array.isArray(value)) {
             value.forEach(item => {
-                const itemLine = document.createElement('div');
-                itemLine.textContent = item;
-                itemLine.style.color = color;
-                terminalOutput.prepend(itemLine);
+                const line = document.createElement('div');
+                line.className = 'terminal-line';
+                line.style.color = color;
+                line.textContent = item;
+                terminalOutput.prepend(line);
             });
         } else {
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.style.color = color;
             line.textContent = value;
             terminalOutput.prepend(line);
         }
@@ -422,8 +1022,8 @@ window.apps.terminal = function() {
 
     input.addEventListener('keydown', function(event) {
         if (event.key === 'Enter') {
-            const currentTime = new Date().toLocaleTimeString();
             const content = input.value;
+            const currentTime = new Date().toLocaleTimeString();
             output(`[${currentTime}] ${content}`, 'yellow');
             const result = execute(content);
             output(result);
@@ -434,6 +1034,7 @@ window.apps.terminal = function() {
 
     return terminal;
 };
+window.os.registerApplication('Terminal', '🖥️', window.apps.terminal, 800, 500);
 
 })()
   </script>
@@ -441,15 +1042,14 @@ window.apps.terminal = function() {
    (() => {
 function getSlideDOMElement(slides) {
     const result = [];
-
+    
     slides.forEach(item => {
         const lines = item.split('\n');
         const slideElement = document.createElement('div');
         slideElement.className = 'slide';
-
+        
         lines.forEach(line => {
             let element;
-
             if (line.startsWith('# ')) {
                 element = document.createElement('h1');
                 element.textContent = line.slice(2);
@@ -463,8 +1063,8 @@ function getSlideDOMElement(slides) {
                 const altText = line.match(/!\[(.*?)\]/)[1];
                 const src = line.match(/\((.*?)\)/)[1];
                 element = document.createElement('img');
-                element.alt = altText;
                 element.src = src;
+                element.alt = altText;
             } else if (line.startsWith('`')) {
                 element = document.createElement('pre');
                 element.textContent = line.slice(1, -1);
@@ -472,13 +1072,12 @@ function getSlideDOMElement(slides) {
                 element = document.createElement('p');
                 element.textContent = line;
             }
-
             slideElement.appendChild(element);
         });
-
+        
         result.push(slideElement);
     });
-
+    
     return result;
 }
 function getPresenterLayout() {
@@ -513,21 +1112,17 @@ function getPresenterLayout() {
 
     return presenter;
 }
-function readFileContent(path) {
-    if (window.os.fs.isValidPath(path)) {
-        const lines = window.os.fs.read(path);
-        if (lines) {
-            return lines.join('\n');
-        }
+function readFileContentSync(path) {
+    const lines = window.os.fs.read(path);
+    if (lines) {
+        return lines.join('\n');
     }
     return '';
 }
-window.apps = window.apps || {};
-
-window.apps.presenter = function(path = '/itdays.md') {
+window.apps.presenter = function(windowInstance, path = '/itdays.md') {
     const rootElement = getPresenterLayout();
     const contentElement = rootElement.querySelector('.content');
-    const fileContent = readFileContent(path);
+    const fileContent = readFileContentSync(path);
     const slides = getSlideDOMElement(fileContent.split('---'));
     
     slides.forEach(slide => contentElement.appendChild(slide));
@@ -552,9 +1147,74 @@ window.apps.presenter = function(path = '/itdays.md') {
         }
     });
     
-    document.body.appendChild(rootElement);
+    return rootElement;
 };
-window.apps.presenter();
+window.os.registerApplication('Presenter', '📽️', window.apps.presenter, 1200, 680, ['md']);
+
+})()
+  </script>
+  <script id="apps_browser">
+   (() => {
+function browser(win, path = '') {
+    const container = document.createElement('div');
+    container.className = 'browser';
+    let browserPath = typeof path === 'string' ? path : '';
+
+    function load(path) {
+        browserPath = path;
+        container.innerHTML = '';
+
+        if (path) {
+            const backIcon = document.createElement('div');
+            backIcon.className = 'icon';
+            const emojiSpan = document.createElement('span');
+            emojiSpan.className = 'emoji';
+            emojiSpan.textContent = '🔙';
+            backIcon.appendChild(emojiSpan);
+            backIcon.onclick = () => load(path.split('/').slice(0, -1).join('/'));
+            container.appendChild(backIcon);
+        }
+
+        const entries = window.os.fs.ls(path);
+        entries.forEach(item => {
+            const icon = window.os.getOSIcon(path + '/' + item, () => load(path + '/' + item));
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = path + '/' + item;
+            checkbox.onclick = (e) => e.stopPropagation();
+            container.appendChild(icon);
+            container.appendChild(checkbox);
+        });
+    }
+
+    load(browserPath);
+
+    const toolbar = window.os.gui.createToolbar(win);
+    toolbar('📁', () => {
+        const name = prompt('Enter directory name:');
+        if (name) {
+            window.os.fs.mkdir(browserPath + '/' + name);
+            load(browserPath);
+        }
+    });
+    toolbar('📄', () => {
+        const name = prompt('Enter file name:');
+        if (name) {
+            window.os.fs.write(browserPath + '/' + name, '');
+            load(browserPath);
+        }
+    });
+    toolbar('🗑️', () => {
+        const checkboxes = container.querySelectorAll('input[type="checkbox"]:checked');
+        checkboxes.forEach(checkbox => {
+            window.os.fs.rm(checkbox.value);
+        });
+        load(browserPath);
+    });
+
+    return container;
+}
+window.os.registerApplication('Browser', '📂', browser, 450, 400);
 
 })()
   </script>
@@ -566,10 +1226,32 @@ window.os.fs.write('/sources/chatgpt_filesystem/filesystem.txt', 'Package: files
 window.os.fs.write('/sources/chatgpt_filesystem/outputs.txt', 'Package: outputs\ncall write with the path `/logo.txt` and ascii art of text `TempLLM OS` fill empty spaces with .')
 window.os.fs.write('/sources/chatgpt_filesystem/utils.txt', 'Package: utils\nDefine a function `cat` on `window.os` namespace that takes a path as a parameter and returns the content of the file split by `\n` ')
 window.os.fs.write('/sources/chatgpt_filesystem/fs-tests.txt', 'Package: fs-tests\ncreate a new directory in the root directory called `fstest`\ncreate a new file in the `fstest` directory called `test.txt` with the content `hello world`\nlist the entries in the `fstest` directory and log it to console\nread the content of the `fstest/test.txt` file and log it to console\nremove the `fstest` directory')
-window.os.fs.write('/sources/chatgpt_terminal/terminal-style.txt', 'Package: terminal-style\ndefine a terminal class with the following css properties\n- width: 100%\n- height: 100%\n- background-color: black\n- color: white\n- font-family: monospace\n- overflow: hidden\n- display: flex\n- flex-direction: column\ndefine a terminal-output class with the following css properties\n- flex: 1\n- overflow-y: auto\n- padding: 10px\n- display: flex\n- flex-direction: column-reverse\ndefine a terminal-line class with the following css properties\n- display: flex\n- flex-direction: row\n- overflow-wrap: anywhere\ndefine a terminal-input class with the following css properties\n- display: flex\n- flex-direction: row\ndefine a terminal-input-text class with the following css properties\n- background-color: transparent\n- border: none\n- color: white\n- font-family: monospace\n- font-size: 16px\n- flex: 1\n- outline: none')
-window.os.fs.write('/sources/chatgpt_terminal/terminal-runtime.txt', 'Package: terminal-runtime\nkeep a local variable called currentPath with value "/"\ndefine a local function `cd` that takes a string parameter and sets currentPath to it\ndefine a local function `pwd` that returns the parent scope defined currentPath\ndefine and object called bin and referece functions from objects:\n - window.os.fs\n - `cd` and `pwd` functions\ncurrentPath is defined in parent scope\ndefine a function `execute` that takes a string parameter and:\n - splits the string by space but keeps in a single element if it is in quotes\n - set path to currentPath\n - the first element is the command and prepend `bin.` to it\n - if the second element exists:\n    - if it does not start with `/`, prepend `currentPath` to it and assign it to path after calling `getPath` on it\n    - if it starts with `/`, assign it to path after calling `getPath` on it\n - return eval of `command` with `path` and rest of the parameters from the list as string arguments\n - if the eval throws an error, return the error message\ndefine a function `terminal` on window.apps that creates a root element with class terminal and returns it at the end\ncreate the following dom structure:\n - .terminal\n   - .terminal-output\n     - .terminal-line with text "Welcome to TempLLM OS"\n   - .terminal-input\n     - .prefix with text ">"\n     - input.terminal-input-text\ndefine inner function called output that takes two parameters: value and color with default value white. The function prepends a div with class terminal-line having color style as provided in the function and the value as text to the terminal-output div. if the value is a list then prepend each item in the list as a separate div\nwhen the user hits the enter key on the input take the content call the output function with the content prefixed with `[%current_time%]` and color yellow, call `output` with the resul of calling `execute` function with the value of the input, clear the input and focus it again')
-window.os.fs.write('/sources/chatgpt_presenter/presenter-styles.txt', 'Package: presenter-styles\n.presenter class with 100% width and height, white background, black color, monospace font-family, hidden overflow, flex display and column flex-direction\n.presenter .header class with display flex, row flex-direction, 20px height, padding 10px, align-items center and justify-content space-between, yellow background and black color text\n.presenter .header img with 100% height\n.presenter .header p with margin 0\n.presenter .content class with display flex, position realtive, flex 1, padding 10px, overflow hidden, white background\n.presenter .footer class with display flex, row-reverse flex-direction,, 20px height, padding 10px, align-items center and justify-content space-between\n.presenter .slide should have an absolute position, white background color, 100% width and height, hidden overflow, display flex and column flex-direction\n.slide content should be centered with align-items center and justify-content center and text centered\n.slide h1 with font-size 5em\n.slide h2 with font-size 1.5em\n.slide pre with white-space pre-wrap and background-color #201e30, white text, padding 5, margin 0 auto, max-width 720 and text-align left')
-window.os.fs.write('/sources/chatgpt_presenter/presenter-logic.txt', 'Package: presenter-logic\ndefine a function called getSlideDOMElement that takes an array of strings as an argument\niterate the array and for each item:\n split item by `\n`\n   iterate the split result and for each line:\n     create a slide div element with class slide\n     generate html dom elements corresponding to the markdown syntax with headers, text, image and backtick as pre support and append them to the slide element\n   append the slide element to the result array\nreturn the result array\ndefine a function called getPresenterLayout that creates the following dom structure of divs:\n .presenter\n   .header\n     img[`https://www.itdays.ro/public/images/logo-gri.png`]\n     p`INNOVATION, PROGRAMMING AND TECHNOLOGIES`\n   .content\n   .footer\n     img[`https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg`]\nand return the .presenter element\ndefine a function called readFileContent that takes a path as an argument\n read the file provided in the argument and merge the output in a single string\ndefine a function called presenter on window.apps that takes a string as an argument with default value "/itdays.md"\ngets the root element by executing getPresenterLayout and gets .content child as local reference\nexecute readFileContent with the argument and store value\nexecute getSlideDOMElement with the stored value split by `---` and append elements of result to the content element\nstarting with index 0, if the user presses arrow keys navigate through the slides by showing the slide at index\nappend the root element to the body\nexecute window.apps.presenter()')
+window.os.fs.write('/sources/chatgpt_desktop/content-style.txt', 'Package: content-style\ncss style the `#desktop_content` id to match the following rules:\nabsolute position, fixed size, 100% width, 100% height, overflow-y hidden, padding of 10px, display flex, flex-wrap wrap, flex-direction column, align content: flex start')
+window.os.fs.write('/sources/chatgpt_desktop/content.txt', 'Package: content')
+window.os.fs.write('/sources/chatgpt_desktop/notification-styles.txt', 'Package: notification-styles\ncss style the `#desktop_notifications` id to match the following rules:\nabsolute position, fixed size, 100% width, 100% height, overflow-y hidden, padding of 10px, display flex, flex-wrap wrap, flex-direction column, align content: flex start\ncss style the `.notification` class to match the following rules:\nwidth of 100%, padding of 10px, margin of 5px, border-radius of 5px, background color of #f1f1f1, display flex, justify content space-between, align items center')
+window.os.fs.write('/sources/chatgpt_desktop/icon-styles.txt', 'Package: icon-styles\ncss style the `.icon` class to match the following rules:\n1. 64px width, 64px min height, text-align center, margin of 5px, pointer cursor, position relative, display flex with a column flex direction\n2. containing `.emoji` class should be a block, have a font-size of 30px and inline-block display, position relative\n3. containing `.title` class should be a block, have a font-size of 8px, monospaced font, black text, padding of 5px, allow word-wrap to break word, black rounded border with white background\n4. containing `.app-emoji` class should be absolutely positioned  12px on the right of the icon and 20px top\n5. containing checkbox should be absolutely positioned  2px on the left of the icon and -6px top, with a 8px width and 8px height')
+window.os.fs.write('/sources/chatgpt_desktop/icon.txt', 'Package: icon\nDefine a function called `icon` on `window.os` namespace that takes three parameters: parent, emoji, title and a callback:\n- create a root DOM element with the class `.icon` and add it to `parent`\n- add a span with the class `.emoji` and the emoji as its content\n- add a span with the class `.title` and the title as its content\n- when the icon is clicked, call the callback')
+window.os.fs.write('/sources/chatgpt_desktop/desktop-app.txt', 'Package: desktop-app\nDefine a function called `addApp` on `window.os` namespace that takes four parameters: emoji, title and a callback:\n- call `icon` with element at `#desktop_content`, emoji, title and the callback as parameters')
+window.os.fs.write('/sources/chatgpt_desktop/tests.txt', 'Package: tests\ncall addApp 10 times for 10 different emojis and random titles and callback to log the title when clicked')
+window.os.fs.write('/sources/chatgpt_gui/draggable.txt', 'Package: draggable\nImplement `makeDraggable` on `window.os.gui` object that takes two parameters root and dragHandleHTMLElement with the following functionality:\n - change absolute position of root by dragging the dragHandleHTMLElement\nImplement `makeResizable` on `window.os.gui` object  that takes two parameters: root, resizeHandleHTMLElement with the following functionality:` \n - resize (both width and height) the root HTMLElement element by dragging the resizeHandle DOM element.\n - update starting width and height on mouseup\nImplement `bringToFront` on `window.os.gui` object that taskes a single parameter: rootDOMNode  with the following functionality:\n- creates an internal function that:\n  * takes all elements with the same class as rootDomNode\n  * iterate through them and sets the z-index to 0 and at the end sets the z-index of rootDOMNode to 1\n- adds a mousedown event listener to rootDOMNode that calls the internal function\n- call the internal function')
+window.os.fs.write('/sources/chatgpt_gui/gui-tests.txt', 'Package: gui-tests')
+window.os.fs.write('/sources/chatgpt_gui/titleBar.txt', 'Package: titleBar\nDefine a function `titleBar` on the `window.os.gui` object that takes two parameter: parentElement (DOM element), title (string), and a callback `close` and has the following functionality:\n- create a root DOM element with the class `.titleBar`\n- add to the root DOM element a `span` containing the title parameter\n- add to the root DOM element a `button` with the text `❌` and class `close` that calls the close callback\n- append the root DOM element to parentElement')
+window.os.fs.write('/sources/chatgpt_gui/toolbar.txt', 'Package: toolbar\ncreate function `createToolbar` on the `window.os.gui` object and generate jsdoc that takes one HTMLElement parameter `win`\n- create a root DOM element with the class `.toolbar`\n- append the root DOM element to the `.toolbarPlaceholder` from `win` HTML element\n- create internal function `addButton` that takes two parameters: text and callback that adds a button to the root DOM element with the text parameter and call the callback when the button is clicked\n- return internal addButton function')
+window.os.fs.write('/sources/chatgpt_gui/window.txt', 'Package: window\nDefine a function `createWindow` on the `window.os.gui` object that takes four parameters: emoji, title, width and height that are defaulting to 400 and 300, respectively if not passed and have the following functionality:\n- create a root DOM element with the class `.window`, set the width and height only, and add it to document body in the middle of the document\n- call bringToFront on the root element\n- add and empty div with class `titlePlaceholder` to the root DOM element\n- add and empty div with class `toolbarPlaceholder` to the root DOM element\n- add and empty div with class `contentPlaceholder` to the root DOM element\n- add and empty div with class `statusPlaceholder` to the root DOM element\n- add a resize handle to the root DOM element with class `resizeHandle`\n- add titleBar to `.titlePlaceholder` having the text `emoji + title` and close callback removes root DOM element from the document body\n- make root element draggable by the `.titlePlaceholder` element\n- make root element resizable by the `resizeHandle` element\n- set root DOM element left position document width divided by 2 minus width divided by 2\n- set root DOM element top position document height divided by 2 minus height divided by 2\n- return root DOM element\nDefine a function called `attachToWindow` on the `window.os.gui` object that takes two parameters: windowElement and contentElement that takes the contentElement and appends it to the `.contentPlaceholder` of the windowElement')
+window.os.fs.write('/sources/chatgpt_gui/gui-styles.txt', 'Package: gui-styles\ncss style for a .titleBar class to follow the following rules:\n- orange background color, a black bottom border of 1px solid\n- display of flex, a justify-content of space-between, an align-items of center\n- monospaced black small text\n- 5px horizontal padding, 0 vertical padding\n- 2px black border bottom\n- render buttons flat, no border, no background, a cursor of pointer, font size of 6, 5px padding\n- do not allow text selection\ncss style for a .window class to follow the following rules:\n- white background color\n- disable text selection\n- a border of 2px solid black\n- a border-radius of 8px\n- hidden overflow\n- a box-shadow of 4px 4px 0 0 rgba(0,0,0,0.5)\n- absolute position\n- display of flex and flex-direction of column\n- inner .contentPlaceholder class should have a padding of 5px, flex-grow of 1 and overflow of auto\n- inner .statusPlaceholder class should have  a border-top of 1px solid black and a monospaced small text\ncss style for a  `.resizeHandle` class with the following rules:\n- a width and height of 0px\n- an absolute position\n- a bottom and right of 0\n- a cursor of se-resize\n- border width: 0 0 10px 10px\n- border style: solid\n- `border-color: transparent transparent #ff7200 transparent`\n- transform: rotate(0deg)\ncss style for `.toolbar` class to follow the following rules:\n- a padding of 2px\n- a background of antique white\n- a margin-bottom of 2px\n- a border-bottom of 1px solid black\n- a display of flex\n- a justify-content of flex-start\ninner buttons have:\n - no border\n - cursor pointer\n - transparent background')
+window.os.fs.write('/sources/chatgpt_gui/notification-styles.txt', 'Package: notification-styles\ncss style for a .notification-wrapper class to follow the following rules:\n- an absolute position\n- a top of 0\n- a right of 0\n- a z-index of 1000\n- a display of flex\n- a justify-content of center\n- a flex-direction of column\ncss style for a .notification class to follow the following rules:\n- white background, a black border of 1px solid\n- a black border of 2px solid\n- width width of 200px\n- word wrap\n- padding of 10px\n- a border-radius of 5px\n- a box-shadow of 2px 2px 0 0 rgba(0,0,0,0.5)\n- a top margin of 5px\n- a position of relative')
+window.os.fs.write('/sources/chatgpt_gui/notification.txt', 'Package: notification\ncrate a root container div element having the class `.notification-wrapper`\nDefine a function `notification` on the `window.os.gui` object that takes a single parameter message and has the following functionality:\n- create a root DOM element with the class `.notification`\n- add to the root DOM element a `span` containing the message parameter\n- append the root DOM element to .notification-wrapper\n- set a timeout of 2000ms to remove the root DOM element from parent')
+window.os.fs.write('/sources/chatgpt_gui/tests.txt', 'Package: tests\ncreate an element h1 with text `hello world!` and attach to a window with title `Hello World` and emoji `🌍` having 300x200 size\ncreate an element h1 with text `good bye world!` and attach to a window with title `Good Bye` and emoji `👋` having 300x200 size\ncreate a h3 element with the text "here\ncreate a window with title `Toolbar` and emoji `🛠`\ncreate a toolbar on window and add button with text `👋` that alerts `clicked` on callback\nattach the h3 element to the window')
+window.os.fs.write('/sources/chatgpt_registry/extension.txt', 'Package: extension\ncreate a new function `registerExtension` on `window.os` object that takes an extension, an emoji and a callback function with the following functionality:\n - stores on the `window.os.registry` object the extension as key and emoji and callback as value')
+window.os.fs.write('/sources/chatgpt_registry/app-icon.txt', 'Package: app-icon\ncreate jsdoc and function `getOSIcon` on `window.os` object having a path and callback parameter with the following functionality:\n- create a root element `div` having the class `icon`\n- save isFile to constant\n- add a span element with class `emoji` and content 📄 if isFile, 📁 otherwise\n- add a div element with class title containing the name from path\n- extract extension from path and search if is registered in the `window.os.registry` object\n- sets `currentCallback` to function parameter callback\n- if extension is registered reads stores it in a `extData` property and:\n   - adds span element with class `app-emoji` with the content of `extData.emoji` \n   - sets the `currentCallback` to a function that calls `extData.callback` with the path\n- exit condition and add click listener to the root element that calls `currentCallback` with the path\n- return the root element')
+window.os.fs.write('/sources/chatgpt_registry/registry.txt', 'Package: registry\ncreate a new function `registerApplication` on the `window.os` object and jsdoc that takes a title, emoji, callback, width=400 and height = 400 and a an array of extensions being undefined by default having the following functionality:\n- define an internal `execute` that takes a spread params:\n  - creates a new window instance with the title, emoji, width and height and saves it to a constant\n  - attach to window the result of calling the callback with the window instance and spread params\n- if extensions is defined, call `registerExtension` for each extension with extension, emoji and the execute function\n- call addApp with the emoji, title and callback that calls the execute function with no parameters')
+window.os.fs.write('/sources/chatgpt_registry/hello-world.txt', 'Package: hello-world\nCreate a `helloWorld` function that takes a parent and path parameter:\n - creates and returns a root element `div` having an h1 child element with "Hello World" text\n - if path is defined append a pre element containing the content of reading the file at the path\n - returns the root element\nafter definition, register application with "hello world" title, 👋 as emoji, `helloWorld` function and 300x200 size')
+window.os.fs.write('/sources/chatgpt_apps_terminal/terminal-style.txt', 'Package: terminal-style\ndefine a terminal class with the following css properties\n- width: 100%\n- height: 100%\n- background-color: black\n- color: white\n- font-family: monospace\n- overflow: hidden\n- display: flex\n- flex-direction: column\ndefine a terminal-output class with the following css properties\n- flex: 1\n- overflow-y: auto\n- padding: 10px\n- display: flex\n- flex-direction: column-reverse\ndefine a terminal-line class with the following css properties\n- display: flex\n- flex-direction: row\n- overflow-wrap: anywhere\ndefine a terminal-input class with the following css properties\n- display: flex\n- flex-direction: row\ndefine a terminal-input-text class with the following css properties\n- background-color: transparent\n- border: none\n- color: white\n- font-family: monospace\n- font-size: 16px\n- flex: 1\n- outline: none')
+window.os.fs.write('/sources/chatgpt_apps_terminal/terminal-runtime.txt', 'Package: terminal-runtime\nkeep a local variable called currentPath with value "/"\ndefine a local function `cd` that takes a string parameter and sets currentPath to it\ndefine a local function `pwd` that returns the parent scope defined currentPath\ndefine and object called bin and referece functions from objects:\n - window.os.fs\n - `cd` and `pwd` functions\ncurrentPath is defined in parent scope\ndefine a function `execute` that takes a string parameter and:\n - splits the string by space but keeps in a single element if it is in quotes\n - set path to currentPath\n - the first element is the command and prepend `bin.` to it\n - if the second element exists:\n    - if it does not start with `/`, prepend `currentPath` to it and assign it to path after calling `getPath` on it\n    - if it starts with `/`, assign it to path after calling `getPath` on it\n - return eval of `command` with `path` and rest of the parameters from the list as string arguments\n - if the eval throws an error, return the error message\ndefine a function `terminal` on window.apps that creates a root element with class terminal and returns it at the end\ncreate the following dom structure:\n - .terminal\n   - .terminal-output\n     - .terminal-line with text "Welcome to TempLLM OS"\n   - .terminal-input\n     - .prefix with text ">"\n     - input.terminal-input-text\ndefine inner function called output that takes two parameters: value and color with default value white. The function prepends a div with class terminal-line having color style as provided in the function and the value as text to the terminal-output div. if the value is a list then prepend each item in the list as a separate div\nwhen the user hits the enter key on the input take the content call the output function with the content prefixed with `[%current_time%]` and color yellow, call `output` with the resul of calling `execute` function with the value of the input, clear the input and focus it again\ncall register application with "Terminal" title, 🖥️ as emoji, terminal function reference and 800x500 size')
+window.os.fs.write('/sources/chatgpt_apps_presenter/presenter-styles.txt', 'Package: presenter-styles\n.presenter class with 100% width and height, white background, black color, monospace font-family, hidden overflow, flex display and column flex-direction\n.presenter .header class with display flex, row flex-direction, 20px height, padding 10px, align-items center and justify-content space-between, yellow background and black color text\n.presenter .header img with 100% height\n.presenter .header p with margin 0\n.presenter .content class with display flex, position realtive, flex 1, padding 10px, overflow hidden, white background\n.presenter .footer class with display flex, row-reverse flex-direction,, 20px height, padding 10px, align-items center and justify-content space-between\n.presenter .slide should have an absolute position, white background color, 100% width and height, hidden overflow, display flex and column flex-direction\n.slide content should be centered with align-items center and justify-content center and text centered\n.slide h1 with font-size 5em\n.slide h2 with font-size 1.5em\n.slide pre with white-space pre-wrap and background-color #201e30, white text, padding 5, margin 0 auto, max-width 720 and text-align left')
+window.os.fs.write('/sources/chatgpt_apps_presenter/presenter-logic.txt', 'Package: presenter-logic\ndefine a function called getSlideDOMElement that takes an array of strings as an argument\niterate the array and for each item:\n split item by `\n`\n   iterate the split result and for each line:\n     create a slide div element with class slide\n     generate html dom elements corresponding to the markdown syntax with headers, text, image and backtick as pre support and append them to the slide element\n   append the slide element to the result array\nreturn the result array\ndefine a function called getPresenterLayout that creates the following dom structure of divs:\n .presenter\n   .header\n     img[`https://www.itdays.ro/public/images/logo-gri.png`]\n     p`INNOVATION, PROGRAMMING AND TECHNOLOGIES`\n   .content\n   .footer\n     img[`https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg`]\nand return the .presenter element\ndefine a function called readFileContentSync that takes a path as an argument\n read the file provided in the argument and merge the output in a single string\ndefine a function called presenter on window.apps that takes a windowInstance and path string with default value "/itdays.md" as arguments\ngets the root element by executing getPresenterLayout and gets .content child as local reference\nexecute readFileContentSync with the argument and store value\nexecute getSlideDOMElement with the stored value split by `---` and append elements of result to the content element\nstarting with index 0, if the user presses arrow keys navigate through the slides by showing the slide at index\nreturns the root element\ncall register application with "Presenter" title, 📽️ as emoji, presenter function reference and 1200x680 size for [md] extensions')
+window.os.fs.write('/sources/chatgpt_apps_browser/styles.txt', 'Package: styles\ncss to style .browser class to have display flex and flex-wrap wrap')
+window.os.fs.write('/sources/chatgpt_apps_browser/browser.txt', 'Package: browser\n1. Create a `browser` function that takes a win and path defaulting to "" parameter:\n - create a container dom element with class `browser`\n - set browserPath to path or `""` if path is undefined or not string\n - generate internal load function that takes path parameter:\n   - set browserPath to path\n   - removes all children of the container element\n   - if path is not empty, create a new `div` with class icon, inner element `.emoji` with internal span element having content "🔙"  and class `emoji` and on click call load with `path.split("/").slice(0, -1).join("/")`\n   - ls all files in the path and for each item:\n      - call `getOsIcon` with path+"/"+item and load function as callback\n      - add a checkbox with value path+"/"+item that prevent event bubbling\n - execute load on browserPath variable\n - create toolbar\n - call `addButton` on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name\n - call `addButton` on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and "" as content\n - call `addButton` on the toolbar with `🗑️` text and list all the selected checkbox values, removes them and calls load on the current path\n - return dom element\nCall register application with "Browser" title, 📂 as emoji, browser and 450x400 size')
   </script>
   <script>
    window.os.fs.write('/itdays.md', '`Load the "filesystem" object from the local storage as json, if it does not exist create an empty object with a property "about.txt" with the content "Welcome to TempLLMOS"`,\n`Define the following functions on the window.os.fs object:`,\n` "sync" - save the filesystem object to the local storage that will be called by the other functions that modify the filesystem object`,\n` "ls" - returns a list of entries in the filesystem object at the given path`,\n` "mkdir" - creates an empty object at the given path`,\n` "rm" - removes the object at the given path`,\n` "write" - writes the content to an entry in the filesystem object at the given path`,\n` "read" - reads an entry split by \\n in the filesystem object at the given path, last element in path is the file name`\n---\n# LLMs: A Paradigm Shift in Operating Systems\n![image](https://avatars.githubusercontent.com/u/3071201?s=96&v=4)\n## cornel stefanache\n### cto@ascentcore\n### co-creator@monkeyuser.com\n---\n# Can LLM Write Good OS?\n---\n# Can LLM Write Bad OS?\n---\n# Let there be storage\n\n<code>\ntest\n</code>')

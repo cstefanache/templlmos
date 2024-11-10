@@ -55,6 +55,17 @@ window.os.fs.write = function(path, content) { ... }
      */
 window.os.fs.read = function(path) { ... }
 
+/**
+ * Registers a new application with a title, emoji, callback, dimensions, and optional extensions.
+ * @param {string} title - The title of the application.
+ * @param {string} emoji - The emoji to display for the application.
+ * @param {Function} callback - The function to call when the application is executed.
+ * @param {number} [width=400] - The width of the application window.
+ * @param {number} [height=400] - The height of the application window.
+ * @param {Array} [extensions=undefined] - An optional array of extensions to register with the application.
+ */
+window.os.registerApplication = function(title, emoji, callback, width = 400, height = 400, extensions = undefined) { ... }
+
 
 
 define a function called getSlideDOMElement that takes an array of strings as an argument
@@ -69,15 +80,14 @@ return the result array
 ### Output
 <pre style='text-wrap: wrap'>function getSlideDOMElement(slides) {
     const result = [];
-
+    
     slides.forEach(item => {
         const lines = item.split('\n');
         const slideElement = document.createElement('div');
         slideElement.className = 'slide';
-
+        
         lines.forEach(line => {
             let element;
-
             if (line.startsWith('# ')) {
                 element = document.createElement('h1');
                 element.textContent = line.slice(2);
@@ -91,8 +101,8 @@ return the result array
                 const altText = line.match(/!\[(.*?)\]/)[1];
                 const src = line.match(/\((.*?)\)/)[1];
                 element = document.createElement('img');
-                element.alt = altText;
                 element.src = src;
+                element.alt = altText;
             } else if (line.startsWith('`')) {
                 element = document.createElement('pre');
                 element.textContent = line.slice(1, -1);
@@ -100,13 +110,12 @@ return the result array
                 element = document.createElement('p');
                 element.textContent = line;
             }
-
             slideElement.appendChild(element);
         });
-
+        
         result.push(slideElement);
     });
-
+    
     return result;
 }
 </pre>

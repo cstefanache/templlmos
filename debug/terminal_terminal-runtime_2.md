@@ -54,7 +54,18 @@ window.os.fs.write = function(path, content) { ... }
 window.os.fs.read = function(path) { ... }
 
 /**
- * Changes the current directory to the specified path.
+ * Registers a new application with a title, emoji, callback, dimensions, and optional extensions.
+ * @param {string} title - The title of the application.
+ * @param {string} emoji - The emoji to display for the application.
+ * @param {Function} callback - The function to call when the application is executed.
+ * @param {number} [width=400] - The width of the application window.
+ * @param {number} [height=400] - The height of the application window.
+ * @param {Array} [extensions=undefined] - An optional array of extensions to register with the application.
+ */
+window.os.registerApplication = function(title, emoji, callback, width = 400, height = 400, extensions = undefined) { ... }
+
+/**
+ * Changes the current path to the specified path.
  * @param {string} path - The path to change to.
  */
 function cd(path) { ... }
@@ -64,12 +75,12 @@ function cd(path) { ... }
  */
 function pwd() { ... }
 /**
- * Executes a command with the given parameters, processing the path accordingly.
- * @param {string} input - The command string to execute.
+ * Executes a command with the given parameters, processing the input string.
+ * @param {string} input - The command input string to execute.
  * @returns {any} - The result of the command execution or an error message.
  */
 function execute(input) { ... }
-    const args = input.match(/(?:[^\s"]+|"[^"]*")+/g);
+    const args = input.match(/(?:[^\s"]+|"[^"]*")+/g).map(arg => arg.replace(/(^"|"$)/g, ''));
 
 
 define a function `terminal` on window.apps that creates a root element with class terminal and returns it at the end
@@ -87,7 +98,7 @@ when the user hits the enter key on the input take the content call the output f
 <pre style='text-wrap: wrap'>let currentPath = '/';
 
 /**
- * Changes the current directory to the specified path.
+ * Changes the current path to the specified path.
  * @param {string} path - The path to change to.
  */
 function cd(path) {
@@ -115,25 +126,21 @@ const bin = {
     pwd: pwd
 };
 /**
- * Executes a command with the given parameters, processing the path accordingly.
- * @param {string} input - The command string to execute.
+ * Executes a command with the given parameters, processing the input string.
+ * @param {string} input - The command input string to execute.
  * @returns {any} - The result of the command execution or an error message.
  */
 function execute(input) {
-    const args = input.match(/(?:[^\s"]+|"[^"]*")+/g);
+    const args = input.match(/(?:[^\s"]+|"[^"]*")+/g).map(arg => arg.replace(/(^"|"$)/g, ''));
     let path = currentPath;
     const command = `bin.${args[0]}`;
-    
+
     if (args[1]) {
-        if (!args[1].startsWith('/')) {
-            path = window.os.fs.getPath(`${currentPath}/${args[1]}`);
-        } else {
-            path = window.os.fs.getPath(args[1]);
-        }
+        path = args[1].startsWith('/') ? window.os.fs.getPath(args[1]) : window.os.fs.getPath(`${currentPath}/${args[1]}`);
     }
 
     try {
-        return eval(`${command}("${path}", ${args.slice(2).map(arg => `"${arg}"`).join(', ')})`);
+        return eval(`${command}('${path}', ${args.slice(2).map(arg => `'${arg}'`).join(', ')})`);
     } catch (error) {
         return error.message;
     }
@@ -164,17 +171,18 @@ window.apps.terminal = function() {
     terminal.appendChild(terminalInput);
 
     function output(value, color = 'white') {
-        const line = document.createElement('div');
-        line.className = 'terminal-line';
-        line.style.color = color;
         if (Array.isArray(value)) {
             value.forEach(item => {
-                const itemLine = document.createElement('div');
-                itemLine.textContent = item;
-                itemLine.style.color = color;
-                terminalOutput.prepend(itemLine);
+                const line = document.createElement('div');
+                line.className = 'terminal-line';
+                line.style.color = color;
+                line.textContent = item;
+                terminalOutput.prepend(line);
             });
         } else {
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.style.color = color;
             line.textContent = value;
             terminalOutput.prepend(line);
         }
@@ -182,8 +190,8 @@ window.apps.terminal = function() {
 
     input.addEventListener('keydown', function(event) {
         if (event.key === 'Enter') {
-            const currentTime = new Date().toLocaleTimeString();
             const content = input.value;
+            const currentTime = new Date().toLocaleTimeString();
             output(`[${currentTime}] ${content}`, 'yellow');
             const result = execute(content);
             output(result);

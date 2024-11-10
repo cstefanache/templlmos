@@ -29,7 +29,8 @@
             "rebuild": false,
             "library": false,
             "dependencies": [
-                "filesystem"
+                "filesystem",
+                "registry"
             ],
             "instructions": [
                 [
@@ -54,19 +55,19 @@
                     "and return the .presenter element"
                 ],
                 [
-                    "define a function called readFileContent that takes a path as an argument",
+                    "define a function called readFileContentSync that takes a path as an argument",
                     " read the file provided in the argument and merge the output in a single string"
                 ],
                 [
-                    "define a function called presenter on window.apps that takes a string as an argument with default value '/itdays.md'",
-                    "gets the root element by executing getPresenterLayout and gets .content child as local reference", 
-                    "execute readFileContent with the argument and store value",
+                    "define a function called presenter on window.apps that takes a windowInstance and path string with default value '/itdays.md' as arguments",
+                    "gets the root element by executing getPresenterLayout and gets .content child as local reference",
+                    "execute readFileContentSync with the argument and store value",
                     "execute getSlideDOMElement with the stored value split by `---` and append elements of result to the content element",
                     "starting with index 0, if the user presses arrow keys navigate through the slides by showing the slide at index",
-                    "append the root element to the body"
+                    "returns the root element"
                 ],
                 [
-                    "execute window.apps.presenter()"
+                    "call register application with 'Presenter' title, 📽️ as emoji, presenter function reference and 1200x680 size for [md] extensions"
                 ]
             ]
         }
