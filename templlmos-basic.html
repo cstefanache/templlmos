@@ -1,0 +1,624 @@
+<html>
+ <head>
+  <style id="osbase_general-styles">
+   body {
+    background-color: #FFF4DF;
+    overflow: hidden;
+}
+  </style>
+  <script id="osbase_global-objects">
+   (() => {
+window.os = {};
+
+})()
+  </script>
+  <script id="osbase_filesystem">
+   (() => {
+(function() {
+    if (!window.os) {
+        window.os = {};
+    }
+    if (!window.os.fs) {
+        window.os.fs = {};
+    }
+
+    const fsKey = 'filesystem';
+    let filesystem = JSON.parse(localStorage.getItem(fsKey)) || {
+        'about.txt': 'Welcome to TempLLMOS'
+    };
+
+    /**
+     * Saves the filesystem object to local storage.
+     * @function
+     */
+    window.os.fs.sync = function() {
+        localStorage.setItem(fsKey, JSON.stringify(filesystem));
+    };
+
+    /**
+     * Processes and returns a path, handling '..', '//' and '/'.
+     * @param {string} path - The path to process.
+     * @returns {string|null} - The processed path or null if invalid.
+     */
+    window.os.fs.getPath = function(path) {
+        const parts = path.split('/').filter(Boolean);
+        const stack = [];
+        for (const part of parts) {
+            if (part === '..') {
+                if (stack.length > 0) {
+                    stack.pop();
+                } else {
+                    return null;
+                }
+            } else {
+                stack.push(part);
+            }
+        }
+        return '/' + stack.join('/');
+    };
+
+    /**
+     * Checks if the path is valid.
+     * @param {string} path - The path to check.
+     * @returns {boolean} - True if valid, false otherwise.
+     */
+    window.os.fs.isValidPath = function(path) {
+        return typeof path === 'string' && path.startsWith('/');
+    };
+
+    /**
+     * Returns a list of entries in the filesystem object at the given path.
+     * @param {string} path - The path to list entries from.
+     * @returns {Array} - An array of entries.
+     */
+    window.os.fs.ls = function(path) {
+        const processedPath = this.getPath(path);
+        if (!this.isValidPath(processedPath)) return [];
+        const parts = processedPath.split('/').filter(Boolean);
+        let current = filesystem;
+        for (const part of parts) {
+            if (current[part]) {
+                current = current[part];
+            } else {
+                return [];
+            }
+        }
+        return Object.keys(current);
+    };
+
+    /**
+     * Creates an empty object at the given path.
+     * @param {string} path - The path to create the directory at.
+     */
+    window.os.fs.mkdir = function(path) {
+        const processedPath = this.getPath(path);
+        if (!this.isValidPath(processedPath)) return;
+        const parts = processedPath.split('/').filter(Boolean);
+        let current = filesystem;
+        for (const part of parts) {
+            if (!current[part]) {
+                current[part] = {};
+            }
+            current = current[part];
+        }
+        this.sync();
+    };
+
+    /**
+     * Removes the object at the given path.
+     * @param {string} path - The path to remove the object from.
+     */
+    window.os.fs.rm = function(path) {
+        const processedPath = this.getPath(path);
+        if (!this.isValidPath(processedPath)) return;
+        const parts = processedPath.split('/').filter(Boolean);
+        let current = filesystem;
+        for (let i = 0; i < parts.length - 1; i++) {
+            if (current[parts[i]]) {
+                current = current[parts[i]];
+            } else {
+                return;
+            }
+        }
+        delete current[parts[parts.length - 1]];
+        this.sync();
+    };
+
+    /**
+     * Writes the content to an entry in the filesystem object at the given path.
+     * @param {string} path - The path to write to.
+     * @param {string} content - The content to write.
+     */
+    window.os.fs.write = function(path, content) {
+        const processedPath = this.getPath(path);
+        if (!this.isValidPath(processedPath)) return;
+        const parts = processedPath.split('/').filter(Boolean);
+        let current = filesystem;
+        for (const part of parts.slice(0, -1)) {
+            if (!current[part]) {
+                current[part] = {};
+            }
+            current = current[part];
+        }
+        current[parts[parts.length - 1]] = content;
+        this.sync();
+    };
+
+    /**
+     * Reads an entry split by '\n' in the filesystem object at the given path.
+     * @param {string} path - The path to read from.
+     * @returns {Array|null} - An array of lines or null if not found.
+     */
+    window.os.fs.read = function(path) {
+        const processedPath = this.getPath(path);
+        if (!this.isValidPath(processedPath)) return null;
+        const parts = processedPath.split('/').filter(Boolean);
+        let current = filesystem;
+        for (const part of parts) {
+            if (current[part]) {
+                current = current[part];
+            } else {
+                return null;
+            }
+        }
+        return current.split('\n');
+    };
+
+    window.os.fs.sync();
+})();
+
+})()
+  </script>
+  <style id="basic-registry_registry-close-button">
+   .close-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 5px;
+    cursor: pointer;
+    color: red;
+}
+  </style>
+  <script id="basic-registry_registry">
+   (() => {
+/**
+ * Registers a new application in the OS with a title, emoji, and a callback function.
+ * The callback function is executed to create a DOM element which is then displayed
+ * in the body with a close button to remove it.
+ * 
+ * @param {string} title - The title of the application.
+ * @param {string} emoji - The emoji representing the application.
+ * @param {function} callback - A function that returns a DOM element.
+ */
+window.os = window.os || {};
+
+window.os.registerApplication = function(title, emoji, callback) {
+    const appElement = callback();
+    appElement.style.position = 'relative';
+
+    const closeButton = document.createElement('span');
+    closeButton.className = 'close-button';
+    closeButton.textContent = '❌';
+    closeButton.addEventListener('click', function() {
+        document.body.removeChild(appElement);
+    });
+
+    appElement.appendChild(closeButton);
+    document.body.appendChild(appElement);
+};
+
+})()
+  </script>
+  <style id="terminal_terminal-style">
+   .terminal {
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    color: white;
+    font-family: monospace;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+.terminal-output {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column-reverse;
+}
+.terminal-line {
+    display: flex;
+    flex-direction: row;
+    overflow-wrap: anywhere;
+}
+.terminal-input {
+    display: flex;
+    flex-direction: row;
+}
+.terminal-input-text {
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-family: monospace;
+    font-size: 16px;
+    flex: 1;
+    outline: none;
+}
+  </style>
+  <style id="presenter_presenter-styles">
+   .presenter {
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    color: black;
+    font-family: monospace;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.presenter .header {
+    display: flex;
+    flex-direction: row;
+    height: 20px;
+    padding: 10px;
+    align-items: center;
+    justify-content: space-between;
+    background-color: yellow;
+    color: black;
+}
+
+.presenter .header img {
+    height: 100%;
+}
+
+.presenter .header p {
+    margin: 0;
+}
+
+.presenter .content {
+    display: flex;
+    position: relative;
+    flex: 1;
+    padding: 10px;
+    overflow: hidden;
+    background-color: white;
+}
+
+.presenter .footer {
+    display: flex;
+    flex-direction: row-reverse;
+    height: 20px;
+    padding: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.presenter .slide {
+    position: absolute;
+    background-color: white;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+}
+.slide.dark {
+    background-color: black;
+    color: white;
+}
+
+.slide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.slide h1 {
+    font-size: 5em;
+}
+
+.slide h2 {
+    font-size: 3em;
+}
+
+.slide h3 {
+    font-size: 2em;
+}
+
+.slide pre {
+    white-space: pre-wrap;
+    background-color: #201e30;
+    color: white;
+    padding: 5px;
+    margin: 0 auto;
+    max-width: 720px;
+    text-align: left;
+}
+  </style>
+ </head>
+ <body>
+  <span id="osbase_logo">
+   <svg height="100" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);" viewbox="0 0 100 100" width="100">
+    <g fill="none" stroke="black" stroke-width="2">
+     <polygon points="50,10 90,40 10,40">
+     </polygon>
+     <rect height="40" width="40" x="30" y="40">
+     </rect>
+     <line x1="50" x2="50" y1="40" y2="80">
+     </line>
+     <line x1="30" x2="70" y1="60" y2="60">
+     </line>
+    </g>
+    <text fill="black" font-family="Arial" font-size="8" text-anchor="middle" x="50" y="95">
+     TempLLM OS
+    </text>
+   </svg>
+  </span>
+  <script id="osbase_outputs">
+   (() => {
+const asciiArt = `
+TTTTT  EEEEE  M   M  PPPP   L     L      M   M      OOO   SSSS
+  T    E      MM MM  P   P  L     L     MM MM     O   O S
+  T    EEEE   M M M  PPPP   L     L     M M M     O   O  SSSS
+  T    E      M   M  P      L     L     M   M     O   O     S
+  T    EEEEE  M   M  P      LLLLL LLLLL M   M      OOO  SSSS
+`.replace(/ /g, '.');
+
+window.os.fs.write('/logo.txt', asciiArt);
+
+})()
+  </script>
+  <script id="terminal_terminal-runtime">
+   (() => {
+let currentPath = '/';
+
+/**
+ * Changes the current path to the specified path.
+ * @param {string} path - The new path to set as current.
+ */
+function cd(path) {
+    currentPath = path;
+}
+
+/**
+ * Returns the current working directory.
+ * @returns {string} - The current path.
+ */
+function pwd() {
+    return currentPath;
+}
+
+const bin = {
+    sync: window.os.fs.sync,
+    getPath: window.os.fs.getPath,
+    isValidPath: window.os.fs.isValidPath,
+    ls: window.os.fs.ls,
+    mkdir: window.os.fs.mkdir,
+    rm: window.os.fs.rm,
+    write: window.os.fs.write,
+    read: window.os.fs.read,
+    cd: cd,
+    pwd: pwd
+};
+/**
+ * Executes a command with the given parameters, processing the path accordingly.
+ * @param {string} input - The command input string to execute.
+ * @returns {any} - The result of the command execution or an error message.
+ */
+function execute(input) {
+    const args = input.match(/(?:[^\s"]+|"[^"]*")+/g).map(arg => arg.replace(/(^"|"$)/g, ''));
+    let path = currentPath;
+    const command = `bin.${args[0]}`;
+    
+    if (args[1]) {
+        path = args[1].startsWith('/') ? window.os.fs.getPath(args[1]) : window.os.fs.getPath(`${currentPath}/${args[1]}`);
+    }
+
+    try {
+        return eval(`${command}("${path}", ${args.slice(2).map(arg => `"${arg}"`).join(', ')})`);
+    } catch (error) {
+        return error.message;
+    }
+}
+window.apps = window.apps || {};
+
+window.apps.terminal = function() {
+    const terminal = document.createElement('div');
+    terminal.className = 'terminal';
+
+    const terminalOutput = document.createElement('div');
+    terminalOutput.className = 'terminal-output';
+    const welcomeLine = document.createElement('div');
+    welcomeLine.className = 'terminal-line';
+    welcomeLine.textContent = 'Welcome to TempLLM OS';
+    terminalOutput.appendChild(welcomeLine);
+    terminal.appendChild(terminalOutput);
+
+    const terminalInput = document.createElement('div');
+    terminalInput.className = 'terminal-input';
+    const prefix = document.createElement('span');
+    prefix.className = 'prefix';
+    prefix.textContent = '>';
+    const input = document.createElement('input');
+    input.className = 'terminal-input-text';
+    terminalInput.appendChild(prefix);
+    terminalInput.appendChild(input);
+    terminal.appendChild(terminalInput);
+
+    function output(value, color = 'white') {
+        const line = document.createElement('div');
+        line.className = 'terminal-line';
+        line.style.color = color;
+        if (Array.isArray(value)) {
+            value.forEach(item => {
+                const itemLine = document.createElement('div');
+                itemLine.textContent = item;
+                itemLine.style.color = color;
+                terminalOutput.prepend(itemLine);
+            });
+        } else {
+            line.textContent = value;
+            terminalOutput.prepend(line);
+        }
+    }
+
+    input.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            const currentTime = new Date().toLocaleTimeString();
+            const content = input.value;
+            output(`[${currentTime}] ${content}`, 'yellow');
+            const result = execute(content);
+            output(result);
+            input.value = '';
+            input.focus();
+        }
+    });
+
+    return terminal;
+};
+window.os.registerApplication('Terminal', '🖥️', window.apps.terminal);
+
+})()
+  </script>
+  <script id="presenter_presenter-logic">
+   (() => {
+function getSlideDOMElement(slides) {
+    const result = [];
+    slides.forEach(item => {
+        const lines = item.split('\n');
+        const slideElement = document.createElement('div');
+        slideElement.className = 'slide';
+
+        lines.forEach(line => {
+            if (line.startsWith('.')) {
+                slideElement.classList.add(line.substring(1).trim());
+            } else {
+                let element;
+                if (line.startsWith('# ')) {
+                    element = document.createElement('h1');
+                    element.textContent = line.substring(2).trim();
+                } else if (line.startsWith('## ')) {
+                    element = document.createElement('h2');
+                    element.textContent = line.substring(3).trim();
+                } else if (line.startsWith('### ')) {
+                    element = document.createElement('h3');
+                    element.textContent = line.substring(4).trim();
+                } else if (line.startsWith('![')) {
+                    const altText = line.match(/!\[(.*?)\]/)[1];
+                    const src = line.match(/\((.*?)\)/)[1];
+                    element = document.createElement('img');
+                    element.src = src;
+                    element.alt = altText;
+                } else if (line.startsWith('`')) {
+                    element = document.createElement('pre');
+                    element.textContent = line.substring(1, line.length - 1).trim();
+                } else {
+                    element = document.createElement('p');
+                    element.textContent = line.trim();
+                }
+                slideElement.appendChild(element);
+            }
+        });
+
+        result.push(slideElement);
+    });
+    return result;
+}
+function getPresenterLayout() {
+    const presenter = document.createElement('div');
+    presenter.className = 'presenter';
+
+    const header = document.createElement('div');
+    header.className = 'header';
+
+    const headerImage = document.createElement('img');
+    headerImage.src = 'https://www.itdays.ro/public/images/logo-gri.png';
+    header.appendChild(headerImage);
+
+    const headerText = document.createElement('p');
+    headerText.textContent = 'INNOVATION, PROGRAMMING AND TECHNOLOGIES';
+    header.appendChild(headerText);
+
+    presenter.appendChild(header);
+
+    const content = document.createElement('div');
+    content.className = 'content';
+    presenter.appendChild(content);
+
+    const footer = document.createElement('div');
+    footer.className = 'footer';
+
+    const footerImage = document.createElement('img');
+    footerImage.src = 'https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg';
+    footer.appendChild(footerImage);
+
+    presenter.appendChild(footer);
+
+    return presenter;
+}
+function readFileContentSync(path) {
+    const lines = window.os.fs.read(path);
+    if (lines) {
+        return lines.join('\n');
+    }
+    return '';
+}
+window.apps.presenter = function(windowInstance, path = '/itdays.md') {
+    const rootElement = getPresenterLayout();
+    const content = rootElement.querySelector('.content');
+    const fileContent = readFileContentSync(path);
+    const slides = getSlideDOMElement(fileContent.split('---'));
+    
+    slides.forEach(slide => content.appendChild(slide));
+    
+    let currentIndex = 0;
+    function showSlide(index) {
+        const allSlides = content.children;
+        for (let i = 0; i < allSlides.length; i++) {
+            allSlides[i].style.display = (i === index) ? 'block' : 'none';
+        }
+    }
+    
+    showSlide(currentIndex);
+    
+    window.addEventListener('keydown', function(event) {
+        console.log(event)
+        if (event.key === 'ArrowRight') {
+            currentIndex = Math.min(currentIndex + 1, content.children.length - 1);
+            showSlide(currentIndex);
+        } else if (event.key === 'ArrowLeft') {
+            currentIndex = Math.max(currentIndex - 1, 0);
+            showSlide(currentIndex);
+        }
+    });
+    
+    return rootElement;
+};
+window.os.registerApplication('Presenter', '📽️', window.apps.presenter);
+
+})()
+  </script>
+  <script>
+   window.os.fs.write('/sources/chatgpt_os/general-styles.txt', 'Package: general-styles\ncss to apply a #FFF4DF background color to the body and overflow hidden')
+window.os.fs.write('/sources/chatgpt_os/logo.txt', 'Package: logo\nSVG dom element, fixed centered on the screen, with a width of 100px and height of 100px of a line art temple logo and the text that says "TempLLM OS"')
+window.os.fs.write('/sources/chatgpt_os/global-objects.txt', 'Package: global-objects\nCreate a new empty object `os` on the window global object')
+window.os.fs.write('/sources/chatgpt_filesystem/filesystem.txt', 'Package: filesystem\nLoad the `filesystem` object from the local storage as json, if it does not exist create an empty object with a property `about.txt` with the content `Welcome to TempLLMOS`\nDefine the following functions on the window.os.fs object:\n `sync` - save the filesystem object to the local storage that will be called by the other functions that modify the filesystem object\n `getPath` - process and return a path by taking into account `..`, `//` and `/`. return null if the path is invalid\n `isValidPath` - checks if the path is valid\n `ls` - returns a list of entries in the filesystem object at the given path\n `mkdir` - creates an empty object at the given path\n `rm` - removes the object at the given path\n `write` - writes the content to an entry in the filesystem object at the given path\n `read` - reads an entry split by `\n` in the filesystem object at the given path, last element in path is the file name')
+window.os.fs.write('/sources/chatgpt_filesystem/outputs.txt', 'Package: outputs\ncall write with the path `/logo.txt` and ascii art of text `TempLLM OS` fill empty spaces with .')
+window.os.fs.write('/sources/chatgpt_filesystem/utils.txt', 'Package: utils\nDefine a function `cat` on `window.os` namespace that takes a path as a parameter and returns the content of the file split by `\n` ')
+window.os.fs.write('/sources/chatgpt_filesystem/fs-tests.txt', 'Package: fs-tests\ncreate a new directory in the root directory called `fstest`\ncreate a new file in the `fstest` directory called `test.txt` with the content `hello world`\nlist the entries in the `fstest` directory and log it to console\nread the content of the `fstest/test.txt` file and log it to console\nremove the `fstest` directory')
+window.os.fs.write('/sources/chatgpt_basic_registry/registry-close-button.txt', 'Package: registry-close-button\n.close-button position absolute, top 0, right 0, padding 5px, cursor pointer, color red')
+window.os.fs.write('/sources/chatgpt_basic_registry/registry.txt', 'Package: registry\ncreate a new function `registerApplication` on the `window.os` object and jsdoc that takes a title, emoji, callback by default having the following functionality:\n- execute the callback function and store the resulting DOM element in a variable\n- set position relative to the DOM element\n- create a new span dom element with the class .close-button and text: ❌, append it to the DOM element and add a click event listener that removes the DOM element from the body\n- append the DOM element to the body')
+window.os.fs.write('/sources/chatgpt_apps_terminal/terminal-style.txt', 'Package: terminal-style\ndefine a terminal class with the following css properties\n- width: 100%\n- height: 100%\n- background-color: black\n- color: white\n- font-family: monospace\n- overflow: hidden\n- display: flex\n- flex-direction: column\ndefine a terminal-output class with the following css properties\n- flex: 1\n- overflow-y: auto\n- padding: 10px\n- display: flex\n- flex-direction: column-reverse\ndefine a terminal-line class with the following css properties\n- display: flex\n- flex-direction: row\n- overflow-wrap: anywhere\ndefine a terminal-input class with the following css properties\n- display: flex\n- flex-direction: row\ndefine a terminal-input-text class with the following css properties\n- background-color: transparent\n- border: none\n- color: white\n- font-family: monospace\n- font-size: 16px\n- flex: 1\n- outline: none')
+window.os.fs.write('/sources/chatgpt_apps_terminal/terminal-runtime.txt', 'Package: terminal-runtime\nkeep a local variable called currentPath with value "/"\ndefine a local function `cd` that takes a string parameter and sets currentPath to it\ndefine a local function `pwd` that returns the parent scope defined currentPath\ndefine and object called bin and referece functions from objects:\n - window.os.fs\n - `cd` and `pwd` functions\ncurrentPath is defined in parent scope\ndefine a function `execute` that takes a string parameter and:\n - splits the string by space but keeps in a single element if it is in quotes\n - set path to currentPath\n - the first element is the command and prepend `bin.` to it\n - if the second element exists:\n    - if it does not start with `/`, prepend `currentPath` to it and assign it to path after calling `getPath` on it\n    - if it starts with `/`, assign it to path after calling `getPath` on it\n - return eval of `command` with `path` and rest of the parameters from the list as string arguments\n - if the eval throws an error, return the error message\ndefine a function `terminal` on window.apps that creates a root element with class terminal and returns it at the end\ncreate the following dom structure:\n - .terminal\n   - .terminal-output\n     - .terminal-line with text "Welcome to TempLLM OS"\n   - .terminal-input\n     - .prefix with text ">"\n     - input.terminal-input-text\ndefine inner function called output that takes two parameters: value and color with default value white. The function prepends a div with class terminal-line having color style as provided in the function and the value as text to the terminal-output div. if the value is a list then prepend each item in the list as a separate div\nwhen the user hits the enter key on the input take the content call the output function with the content prefixed with `[%current_time%]` and color yellow, call `output` with the resul of calling `execute` function with the value of the input, clear the input and focus it again\ncall register application with "Terminal" title, 🖥️ as emoji, terminal function reference and 800x500 size')
+window.os.fs.write('/sources/chatgpt_apps_presenter/presenter-styles.txt', 'Package: presenter-styles\n.presenter class with 100% width and height, white background, black color, monospace font-family, hidden overflow, flex display and column flex-direction\n.presenter .header class with display flex, row flex-direction, 20px height, padding 10px, align-items center and justify-content space-between, yellow background and black color text\n.presenter .header img with 100% height\n.presenter .header p with margin 0\n.presenter .content class with display flex, position realtive, flex 1, padding 10px, overflow hidden, white background\n.presenter .footer class with display flex, row-reverse flex-direction,, 20px height, padding 10px, align-items center and justify-content space-between\n.presenter .slide should have an absolute position, white background color, 100% width and height, hidden overflow, display flex and column flex-direction and align-content center\n.slide.dark with background-color black and color white\n.slide content should be centered with align-items center and justify-content center and text centered\n.slide h1 with font-size 5em\n.slide h2 with font-size 3em\n.slide h3 with font-size 2em\n.slide pre with white-space pre-wrap and background-color #201e30, white text, padding 5, margin 0 auto, max-width 720 and text-align left')
+window.os.fs.write('/sources/chatgpt_apps_presenter/presenter-logic.txt', 'Package: presenter-logic\ndefine a function called getSlideDOMElement that takes an array of strings as an argument\niterate the array and for each item:\n split item by `\n`\n   iterate the split result and for each line:\n     if the line starts with a dot and a string append the class of the slide to the string\n     create a slide div element with class slide\n     generate html dom elements corresponding to the markdown syntax with headers, text, image and backtick as pre support and append them to the slide element\n   append the slide element to the result array\nreturn the result array\ndefine a function called getPresenterLayout that creates the following dom structure of divs:\n .presenter\n   .header\n     img[`https://www.itdays.ro/public/images/logo-gri.png`]\n     p`INNOVATION, PROGRAMMING AND TECHNOLOGIES`\n   .content\n   .footer\n     img[`https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg`]\nand return the .presenter element\ndefine a function called readFileContentSync that takes a path as an argument\n read the file provided in the argument and merge the output in a single string\ndefine a function called presenter on window.apps that takes a windowInstance and path string with default value "/itdays.md" as arguments\ngets the root element by executing getPresenterLayout and gets .content child as local reference\nexecute readFileContentSync with the argument and store value\nexecute getSlideDOMElement with the stored value split by `---` and append elements of result to the content element\nstarting with index 0, if the user presses arrow keys navigate through the slides by showing the slide at index\nreturns the root element\ncall register application with "Presenter" title, 📽️ as emoji, presenter function reference and 1200x680 size for [md] extensions')
+  </script>
+  <script>
+   window.os.fs.write('/itdays.md', '# LLMs: A Paradigm Shift in Operating Systems\n![image](https://avatars.githubusercontent.com/u/3071201?s=96&v=4)\n## cornel stefanache\n### cto@ascentcore\n### co-creator@monkeyuser.com\n---\n.dark\n# kernel panic!\n---\n# Purpose\n## Anyone should be able to:\n## Change the color of the window title bar to light blue\n---\n# Can LLM Write Good OS Code?\n---\n# Can LLM Write OS Code?\n---\n# Can LLM Write OS?\n')
+  </script>
+ </body>
+</html>

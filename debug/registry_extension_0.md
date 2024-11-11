@@ -9,12 +9,8 @@
 window.os.registerExtension = function(extension, emoji, callback) { ... }
 </pre>
 ### Instruction
-<pre style='text-wrap: wrap'>
-You are a code generator that produces JavaScript code exclusively using vanilla JavaScript that will execute in a browser window. When responding to queries, provide only valid and complete JavaScript code without any additional explanations or comments. Do not include any frameworks or libraries such as jQuery, React, or others. Follow best practices for vanilla JavaScript and ensure compatibility with modern browsers. Do not write node or server-side code.. For each function, provide a brief description of its purpose in jsdoc format.
-
-create a new function `registerExtension` on `window.os` object that takes an extension, an emoji and a callback function with the following functionality:
- - stores on the `window.os.registry` object the extension as key and emoji and callback as value
-</pre>
+<pre style='text-wrap: wrap'>create a new function `registerExtension` on `window.os` object that takes an extension, an emoji and a callback function with the following functionality:
+ - stores on the `window.os.registry` object the extension as key and emoji and callback as value</pre>
 ### Output
 <pre style='text-wrap: wrap'>// Ensure the window.os object and its registry are defined
 window.os = window.os || {};

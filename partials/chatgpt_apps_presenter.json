@@ -12,12 +12,14 @@
                     ".presenter .header p with margin 0",
                     ".presenter .content class with display flex, position realtive, flex 1, padding 10px, overflow hidden, white background",
                     ".presenter .footer class with display flex, row-reverse flex-direction,, 20px height, padding 10px, align-items center and justify-content space-between",
-                    ".presenter .slide should have an absolute position, white background color, 100% width and height, hidden overflow, display flex and column flex-direction"
+                    ".presenter .slide should have an absolute position, white background color, 100% width and height, hidden overflow, display flex and column flex-direction and align-content center"
                 ],
                 [
+                    ".slide.dark with background-color black and color white",
                     ".slide content should be centered with align-items center and justify-content center and text centered",
                     ".slide h1 with font-size 5em",
-                    ".slide h2 with font-size 1.5em",
+                    ".slide h2 with font-size 3em",
+                    ".slide h3 with font-size 2em",
                     ".slide pre with white-space pre-wrap and background-color #201e30, white text, padding 5, margin 0 auto, max-width 720 and text-align left"
                 ]
             ]
@@ -38,6 +40,7 @@
                     "iterate the array and for each item:",
                     " split item by `\\n`",
                     "   iterate the split result and for each line:",
+                    "     if the line starts with a dot and a string append the class of the slide to the string",
                     "     create a slide div element with class slide",
                     "     generate html dom elements corresponding to the markdown syntax with headers, text, image and backtick as pre support and append them to the slide element",
                     "   append the slide element to the result array",
@@ -59,7 +62,7 @@
                     " read the file provided in the argument and merge the output in a single string"
                 ],
                 [
-                    "define a function called presenter on window.apps that takes a windowInstance and path string with default value '/itdays.md' as arguments",
+                    "define a function called presenter on window.apps that takes a _ and path string with default value '/itdays.xmd' as arguments",
                     "gets the root element by executing getPresenterLayout and gets .content child as local reference",
                     "execute readFileContentSync with the argument and store value",
                     "execute getSlideDOMElement with the stored value split by `---` and append elements of result to the content element",
@@ -67,7 +70,7 @@
                     "returns the root element"
                 ],
                 [
-                    "call register application with 'Presenter' title, 📽️ as emoji, presenter function reference and 1200x680 size for [md] extensions"
+                    "call register application with 'Presenter' title, 📽️ as emoji, presenter function reference and 1200x680 size for [xmd] extensions"
                 ]
             ]
         }

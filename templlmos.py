@@ -20,6 +20,7 @@ parser.add_argument("--listen", action="store_true", help="Listen for changes")
 args = parser.parse_args()
 
 descriptor = args.descriptor
+
 with open(descriptor, "r") as read_file:
     data = json.load(read_file)
 
@@ -109,12 +110,16 @@ class Server(BaseHTTPRequestHandler):
                 print(f"Dependency not found: {dependency}")
 
         for instruction in instructions.split("---"):
+            instruction = "The DOM content is already loaded. You can now run your script." + "\n" + instruction
             update_response(instruction + "\n" + "-------------------------------" + "\n")
-            result = compiler.llm.call_default_llm(
+            print("$"*80)
+            print(instruction)
+            result = compiler.llm.execute(
                 instruction,
                 dependencies=compiled_dependencies,
-                update_fn=update_response,
-                with_cache=True,
+                to=["script"],
+                tag="script",
+                isLibrary=False,                
             )
             if json_data.get("full", False) is False:
                 output += compiler.process_output(result)

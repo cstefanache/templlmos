@@ -24,6 +24,44 @@
                     "call register application with 'Editor' title, ✍️ as emoji, `editor` function reference and 400x450 size for [txt,doc] extensions"
                 ]
             ]
+        },
+        "markdown-styles": {
+            "disabled": false,
+            "rebuild": false,
+            "to": "head",
+            "tag": "style",
+            "dependencies": [
+            ],
+            "instructions": [
+                [
+                    "create a .markdown class and style it with common markdown styles",
+                    "all pre elements in .markdown style it for code display with smaller font and minimal margins and line height for internal p elements"
+                    
+
+                ]
+            ]
+        },
+        "markdown": {
+            "disabled": false,
+            "rebuild": false,
+            "to": "body",
+            "tag": "script",
+            "dependencies": [
+                "filesystem",
+                "toolbar",
+                "registry"
+            ],
+            "instructions": [
+                [
+                    "Create a `markdown` function that takes a _ and path parameter:",
+                    " - create a dom element with class `markdown`",
+                    " - if path is not empty, read the file content and store it in a variable",
+                    " - avoid escaping html code, parse the markdown content and generate html elements for all type of markdown syntax elements and append them to the previously created element",
+                    " - return  dom element",
+                    "",
+                    "call register application with 'markdown' title, 〽️ as emoji, `markdown` function reference and 800x650 size for [md] extensions"
+                ]
+            ]
         }
     }
 }

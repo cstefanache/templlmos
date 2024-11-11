@@ -38,7 +38,7 @@
         "utils": {
             "to": "head",
             "tag": "script",
-            "disabled": "true",
+            "disabled": true,
             "rebuild": false,
             "library": true,
             "dependencies": [

@@ -2,14 +2,12 @@
 ### API
 <pre style='text-wrap: wrap'></pre>
 ### Instruction
-<pre style='text-wrap: wrap'>
-You are a code generator that produces CSS code exclusively. When responding to queries, provide only valid and complete CSS code without any additional explanations or comments. Do not include any HTML, JavaScript, or commentary unless explicitly asked to. Follow best practices for CSS and ensure compatibility across modern browsers.
-
+<pre style='text-wrap: wrap'>.slide.dark with background-color black and color white
 .slide content should be centered with align-items center and justify-content center and text centered
 .slide h1 with font-size 5em
-.slide h2 with font-size 1.5em
-.slide pre with white-space pre-wrap and background-color #201e30, white text, padding 5, margin 0 auto, max-width 720 and text-align left
-</pre>
+.slide h2 with font-size 3em
+.slide h3 with font-size 2em
+.slide pre with white-space pre-wrap and background-color #201e30, white text, padding 5, margin 0 auto, max-width 720 and text-align left</pre>
 ### Output
 <pre style='text-wrap: wrap'>.presenter {
     width: 100%;
@@ -67,7 +65,13 @@ You are a code generator that produces CSS code exclusively. When responding to 
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    align-content: center;
 }
+.slide.dark {
+    background-color: black;
+    color: white;
+}
+
 .slide {
     display: flex;
     align-items: center;
@@ -80,7 +84,11 @@ You are a code generator that produces CSS code exclusively. When responding to 
 }
 
 .slide h2 {
-    font-size: 1.5em;
+    font-size: 3em;
+}
+
+.slide h3 {
+    font-size: 2em;
 }
 
 .slide pre {

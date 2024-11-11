@@ -1,0 +1,32 @@
+{
+    "basic-registry": {
+        "registry-close-button": {
+            "disabled": false,
+            "to": "head",
+            "tag": "style",
+            "instructions": [
+                [
+                    ".close-button position absolute, top 0, right 0, padding 5px, cursor pointer, color red"
+                ]
+            ]
+        },
+        "registry": {
+            "disabled": false,
+            "to": "head",
+            "tag": "script",
+            "rebuild": false,
+            "library": true,
+            "dependencies": [
+            ],
+            "instructions": [
+                [
+                    "create a new function `registerApplication` on the `window.os` object and jsdoc that takes a title, emoji, callback by default having the following functionality:",
+                    "- execute the callback function and store the resulting DOM element in a variable",
+                    "- set position relative to the DOM element",
+                    "- create a new span dom element with the class .close-button and text: ❌, append it to the DOM element and add a click event listener that removes the DOM element from the body",
+                    "- append the DOM element to the body"
+                ]
+            ]
+        }
+    }
+}

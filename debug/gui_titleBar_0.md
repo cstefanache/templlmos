@@ -9,15 +9,11 @@
 window.os.gui.titleBar = function(parentElement, title, close) { ... }
 </pre>
 ### Instruction
-<pre style='text-wrap: wrap'>
-You are a code generator that produces JavaScript code exclusively using vanilla JavaScript that will execute in a browser window. When responding to queries, provide only valid and complete JavaScript code without any additional explanations or comments. Do not include any frameworks or libraries such as jQuery, React, or others. Follow best practices for vanilla JavaScript and ensure compatibility with modern browsers. Do not write node or server-side code.. For each function, provide a brief description of its purpose in jsdoc format.
-
-Define a function `titleBar` on the `window.os.gui` object that takes two parameter: parentElement (DOM element), title (string), and a callback `close` and has the following functionality:
+<pre style='text-wrap: wrap'>Define a function `titleBar` on the `window.os.gui` object that takes two parameter: parentElement (DOM element), title (string), and a callback `close` and has the following functionality:
 - create a root DOM element with the class `.titleBar`
 - add to the root DOM element a `span` containing the title parameter
 - add to the root DOM element a `button` with the text `❌` and class `close` that calls the close callback
-- append the root DOM element to parentElement
-</pre>
+- append the root DOM element to parentElement</pre>
 ### Output
 <pre style='text-wrap: wrap'>window.os = window.os || {};
 window.os.gui = window.os.gui || {};

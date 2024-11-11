@@ -8,50 +8,7 @@
 window.os.gui.attachToWindow = function(windowElement, contentElement) { ... }
 </pre>
 ### Instruction
-<pre style='text-wrap: wrap'>
-You are a code generator that produces JavaScript code exclusively using vanilla JavaScript that will execute in a browser window. When responding to queries, provide only valid and complete JavaScript code without any additional explanations or comments. Do not include any frameworks or libraries such as jQuery, React, or others. Follow best practices for vanilla JavaScript and ensure compatibility with modern browsers. Do not write node or server-side code.. For each function, provide a brief description of its purpose in jsdoc format.
-
-Given the following implemented functions:
-/**
- * Creates a title bar with a title and a close button.
- * @param {HTMLElement} parentElement - The parent DOM element to append the title bar to.
- * @param {string} title - The title to display in the title bar.
- * @param {Function} close - The callback function to call when the close button is clicked.
- */
-window.os.gui.titleBar = function(parentElement, title, close) { ... }
-
-/**
- * Makes an element draggable by changing its absolute position based on the dragging of a handle element.
- * @param {HTMLElement} root - The element to be made draggable.
- * @param {HTMLElement} dragHandleHTMLElement - The element that will be used to drag the root element.
- */
-window.os.gui.makeDraggable = function(root, dragHandleHTMLElement) { ... }
-/**
- * Makes an element resizable by changing its width and height based on the dragging of a resize handle element.
- * @param {HTMLElement} root - The element to be made resizable.
- * @param {HTMLElement} resizeHandleHTMLElement - The element that will be used to resize the root element.
- */
-window.os.gui.makeResizable = function(root, resizeHandleHTMLElement) { ... }
-/**
- * Brings the specified DOM node to the front by adjusting its z-index.
- * @param {HTMLElement} rootDOMNode - The element to be brought to the front.
- */
-window.os.gui.bringToFront = function(rootDOMNode) { ... }
-const bringToFrontInternal = function() { ... }
-
-/**
- * Creates a new window with a title, emoji, and specified dimensions.
- * @param {string} emoji - The emoji to display in the title.
- * @param {string} title - The title of the window.
- * @param {number} [width=400] - The width of the window.
- * @param {number} [height=300] - The height of the window.
- * @returns {HTMLElement} The created window element.
- */
-window.os.gui.createWindow = function(emoji, title, width = 400, height = 300) { ... }
-
-
-Define a function called `attachToWindow` on the `window.os.gui` object that takes two parameters: windowElement and contentElement that takes the contentElement and appends it to the `.contentPlaceholder` of the windowElement
-</pre>
+<pre style='text-wrap: wrap'>Define a function called `attachToWindow` on the `window.os.gui` object that takes two parameters: windowElement and contentElement that takes the contentElement and appends it to the `.contentPlaceholder` of the windowElement</pre>
 ### Output
 <pre style='text-wrap: wrap'>/**
  * Creates a new window with a title, emoji, and specified dimensions.

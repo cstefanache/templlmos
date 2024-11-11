@@ -21,7 +21,8 @@
         "chatgpt_apps_presenter.json",
         "chatgpt_apps_browser.json",
         "chatgpt_apps_editor.json",
-        "chatgpt_apps_photobooth.json"
+        "chatgpt_apps_photobooth.json",
+        "chatgpt_apps_generic.json"
     ],
     "_partials": [
         "os.json",

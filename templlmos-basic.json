@@ -1,0 +1,39 @@
+{
+    "models": [
+        {
+            "repository": "TheBloke/deepseek-coder-6.7B-instruct-GGUF",
+            "model": "deepseek-coder-6.7b-instruct.Q5_K_M.gguf",
+            "depsPrefix": "Given the following already defined functions:\n",
+            "prefix": "Write only browser JS, JavaScript, HTML and CSS. Document all function declarations using jsdoc.\n### Instruction:\n{deps}\n\n",
+            "suffix": "\n### Response:\n",
+            "libraryPrefix": "### Instruction:\nGenerate declared functions signature only using the following format `namespace.method = (params) // description`:\n```\n",
+            "librarySuffix": "\n```\n### Response:\n",
+            "stop": "```\n"
+        }
+    ],
+    "partials": [
+        "chatgpt_os.json",
+        "chatgpt_filesystem.json",
+        "chatgpt_basic_registry.json",
+        "chatgpt_apps_terminal.json",
+        "chatgpt_apps_presenter.json"
+    ],
+    "_partials": [
+        "os.json",
+        "filesystem.json",
+        "desktop.json",
+        "output.json",
+        "gui.json",
+        "registry.json",
+        "apps.json",
+        "development.json",
+        "games.json"
+    ],
+    "skip": [
+        "chatgpt_desktop.json",
+        "chatgpt_gui.json",
+        "registry.json"
+        
+    ],
+    "definition": {}
+}

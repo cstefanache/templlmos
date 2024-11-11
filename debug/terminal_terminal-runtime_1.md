@@ -9,80 +9,7 @@ function execute(input) { ... }
     const args = input.match(/(?:[^\s"]+|"[^"]*")+/g).map(arg => arg.replace(/(^"|"$)/g, ''));
 </pre>
 ### Instruction
-<pre style='text-wrap: wrap'>
-You are a code generator that produces JavaScript code exclusively using vanilla JavaScript that will execute in a browser window. When responding to queries, provide only valid and complete JavaScript code without any additional explanations or comments. Do not include any frameworks or libraries such as jQuery, React, or others. Follow best practices for vanilla JavaScript and ensure compatibility with modern browsers. Do not write node or server-side code.. For each function, provide a brief description of its purpose in jsdoc format.
-
-Given the following implemented functions:
-    /**
-     * Saves the filesystem object to local storage.
-     * @function
-     */
-window.os.fs.sync = function() { ... }
-    /**
-     * Processes and returns a path, handling '..', '//' and '/'.
-     * @param {string} path - The path to process.
-     * @returns {string|null} - The processed path or null if invalid.
-     */
-window.os.fs.getPath = function(path) { ... }
-    /**
-     * Checks if the path is valid.
-     * @param {string} path - The path to check.
-     * @returns {boolean} - True if valid, false otherwise.
-     */
-window.os.fs.isValidPath = function(path) { ... }
-    /**
-     * Returns a list of entries in the filesystem object at the given path.
-     * @param {string} path - The path to list entries from.
-     * @returns {Array} - An array of entries.
-     */
-window.os.fs.ls = function(path) { ... }
-    /**
-     * Creates an empty object at the given path.
-     * @param {string} path - The path to create the directory at.
-     */
-window.os.fs.mkdir = function(path) { ... }
-    /**
-     * Removes the object at the given path.
-     * @param {string} path - The path to remove the object from.
-     */
-window.os.fs.rm = function(path) { ... }
-    /**
-     * Writes the content to an entry in the filesystem object at the given path.
-     * @param {string} path - The path to write to.
-     * @param {string} content - The content to write.
-     */
-window.os.fs.write = function(path, content) { ... }
-    /**
-     * Reads an entry split by '\n' in the filesystem object at the given path.
-     * @param {string} path - The path to read from.
-     * @returns {Array|null} - An array of lines or null if not found.
-     */
-window.os.fs.read = function(path) { ... }
-
-/**
- * Registers a new application with a title, emoji, callback, dimensions, and optional extensions.
- * @param {string} title - The title of the application.
- * @param {string} emoji - The emoji to display for the application.
- * @param {Function} callback - The function to call when the application is executed.
- * @param {number} [width=400] - The width of the application window.
- * @param {number} [height=400] - The height of the application window.
- * @param {Array} [extensions=undefined] - An optional array of extensions to register with the application.
- */
-window.os.registerApplication = function(title, emoji, callback, width = 400, height = 400, extensions = undefined) { ... }
-
-/**
- * Changes the current path to the specified path.
- * @param {string} path - The path to change to.
- */
-function cd(path) { ... }
-/**
- * Returns the current working directory.
- * @returns {string} - The current path.
- */
-function pwd() { ... }
-
-
-currentPath is defined in parent scope
+<pre style='text-wrap: wrap'>currentPath is defined in parent scope
 define a function `execute` that takes a string parameter and:
  - splits the string by space but keeps in a single element if it is in quotes
  - set path to currentPath
@@ -91,8 +18,7 @@ define a function `execute` that takes a string parameter and:
     - if it does not start with `/`, prepend `currentPath` to it and assign it to path after calling `getPath` on it
     - if it starts with `/`, assign it to path after calling `getPath` on it
  - return eval of `command` with `path` and rest of the parameters from the list as string arguments
- - if the eval throws an error, return the error message
-</pre>
+ - if the eval throws an error, return the error message</pre>
 ### Output
 <pre style='text-wrap: wrap'>let currentPath = '/';
 
@@ -113,14 +39,7 @@ function pwd() {
 }
 
 const bin = {
-    sync: window.os.fs.sync,
-    getPath: window.os.fs.getPath,
-    isValidPath: window.os.fs.isValidPath,
-    ls: window.os.fs.ls,
-    mkdir: window.os.fs.mkdir,
-    rm: window.os.fs.rm,
-    write: window.os.fs.write,
-    read: window.os.fs.read,
+    fs: window.os.fs,
     cd: cd,
     pwd: pwd
 };
@@ -133,13 +52,13 @@ function execute(input) {
     const args = input.match(/(?:[^\s"]+|"[^"]*")+/g).map(arg => arg.replace(/(^"|"$)/g, ''));
     let path = currentPath;
     const command = `bin.${args[0]}`;
-
+    
     if (args[1]) {
         path = args[1].startsWith('/') ? window.os.fs.getPath(args[1]) : window.os.fs.getPath(`${currentPath}/${args[1]}`);
     }
-
+    
     try {
-        return eval(`${command}('${path}', ${args.slice(2).map(arg => `'${arg}'`).join(', ')})`);
+        return eval(`${command}("${path}", ${args.slice(2).map(arg => `"${arg}"`).join(', ')})`);
     } catch (error) {
         return error.message;
     }

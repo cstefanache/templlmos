@@ -7,7 +7,7 @@
             "instructions": [
                 [
                     "css style the `#desktop_content` id to match the following rules:",
-                    "absolute position, fixed size, 100% width, 100% height, overflow-y hidden, padding of 10px, display flex, flex-wrap wrap, flex-direction column, align content: flex start, disable selection"
+                    "absolute position, #FFF4DF background color, size, 100% width, 100% height, overflow-y hidden, padding of 10px, display flex, flex-wrap wrap, flex-direction column, align content: flex start, disable selection"
                 ]
             ]
         },

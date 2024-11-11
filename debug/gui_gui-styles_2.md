@@ -2,10 +2,7 @@
 ### API
 <pre style='text-wrap: wrap'></pre>
 ### Instruction
-<pre style='text-wrap: wrap'>
-You are a code generator that produces CSS code exclusively. When responding to queries, provide only valid and complete CSS code without any additional explanations or comments. Do not include any HTML, JavaScript, or commentary unless explicitly asked to. Follow best practices for CSS and ensure compatibility across modern browsers.
-
-css style for a  `.resizeHandle` class with the following rules:
+<pre style='text-wrap: wrap'>css style for a  `.resizeHandle` class with the following rules:
 - a width and height of 0px
 - an absolute position
 - a bottom and right of 0
@@ -13,8 +10,7 @@ css style for a  `.resizeHandle` class with the following rules:
 - border width: 0 0 10px 10px
 - border style: solid
 - `border-color: transparent transparent #ff7200 transparent`
-- transform: rotate(0deg)
-</pre>
+- transform: rotate(0deg)</pre>
 ### Output
 <pre style='text-wrap: wrap'>.titleBar {
     background-color: orange;

@@ -1,83 +1,14 @@
 ## presenter_presenter-logic_3
 ### API
-<pre style='text-wrap: wrap'>window.apps.presenter = function(windowInstance, path = '/itdays.md') { ... }
+<pre style='text-wrap: wrap'>window.apps.presenter = function(_, path = '/itdays.xmd') { ... }
 </pre>
 ### Instruction
-<pre style='text-wrap: wrap'>
-You are a code generator that produces JavaScript code exclusively using vanilla JavaScript that will execute in a browser window. When responding to queries, provide only valid and complete JavaScript code without any additional explanations or comments. Do not include any frameworks or libraries such as jQuery, React, or others. Follow best practices for vanilla JavaScript and ensure compatibility with modern browsers. Do not write node or server-side code.
-
-Given the following implemented functions:
-    /**
-     * Saves the filesystem object to local storage.
-     * @function
-     */
-window.os.fs.sync = function() { ... }
-    /**
-     * Processes and returns a path, handling '..', '//' and '/'.
-     * @param {string} path - The path to process.
-     * @returns {string|null} - The processed path or null if invalid.
-     */
-window.os.fs.getPath = function(path) { ... }
-    /**
-     * Checks if the path is valid.
-     * @param {string} path - The path to check.
-     * @returns {boolean} - True if valid, false otherwise.
-     */
-window.os.fs.isValidPath = function(path) { ... }
-    /**
-     * Returns a list of entries in the filesystem object at the given path.
-     * @param {string} path - The path to list entries from.
-     * @returns {Array} - An array of entries.
-     */
-window.os.fs.ls = function(path) { ... }
-    /**
-     * Creates an empty object at the given path.
-     * @param {string} path - The path to create the directory at.
-     */
-window.os.fs.mkdir = function(path) { ... }
-    /**
-     * Removes the object at the given path.
-     * @param {string} path - The path to remove the object from.
-     */
-window.os.fs.rm = function(path) { ... }
-    /**
-     * Writes the content to an entry in the filesystem object at the given path.
-     * @param {string} path - The path to write to.
-     * @param {string} content - The content to write.
-     */
-window.os.fs.write = function(path, content) { ... }
-    /**
-     * Reads an entry split by '\n' in the filesystem object at the given path.
-     * @param {string} path - The path to read from.
-     * @returns {Array|null} - An array of lines or null if not found.
-     */
-window.os.fs.read = function(path) { ... }
-
-/**
- * Registers a new application with a title, emoji, callback, dimensions, and optional extensions.
- * @param {string} title - The title of the application.
- * @param {string} emoji - The emoji to display for the application.
- * @param {Function} callback - The function to call when the application is executed.
- * @param {number} [width=400] - The width of the application window.
- * @param {number} [height=400] - The height of the application window.
- * @param {Array} [extensions=undefined] - An optional array of extensions to register with the application.
- */
-window.os.registerApplication = function(title, emoji, callback, width = 400, height = 400, extensions = undefined) { ... }
-
-function getSlideDOMElement(slides) { ... }
-                const altText = line.match(/!\[(.*?)\]/)[1];
-                const src = line.match(/\((.*?)\)/)[1];
-function getPresenterLayout() { ... }
-function readFileContentSync(path) { ... }
-
-
-define a function called presenter on window.apps that takes a windowInstance and path string with default value '/itdays.md' as arguments
+<pre style='text-wrap: wrap'>define a function called presenter on window.apps that takes a _ and path string with default value '/itdays.xmd' as arguments
 gets the root element by executing getPresenterLayout and gets .content child as local reference
 execute readFileContentSync with the argument and store value
 execute getSlideDOMElement with the stored value split by `---` and append elements of result to the content element
 starting with index 0, if the user presses arrow keys navigate through the slides by showing the slide at index
-returns the root element
-</pre>
+returns the root element</pre>
 ### Output
 <pre style='text-wrap: wrap'>function getSlideDOMElement(slides) {
     const result = [];
@@ -86,37 +17,41 @@ returns the root element
         const lines = item.split('\n');
         const slideElement = document.createElement('div');
         slideElement.className = 'slide';
-        
+
         lines.forEach(line => {
-            let element;
-            if (line.startsWith('# ')) {
-                element = document.createElement('h1');
-                element.textContent = line.slice(2);
-            } else if (line.startsWith('## ')) {
-                element = document.createElement('h2');
-                element.textContent = line.slice(3);
-            } else if (line.startsWith('### ')) {
-                element = document.createElement('h3');
-                element.textContent = line.slice(4);
-            } else if (line.startsWith('![')) {
-                const altText = line.match(/!\[(.*?)\]/)[1];
-                const src = line.match(/\((.*?)\)/)[1];
-                element = document.createElement('img');
-                element.src = src;
-                element.alt = altText;
-            } else if (line.startsWith('`')) {
-                element = document.createElement('pre');
-                element.textContent = line.slice(1, -1);
+            if (line.startsWith('.')) {
+                slideElement.classList.add(line.substring(1).trim());
             } else {
-                element = document.createElement('p');
-                element.textContent = line;
+                let element;
+                if (line.startsWith('# ')) {
+                    element = document.createElement('h1');
+                    element.textContent = line.substring(2).trim();
+                } else if (line.startsWith('## ')) {
+                    element = document.createElement('h2');
+                    element.textContent = line.substring(3).trim();
+                } else if (line.startsWith('### ')) {
+                    element = document.createElement('h3');
+                    element.textContent = line.substring(4).trim();
+                } else if (line.startsWith('![')) {
+                    const altText = line.match(/!\[(.*?)\]/)[1];
+                    const src = line.match(/\((.*?)\)/)[1];
+                    element = document.createElement('img');
+                    element.src = src;
+                    element.alt = altText;
+                } else if (line.startsWith('`')) {
+                    element = document.createElement('pre');
+                    element.textContent = line.substring(1, line.length - 1).trim();
+                } else {
+                    element = document.createElement('p');
+                    element.textContent = line.trim();
+                }
+                slideElement.appendChild(element);
             }
-            slideElement.appendChild(element);
         });
-        
+
         result.push(slideElement);
     });
-    
+
     return result;
 }
 function getPresenterLayout() {
@@ -152,13 +87,15 @@ function getPresenterLayout() {
     return presenter;
 }
 function readFileContentSync(path) {
-    const lines = window.os.fs.read(path);
-    if (lines) {
-        return lines.join('\n');
+    if (window.os.fs.isValidPath(path)) {
+        const lines = window.os.fs.read(path);
+        if (lines) {
+            return lines.join('\n');
+        }
     }
     return '';
 }
-window.apps.presenter = function(windowInstance, path = '/itdays.md') {
+window.apps.presenter = function(_, path = '/itdays.xmd') {
     const rootElement = getPresenterLayout();
     const contentElement = rootElement.querySelector('.content');
     const fileContent = readFileContentSync(path);

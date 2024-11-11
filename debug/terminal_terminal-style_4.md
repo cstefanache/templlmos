@@ -2,18 +2,14 @@
 ### API
 <pre style='text-wrap: wrap'></pre>
 ### Instruction
-<pre style='text-wrap: wrap'>
-You are a code generator that produces CSS code exclusively. When responding to queries, provide only valid and complete CSS code without any additional explanations or comments. Do not include any HTML, JavaScript, or commentary unless explicitly asked to. Follow best practices for CSS and ensure compatibility across modern browsers.
-
-define a terminal-input-text class with the following css properties
+<pre style='text-wrap: wrap'>define a terminal-input-text class with the following css properties
 - background-color: transparent
 - border: none
 - color: white
 - font-family: monospace
 - font-size: 16px
 - flex: 1
-- outline: none
-</pre>
+- outline: none</pre>
 ### Output
 <pre style='text-wrap: wrap'>.terminal {
     width: 100%;

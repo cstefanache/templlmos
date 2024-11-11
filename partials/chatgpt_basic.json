@@ -1,0 +1,15 @@
+{
+    "basic": {
+        "terminal-runtime": {
+            "to": "body",
+            "tag": "script",
+            "rebuild": false,
+            "library": true,
+            "dependencies": [
+            ],
+            "instructions": [
+                
+            ]
+        }
+    }
+}

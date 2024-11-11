@@ -137,7 +137,7 @@ class Compiler:
 
                         file.write("### Instruction\n")
                         file.write(
-                            f"<pre style='text-wrap: wrap'>{compiled_instruction}</pre>\n"
+                            f"<pre style='text-wrap: wrap'>{instruction}</pre>\n"
                         )
                         file.write("### Output\n")
                         file.write(
@@ -282,7 +282,7 @@ class Compiler:
 
                         file.write("### Instruction\n")
                         file.write(
-                            f"<pre style='text-wrap: wrap'>{compiled_instruction}</pre>\n"
+                            f"<pre style='text-wrap: wrap'>{instruction}</pre>\n"
                         )
                         file.write("### Output\n")
                         file.write(
@@ -326,24 +326,30 @@ class Compiler:
         }
         sources = []
         for partial in self.data.get("partials", []):
-            print(f"Compiling partial: {partial}...")
             with open(f"./partials/{partial}", "r") as read_file:
                 partial_data = json.load(read_file)
 
                 for app, packages in partial_data.items():
                     for package_id, package in packages.items():
-                        source = []
-                        source.append(f"Package: {package_id}")
-                        for instruction_set in package.get("instructions", []):
-                            source.append("\n".join(instruction_set))
-                        all_escaped_sources = (
-                            "\n".join(source).replace(
-                                "'", '"').replace("\n", "\\n")
-                        )
-                        # continue
-                        sources.append(
-                            f"window.os.fs.write('/sources/{partial[:-5]}/{package_id}.txt', '{all_escaped_sources}')"
-                        )
+                        print("*"*100)
+                        print(
+                            f"Compiling package: {app} {package_id} {package}...")
+
+                        for index, _ in enumerate(package.get("instructions", [])):
+                            debug_file_name = f"{DEBUG}/{app}_{package_id}_{index}.md"
+                            
+                            try:
+                                with open(debug_file_name, "r") as file:
+                                    source = file.read()
+                                    source = source.replace(
+                                        "'", '"').replace("\n", "\\n")
+                                    sources.append(
+                                        f"window.os.fs.write('/sources/{partial[:-5]}/{package_id}_{index}.md', '{source}')"
+                                    )
+                            except FileNotFoundError:
+                                print(">>>>"+debug_file_name)
+                                pass
+
                 self.compile(
                     partial_data, html, self.api, update_response=update_response
                 )
@@ -361,7 +367,7 @@ class Compiler:
             print(presentation)
 
             html["body"]["_children_"].append(
-                f"<script>window.os.fs.write('/itdays.md', '{presentation}')</script>")
+                f"<script>window.os.fs.write('/itdays.xmd', '{presentation}')</script>")
 
         with open(f"{DEBUG}/compiled.json", "w") as file:
             json.dump(html, file, indent=4)
