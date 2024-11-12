@@ -21,7 +21,6 @@ Given the following implemented functions:
 """
 
     def get_system_message(self, to, tag, isLibrary=False):
-        print(to, tag)
         system_prompt = ""
         if tag == "style":
             system_prompt = "You are a code generator that produces CSS code exclusively. When responding to queries, provide only valid and complete CSS code without any additional explanations or comments. Do not include any HTML, JavaScript, or commentary unless explicitly asked to. Follow best practices for CSS and ensure compatibility across modern browsers."
@@ -31,7 +30,6 @@ Given the following implemented functions:
                 system_prompt += ". For each function, provide a brief description of its purpose in jsdoc format."
         elif to[0] == "body":
             system_prompt = "You are a code generator that produces the specified DOM element exclusively. When responding to queries, provide only valid and complete HTML code without any additional explanations or comments. Do not include any CSS, JavaScript, or commentary unless explicitly asked to. Follow best practices for HTML and ensure compatibility across modern browsers."
-        print(system_prompt)
         return system_prompt
 
     def get_instruction(self, instruction, dependencies, to, tag, isLibrary=False):
@@ -43,7 +41,7 @@ Given the following implemented functions:
 """
         return compiled_instruction
 
-    def execute(self, instruction, dependencies, to, tag, isLibrary=False):
+    def execute(self, instruction, dependencies, to, tag, isLibrary=False, max_tokens = 2048):
         messages = [
             {
                 "role": "system",
@@ -70,7 +68,7 @@ Given the following implemented functions:
             model="gpt-4o-mini",
             messages=messages,
             temperature=0,
-            max_tokens=2048,
+            max_tokens=max_tokens,
             top_p=1,
         )
 

@@ -1,13 +1,24 @@
 ## terminal_terminal-style_2
 ### API
-<pre style='text-wrap: wrap'></pre>
+
+<pre style='text-wrap: wrap'>
+
+</pre>
 ### Instruction
-<pre style='text-wrap: wrap'>define a terminal-line class with the following css properties
+
+<pre style='text-wrap: wrap'>
+define a terminal-line class with the following css properties
 - display: flex
 - flex-direction: row
-- overflow-wrap: anywhere</pre>
+- overflow-wrap: anywhere
+- margin: 0
+- padding: 0
+- min-height: 20px
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>.terminal {
+
+<pre style='text-wrap: wrap'>
+.terminal {
     width: 100%;
     height: 100%;
     background-color: black;
@@ -28,5 +39,9 @@
     display: flex;
     flex-direction: row;
     overflow-wrap: anywhere;
+    margin: 0;
+    padding: 0;
+    min-height: 20px;
 }
+
 </pre>

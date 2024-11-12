@@ -1,12 +1,20 @@
 ## presenter_presenter-logic_2
 ### API
-<pre style='text-wrap: wrap'>function readFileContentSync(path) { ... }
+
+<pre style='text-wrap: wrap'>
+function readFileContentSync(path) { ... }
+
 </pre>
 ### Instruction
-<pre style='text-wrap: wrap'>define a function called readFileContentSync that takes a path as an argument
- read the file provided in the argument and merge the output in a single string</pre>
+
+<pre style='text-wrap: wrap'>
+define a function called readFileContentSync that takes a path as an argument
+ read the file provided in the argument and merge the output in a single string
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>function getSlideDOMElement(slides) {
+
+<pre style='text-wrap: wrap'>
+function getSlideDOMElement(slides) {
     const result = [];
     
     slides.forEach(item => {
@@ -83,12 +91,11 @@ function getPresenterLayout() {
     return presenter;
 }
 function readFileContentSync(path) {
-    if (window.os.fs.isValidPath(path)) {
-        const lines = window.os.fs.read(path);
-        if (lines) {
-            return lines.join('\n');
-        }
+    const content = window.os.fs.read(path);
+    if (content) {
+        return content.split('\n').join(' ');
     }
     return '';
 }
+
 </pre>

@@ -1,17 +1,27 @@
 ## apps_browser_1
 ### API
-<pre style='text-wrap: wrap'></pre>
+
+<pre style='text-wrap: wrap'>
+
+</pre>
 ### Instruction
-<pre style='text-wrap: wrap'>Call register application with 'Browser' title, 📂 as emoji, browser and 450x400 size</pre>
+
+<pre style='text-wrap: wrap'>
+Call register application with 'Browser' title, 📂 as emoji, browser and 450x400 size
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>function browser(win, path = '') {
+
+<pre style='text-wrap: wrap'>
+function browser(win, path = '') {
     const container = document.createElement('div');
     container.className = 'browser';
     let browserPath = typeof path === 'string' ? path : '';
 
     function load(path) {
         browserPath = path;
-        container.innerHTML = '';
+        while (container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
 
         if (path) {
             const backIcon = document.createElement('div');
@@ -26,11 +36,13 @@
 
         const entries = window.os.fs.ls(path);
         entries.forEach(item => {
-            const icon = window.os.getOSIcon(path + '/' + item, load);
+            const itemPath = path + '/' + item;
+            const icon = window.os.getOSIcon(itemPath, load);
             container.appendChild(icon);
+
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
-            checkbox.value = path + '/' + item;
+            checkbox.value = itemPath;
             checkbox.onclick = (e) => e.stopPropagation();
             container.appendChild(checkbox);
         });
@@ -64,4 +76,5 @@
     return container;
 }
 window.os.registerApplication('Browser', '📂', browser, 450, 400);
+
 </pre>

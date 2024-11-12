@@ -1,17 +1,22 @@
 ## gui_window_0
 ### API
-<pre style='text-wrap: wrap'>/**
- * Creates a new window with a title, emoji, and specified dimensions.
- * @param {string} emoji - The emoji to display in the title.
- * @param {string} title - The title of the window.
+
+<pre style='text-wrap: wrap'>
+/**
+ * Creates a new window element with a title bar, draggable and resizable functionality.
+ * @param {string} emoji - The emoji to display in the title bar.
+ * @param {string} title - The title to display in the title bar.
  * @param {number} [width=400] - The width of the window.
  * @param {number} [height=300] - The height of the window.
  * @returns {HTMLElement} The created window element.
  */
 window.os.gui.createWindow = function(emoji, title, width = 400, height = 300) { ... }
+
 </pre>
 ### Instruction
-<pre style='text-wrap: wrap'>Define a function `createWindow` on the `window.os.gui` object that takes four parameters: emoji, title, width and height that are defaulting to 400 and 300, respectively if not passed and have the following functionality:
+
+<pre style='text-wrap: wrap'>
+Define a function `createWindow` on the `window.os.gui` object that takes four parameters: emoji, title, width and height that are defaulting to 400 and 300, respectively if not passed and have the following functionality:
 - create a root DOM element with the class `.window`, set the width and height only, and add it to document body in the middle of the document
 - call bringToFront on the root element
 - add and empty div with class `titlePlaceholder` to the root DOM element
@@ -24,12 +29,15 @@ window.os.gui.createWindow = function(emoji, title, width = 400, height = 300) {
 - make root element resizable by the `resizeHandle` element
 - set root DOM element left position document width divided by 2 minus width divided by 2
 - set root DOM element top position document height divided by 2 minus height divided by 2
-- return root DOM element</pre>
+- return root DOM element
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>/**
- * Creates a new window with a title, emoji, and specified dimensions.
- * @param {string} emoji - The emoji to display in the title.
- * @param {string} title - The title of the window.
+
+<pre style='text-wrap: wrap'>
+/**
+ * Creates a new window element with a title bar, draggable and resizable functionality.
+ * @param {string} emoji - The emoji to display in the title bar.
+ * @param {string} title - The title to display in the title bar.
  * @param {number} [width=400] - The width of the window.
  * @param {number} [height=300] - The height of the window.
  * @returns {HTMLElement} The created window element.
@@ -75,4 +83,5 @@ window.os.gui.createWindow = function(emoji, title, width = 400, height = 300) {
     document.body.appendChild(root);
     return root;
 };
+
 </pre>

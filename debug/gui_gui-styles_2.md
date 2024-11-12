@@ -1,8 +1,13 @@
 ## gui_gui-styles_2
 ### API
-<pre style='text-wrap: wrap'></pre>
+
+<pre style='text-wrap: wrap'>
+
+</pre>
 ### Instruction
-<pre style='text-wrap: wrap'>css style for a  `.resizeHandle` class with the following rules:
+
+<pre style='text-wrap: wrap'>
+css style for a  `.resizeHandle` class with the following rules:
 - a width and height of 0px
 - an absolute position
 - a bottom and right of 0
@@ -10,9 +15,12 @@
 - border width: 0 0 10px 10px
 - border style: solid
 - `border-color: transparent transparent #ff7200 transparent`
-- transform: rotate(0deg)</pre>
+- transform: rotate(0deg)
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>.titleBar {
+
+<pre style='text-wrap: wrap'>
+.titleBar {
     background-color: orange;
     border-bottom: 1px solid black;
     display: flex;
@@ -68,4 +76,5 @@
     border-color: transparent transparent #ff7200 transparent;
     transform: rotate(0deg);
 }
+
 </pre>

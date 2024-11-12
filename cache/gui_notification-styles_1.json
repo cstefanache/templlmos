@@ -1,6 +1,7 @@
 {
     "crc": 2428150671,
     "compiled_instruction": "\nYou are a code generator that produces CSS code exclusively. When responding to queries, provide only valid and complete CSS code without any additional explanations or comments. Do not include any HTML, JavaScript, or commentary unless explicitly asked to. Follow best practices for CSS and ensure compatibility across modern browsers.\n\ncss style for a .notification class to follow the following rules:\n- white background, a black border of 1px solid\n- a black border of 2px solid\n- width width of 200px\n- word wrap\n- padding of 10px\n- a border-radius of 5px\n- a box-shadow of 2px 2px 0 0 rgba(0,0,0,0.5)\n- a top margin of 5px\n- a position of relative\n",
-    "output": ".notification {\n    background-color: white;\n    border: 2px solid black;\n    width: 200px;\n    word-wrap: break-word;\n    padding: 10px;\n    border-radius: 5px;\n    box-shadow: 2px 2px 0 0 rgba(0, 0, 0, 0.5);\n    margin-top: 5px;\n    position: relative;\n}\n",
+    "result": "```css\n.notification {\n    background-color: white;\n    border: 2px solid black; /* This will override the 1px border */\n    width: 200px;\n    word-wrap: break-word;\n    padding: 10px;\n    border-radius: 5px;\n    box-shadow: 2px 2px 0 0 rgba(0, 0, 0, 0.5);\n    margin-top: 5px;\n    position: relative;\n}\n```",
+    "output": ".notification {\n    background-color: white;\n    border: 2px solid black; /* This will override the 1px border */\n    width: 200px;\n    word-wrap: break-word;\n    padding: 10px;\n    border-radius: 5px;\n    box-shadow: 2px 2px 0 0 rgba(0, 0, 0, 0.5);\n    margin-top: 5px;\n    position: relative;\n}\n",
     "library": ""
 }

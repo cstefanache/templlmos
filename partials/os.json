@@ -5,7 +5,8 @@
             "tag": "style",
             "instructions": [
                 [
-                    "css to apply a #FFF4DF background color to the body and overflow hidden"
+                    "css to apply a #FFF4DF background color to the body and overflow hidden",
+                    "body has a margin and padding of 0"
                 ]
             ]
         },

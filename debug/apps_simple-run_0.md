@@ -1,16 +1,24 @@
 ## apps_simple-run_0
 ### API
-<pre style='text-wrap: wrap'>function application(parent) { ... }
+
+<pre style='text-wrap: wrap'>
+function application(parent) { ... }
+
 </pre>
 ### Instruction
-<pre style='text-wrap: wrap'>Create an `application` function that takes a parent parameter having the following functionality:
+
+<pre style='text-wrap: wrap'>
+Create an `application` function that takes a parent parameter having the following functionality:
  - create a root dom element with class `chat`
  - create an input element with 100% width with keyup event listener that on enter key press:
    - save the input value to instruction variable and clear the input
    - POST the json having instruction and full as false to `/`, on response add a script tag to the body with id `run-script` and add the response text content to the script tag
- - return dom element</pre>
+ - return dom element
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>function application(parent) {
+
+<pre style='text-wrap: wrap'>
+function application(parent) {
     const root = document.createElement('div');
     root.className = 'chat';
 
@@ -43,4 +51,5 @@
     parent.appendChild(root);
     return root;
 }
+
 </pre>

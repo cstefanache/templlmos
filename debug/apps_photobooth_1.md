@@ -1,23 +1,35 @@
 ## apps_photobooth_1
 ### API
-<pre style='text-wrap: wrap'></pre>
+
+<pre style='text-wrap: wrap'>
+
+</pre>
 ### Instruction
-<pre style='text-wrap: wrap'>call register application with 'Photobooth' title, 📸 as emoji, function reference and 410x360 size</pre>
+
+<pre style='text-wrap: wrap'>
+call register application with 'Photobooth' title, 📸 as emoji, function reference and 410x360 size
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>window.photoBooth = function(win) {
+
+<pre style='text-wrap: wrap'>
+window.photoBooth = function(win) {
     const root = document.createElement('div');
     const toolbar = window.os.gui.createToolbar(win);
     
     const video = document.createElement('video');
     video.autoplay = true;
+    video.width = 640;
+    video.height = 480;
+    root.appendChild(video);
+    
     navigator.mediaDevices.getUserMedia({ video: true })
         .then(stream => {
             video.srcObject = stream;
         })
-        .catch(err => {
-            console.error("Error accessing webcam: ", err);
+        .catch(error => {
+            console.error('Error accessing webcam:', error);
         });
-    
+
     toolbar('📸', function() {
         const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth;
@@ -27,7 +39,7 @@
         
         const timestamp = Date.now();
         const path = `photobooth/image+${timestamp}.png`;
-        canvas.toBlob(function(blob) {
+        canvas.toBlob(blob => {
             const reader = new FileReader();
             reader.onloadend = function() {
                 window.os.fs.write(path, reader.result);
@@ -36,9 +48,9 @@
             reader.readAsDataURL(blob);
         });
     });
-    
-    root.appendChild(video);
+
     return root;
 };
 window.os.registerApplication('Photobooth', '📸', window.photoBooth, 410, 360);
+
 </pre>

@@ -15,8 +15,8 @@
         "chatgpt_os.json",
         "chatgpt_filesystem.json",
         "chatgpt_basic_registry.json",
-        "chatgpt_apps_terminal.json",
-        "chatgpt_apps_presenter.json"
+        "chatgpt_apps_presenter.json",
+        "chatgpt_apps_terminal.json"
     ],
     "_partials": [
         "os.json",
@@ -33,7 +33,6 @@
         "chatgpt_desktop.json",
         "chatgpt_gui.json",
         "registry.json"
-        
     ],
     "definition": {}
 }

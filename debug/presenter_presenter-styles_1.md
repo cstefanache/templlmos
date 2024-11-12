@@ -1,15 +1,23 @@
 ## presenter_presenter-styles_1
 ### API
-<pre style='text-wrap: wrap'></pre>
+
+<pre style='text-wrap: wrap'>
+
+</pre>
 ### Instruction
-<pre style='text-wrap: wrap'>.slide.dark with background-color black and color white
+
+<pre style='text-wrap: wrap'>
+.slide.dark with background-color black and color white
 .slide content should be centered with align-items center and justify-content center and text centered
 .slide h1 with font-size 5em
 .slide h2 with font-size 3em
 .slide h3 with font-size 2em
-.slide pre with white-space pre-wrap and background-color #201e30, white text, padding 5, margin 0 auto, max-width 720 and text-align left</pre>
+.slide pre with white-space pre-wrap and background-color #201e30, white text, padding 5, margin 0 auto, max-width 720 and text-align left
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>.presenter {
+
+<pre style='text-wrap: wrap'>
+.presenter {
     width: 100%;
     height: 100%;
     background-color: white;
@@ -100,4 +108,5 @@
     max-width: 720px;
     text-align: left;
 }
+
 </pre>

@@ -1,16 +1,24 @@
 ## presenter_presenter-logic_3
 ### API
-<pre style='text-wrap: wrap'>window.apps.presenter = function(_, path = '/itdays.xmd') { ... }
+
+<pre style='text-wrap: wrap'>
+window.apps.presenter = function(_, path = '/itdays.xmd') { ... }
+
 </pre>
 ### Instruction
-<pre style='text-wrap: wrap'>define a function called presenter on window.apps that takes a _ and path string with default value '/itdays.xmd' as arguments
+
+<pre style='text-wrap: wrap'>
+define on window.apps namespace a function called presenter  that takes a _ and path string with default value '/itdays.xmd' as arguments
 gets the root element by executing getPresenterLayout and gets .content child as local reference
 execute readFileContentSync with the argument and store value
 execute getSlideDOMElement with the stored value split by `---` and append elements of result to the content element
 starting with index 0, if the user presses arrow keys navigate through the slides by showing the slide at index
-returns the root element</pre>
+returns the root element
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>function getSlideDOMElement(slides) {
+
+<pre style='text-wrap: wrap'>
+function getSlideDOMElement(slides) {
     const result = [];
     
     slides.forEach(item => {
@@ -87,14 +95,14 @@ function getPresenterLayout() {
     return presenter;
 }
 function readFileContentSync(path) {
-    if (window.os.fs.isValidPath(path)) {
-        const lines = window.os.fs.read(path);
-        if (lines) {
-            return lines.join('\n');
-        }
+    const content = window.os.fs.read(path);
+    if (content) {
+        return content.split('\n').join(' ');
     }
     return '';
 }
+window.apps = window.apps || {};
+
 window.apps.presenter = function(_, path = '/itdays.xmd') {
     const rootElement = getPresenterLayout();
     const contentElement = rootElement.querySelector('.content');
@@ -115,14 +123,15 @@ window.apps.presenter = function(_, path = '/itdays.xmd') {
     
     window.addEventListener('keydown', function(event) {
         if (event.key === 'ArrowRight') {
-            currentIndex = (currentIndex + 1) % slides.length;
+            currentIndex = Math.min(currentIndex + 1, contentElement.children.length - 1);
             showSlide(currentIndex);
         } else if (event.key === 'ArrowLeft') {
-            currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+            currentIndex = Math.max(currentIndex - 1, 0);
             showSlide(currentIndex);
         }
     });
     
     return rootElement;
 };
+
 </pre>

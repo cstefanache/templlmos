@@ -1,6 +1,7 @@
 {
     "crc": 3004185574,
     "compiled_instruction": "\nYou are a code generator that produces CSS code exclusively. When responding to queries, provide only valid and complete CSS code without any additional explanations or comments. Do not include any HTML, JavaScript, or commentary unless explicitly asked to. Follow best practices for CSS and ensure compatibility across modern browsers.\n\ncss style for `.toolbar` class to follow the following rules:\n- a padding of 2px\n- a background of antique white\n- a margin-bottom of 2px\n- a border-bottom of 1px solid black\n- a display of flex\n- a justify-content of flex-start\ninner buttons have:\n - no border\n - cursor pointer\n - transparent background\n",
+    "result": "```css\n.toolbar {\n    padding: 2px;\n    background: antiquewhite;\n    margin-bottom: 2px;\n    border-bottom: 1px solid black;\n    display: flex;\n    justify-content: flex-start;\n}\n\n.toolbar button {\n    border: none;\n    cursor: pointer;\n    background: transparent;\n}\n```",
     "output": ".toolbar {\n    padding: 2px;\n    background: antiquewhite;\n    margin-bottom: 2px;\n    border-bottom: 1px solid black;\n    display: flex;\n    justify-content: flex-start;\n}\n\n.toolbar button {\n    border: none;\n    cursor: pointer;\n    background: transparent;\n}\n",
     "library": ""
 }

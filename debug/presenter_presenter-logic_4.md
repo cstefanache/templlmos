@@ -1,10 +1,18 @@
 ## presenter_presenter-logic_4
 ### API
-<pre style='text-wrap: wrap'></pre>
+
+<pre style='text-wrap: wrap'>
+
+</pre>
 ### Instruction
-<pre style='text-wrap: wrap'>call register application with 'Presenter' title, 📽️ as emoji, presenter function reference and 1200x680 size for [xmd] extensions</pre>
+
+<pre style='text-wrap: wrap'>
+call register application with 'Presenter' title, 📽️ as emoji, presenter function reference and 1200x680 size for [xmd] extensions
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>function getSlideDOMElement(slides) {
+
+<pre style='text-wrap: wrap'>
+function getSlideDOMElement(slides) {
     const result = [];
     
     slides.forEach(item => {
@@ -81,14 +89,14 @@ function getPresenterLayout() {
     return presenter;
 }
 function readFileContentSync(path) {
-    if (window.os.fs.isValidPath(path)) {
-        const lines = window.os.fs.read(path);
-        if (lines) {
-            return lines.join('\n');
-        }
+    const content = window.os.fs.read(path);
+    if (content) {
+        return content.split('\n').join(' ');
     }
     return '';
 }
+window.apps = window.apps || {};
+
 window.apps.presenter = function(_, path = '/itdays.xmd') {
     const rootElement = getPresenterLayout();
     const contentElement = rootElement.querySelector('.content');
@@ -109,10 +117,10 @@ window.apps.presenter = function(_, path = '/itdays.xmd') {
     
     window.addEventListener('keydown', function(event) {
         if (event.key === 'ArrowRight') {
-            currentIndex = (currentIndex + 1) % slides.length;
+            currentIndex = Math.min(currentIndex + 1, contentElement.children.length - 1);
             showSlide(currentIndex);
         } else if (event.key === 'ArrowLeft') {
-            currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+            currentIndex = Math.max(currentIndex - 1, 0);
             showSlide(currentIndex);
         }
     });
@@ -120,4 +128,5 @@ window.apps.presenter = function(_, path = '/itdays.xmd') {
     return rootElement;
 };
 window.os.registerApplication('Presenter', '📽️', window.apps.presenter, 1200, 680, ['xmd']);
+
 </pre>

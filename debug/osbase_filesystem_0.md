@@ -1,12 +1,14 @@
 ## osbase_filesystem_0
 ### API
-<pre style='text-wrap: wrap'>    /**
+
+<pre style='text-wrap: wrap'>
+    /**
      * Saves the filesystem object to local storage.
      * @function
      */
 window.os.fs.sync = function() { ... }
     /**
-     * Processes and returns a path, handling '..', '//' and '/'.
+     * Processes and returns a path, handling `..`, `//`, and `/`.
      * @param {string} path - The path to process.
      * @returns {string|null} - The processed path or null if invalid.
      */
@@ -25,7 +27,7 @@ window.os.fs.isValidPath = function(path) { ... }
 window.os.fs.ls = function(path) { ... }
     /**
      * Creates an empty object at the given path.
-     * @param {string} path - The path to create the directory at.
+     * @param {string} path - The path to create the directory.
      */
 window.os.fs.mkdir = function(path) { ... }
     /**
@@ -40,14 +42,17 @@ window.os.fs.rm = function(path) { ... }
      */
 window.os.fs.write = function(path, content) { ... }
     /**
-     * Reads an entry split by '\n' in the filesystem object at the given path.
+     * Reads an entry split by `\n` in the filesystem object at the given path.
      * @param {string} path - The path to read from.
-     * @returns {Array|null} - An array of lines or null if not found.
+     * @returns {string|null} - The content of the file or null if not found.
      */
 window.os.fs.read = function(path) { ... }
+
 </pre>
 ### Instruction
-<pre style='text-wrap: wrap'>Load the `filesystem` object from the local storage as json, if it does not exist create an empty object with a property `about.txt` with the content `Welcome to TempLLMOS`
+
+<pre style='text-wrap: wrap'>
+Load the `filesystem` object from the local storage as json, if it does not exist create an empty object with a property `about.txt` with the content `Welcome to TempLLMOS`
 Define the following functions on the window.os.fs object:
  `sync` - save the filesystem object to the local storage that will be called by the other functions that modify the filesystem object
  `getPath` - process and return a path by taking into account `..`, `//` and `/`. return null if the path is invalid
@@ -57,9 +62,12 @@ Define the following functions on the window.os.fs object:
  `rm` - removes the object at the given path
  `write` - writes the content to an entry in the filesystem object at the given path
  `read` - reads an entry split by `
-` in the filesystem object at the given path, last element in path is the file name</pre>
+` in the filesystem object at the given path, last element in path is the file name
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>(function() {
+
+<pre style='text-wrap: wrap'>
+(function() {
     if (!window.os) {
         window.os = {};
     }
@@ -81,7 +89,7 @@ Define the following functions on the window.os.fs object:
     };
 
     /**
-     * Processes and returns a path, handling '..', '//' and '/'.
+     * Processes and returns a path, handling `..`, `//`, and `/`.
      * @param {string} path - The path to process.
      * @returns {string|null} - The processed path or null if invalid.
      */
@@ -95,7 +103,7 @@ Define the following functions on the window.os.fs object:
                 } else {
                     return null;
                 }
-            } else if (part !== '.') {
+            } else {
                 stack.push(part);
             }
         }
@@ -133,7 +141,7 @@ Define the following functions on the window.os.fs object:
 
     /**
      * Creates an empty object at the given path.
-     * @param {string} path - The path to create the directory at.
+     * @param {string} path - The path to create the directory.
      */
     window.os.fs.mkdir = function(path) {
         const processedPath = this.getPath(path);
@@ -179,20 +187,20 @@ Define the following functions on the window.os.fs object:
         if (!this.isValidPath(processedPath)) return;
         const parts = processedPath.split('/').filter(Boolean);
         let current = filesystem;
-        for (const part of parts.slice(0, -1)) {
-            if (!current[part]) {
-                current[part] = {};
+        for (let i = 0; i < parts.length - 1; i++) {
+            if (!current[parts[i]]) {
+                current[parts[i]] = {};
             }
-            current = current[part];
+            current = current[parts[i]];
         }
         current[parts[parts.length - 1]] = content;
         this.sync();
     };
 
     /**
-     * Reads an entry split by '\n' in the filesystem object at the given path.
+     * Reads an entry split by `\n` in the filesystem object at the given path.
      * @param {string} path - The path to read from.
-     * @returns {Array|null} - An array of lines or null if not found.
+     * @returns {string|null} - The content of the file or null if not found.
      */
     window.os.fs.read = function(path) {
         const processedPath = this.getPath(path);
@@ -206,9 +214,10 @@ Define the following functions on the window.os.fs object:
                 return null;
             }
         }
-        return current.split('\n');
+        return current;
     };
 
     window.os.fs.sync();
 })();
+
 </pre>

@@ -1,9 +1,14 @@
 ## presenter_presenter-logic_1
 ### API
-<pre style='text-wrap: wrap'>function getPresenterLayout() { ... }
+
+<pre style='text-wrap: wrap'>
+function getPresenterLayout() { ... }
+
 </pre>
 ### Instruction
-<pre style='text-wrap: wrap'>define a function called getPresenterLayout that creates the following dom structure of divs:
+
+<pre style='text-wrap: wrap'>
+define a function called getPresenterLayout that creates the following dom structure of divs:
  .presenter
    .header
      img[`https://www.itdays.ro/public/images/logo-gri.png`]
@@ -11,9 +16,12 @@
    .content
    .footer
      img[`https://ascentcore.com/wp-content/uploads/2023/08/AC-Logo.svg`]
-and return the .presenter element</pre>
+and return the .presenter element
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>function getSlideDOMElement(slides) {
+
+<pre style='text-wrap: wrap'>
+function getSlideDOMElement(slides) {
     const result = [];
     
     slides.forEach(item => {
@@ -89,4 +97,5 @@ function getPresenterLayout() {
 
     return presenter;
 }
+
 </pre>

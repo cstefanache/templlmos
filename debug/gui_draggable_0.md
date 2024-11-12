@@ -1,17 +1,25 @@
 ## gui_draggable_0
 ### API
-<pre style='text-wrap: wrap'>/**
+
+<pre style='text-wrap: wrap'>
+/**
  * Makes an element draggable by changing its absolute position when dragging a specified handle.
  * @param {HTMLElement} root - The element to be made draggable.
  * @param {HTMLElement} dragHandleHTMLElement - The element that will be used to drag the root element.
  */
 window.os.gui.makeDraggable = function(root, dragHandleHTMLElement) { ... }
+
 </pre>
 ### Instruction
-<pre style='text-wrap: wrap'>Implement `makeDraggable` on `window.os.gui` object that takes two parameters root and dragHandleHTMLElement with the following functionality:
- - change absolute position of root by dragging the dragHandleHTMLElement</pre>
+
+<pre style='text-wrap: wrap'>
+Implement `makeDraggable` on `window.os.gui` object that takes two parameters root and dragHandleHTMLElement with the following functionality:
+ - change absolute position of root by dragging the dragHandleHTMLElement
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>window.os = window.os || {};
+
+<pre style='text-wrap: wrap'>
+window.os = window.os || {};
 window.os.gui = window.os.gui || {};
 
 /**
@@ -41,4 +49,5 @@ window.os.gui.makeDraggable = function(root, dragHandleHTMLElement) {
         document.addEventListener('mouseup', mouseUpHandler);
     });
 };
+
 </pre>

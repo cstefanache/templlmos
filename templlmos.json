@@ -22,7 +22,9 @@
         "chatgpt_apps_browser.json",
         "chatgpt_apps_editor.json",
         "chatgpt_apps_photobooth.json",
-        "chatgpt_apps_generic.json"
+        "chatgpt_apps_generic.json",
+        "chatgpt_games.json",
+        "chatgpt_development.json"
     ],
     "_partials": [
         "os.json",

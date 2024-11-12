@@ -1,6 +1,7 @@
 {
-    "crc": 2226001393,
-    "compiled_instruction": "\nYou are a code generator that produces CSS code exclusively. When responding to queries, provide only valid and complete CSS code without any additional explanations or comments. Do not include any HTML, JavaScript, or commentary unless explicitly asked to. Follow best practices for CSS and ensure compatibility across modern browsers.\n\ndefine a terminal-line class with the following css properties\n- display: flex\n- flex-direction: row\n- overflow-wrap: anywhere\n",
-    "output": ".terminal-line {\n    display: flex;\n    flex-direction: row;\n    overflow-wrap: anywhere;\n}\n",
+    "crc": 34094633,
+    "compiled_instruction": "\nYou are a code generator that produces CSS code exclusively. When responding to queries, provide only valid and complete CSS code without any additional explanations or comments. Do not include any HTML, JavaScript, or commentary unless explicitly asked to. Follow best practices for CSS and ensure compatibility across modern browsers.\n\ndefine a terminal-line class with the following css properties\n- display: flex\n- flex-direction: row\n- overflow-wrap: anywhere\n- margin: 0\n- padding: 0\n- min-height: 20px\n",
+    "result": "```css\n.terminal-line {\n    display: flex;\n    flex-direction: row;\n    overflow-wrap: anywhere;\n    margin: 0;\n    padding: 0;\n    min-height: 20px;\n}\n```",
+    "output": ".terminal-line {\n    display: flex;\n    flex-direction: row;\n    overflow-wrap: anywhere;\n    margin: 0;\n    padding: 0;\n    min-height: 20px;\n}\n",
     "library": ""
 }

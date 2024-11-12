@@ -28,7 +28,10 @@
                     "define a terminal-line class with the following css properties",
                     "- display: flex",
                     "- flex-direction: row",
-                    "- overflow-wrap: anywhere"
+                    "- overflow-wrap: anywhere",
+                    "- margin: 0",
+                    "- padding: 0",
+                    "- min-height: 20px"
                 ],
                 [
                     "define a terminal-input class with the following css properties",
@@ -54,16 +57,21 @@
             "library": true,
             "dependencies": [
                 "filesystem",
-                "registry"
+                "registry",
+                "os-utils"
             ],
             "instructions": [
+                [
+                    "define a function clear that removres all .terminal-line elements"
+                ],
                 [
                     "keep a local variable called currentPath with value '/'",
                     "define a local function `cd` that takes a string parameter and sets currentPath to it",
                     "define a local function `pwd` that returns the parent scope defined currentPath",
                     "define and object called bin and referece functions from objects:",
-                    " - window.os.fs",
-                    " - `cd` and `pwd` functions"
+                    " - all window.os.fs functions",
+                    " - all window.os.utils functions",
+                    " - cd and pwd functions"
                 ],
                 [
                     "currentPath is defined in parent scope",
@@ -78,7 +86,7 @@
                     " - if the eval throws an error, return the error message"
                 ],
                 [
-                    "define a function `terminal` on window.apps that creates a root element with class terminal and returns it at the end",
+                    "define a function `terminal` on window.apps namespace that creates a root element with class terminal and returns it at the end",
                     "create the following dom structure:",
                     " - .terminal",
                     "   - .terminal-output",
@@ -86,8 +94,8 @@
                     "   - .terminal-input",
                     "     - .prefix with text '>'",
                     "     - input.terminal-input-text",
-                    "define inner function called output that takes two parameters: value and color with default value white. The function prepends a div with class terminal-line having color style as provided in the function and the value as text to the terminal-output div. if the value is a list then prepend each item in the list as a separate div",
-                    "when the user hits the enter key on the input take the content call the output function with the content prefixed with `[%current_time%]` and color yellow, call `output` with the resul of calling `execute` function with the value of the input, clear the input and focus it again"
+                    "define inner function called output that takes two parameters: value and color with default value white. The function prepends a pre with class terminal-line having color style as provided in the function and the value as text to the terminal-output div. if the value is a list then prepend each item in the list as a separate pre",
+                    "when the user hits the enter key on the input take the content call the output function with the content prefixed with `[%current_time%]` and color yellow, call `output` with the resul of calling `execute` function with the value of the input, clear the input and focus it again and update .prefix text with the currentPath + '>' "
                 ],
                 [
                     "call register application with 'Terminal' title, 🖥️ as emoji, terminal function reference and 800x500 size"

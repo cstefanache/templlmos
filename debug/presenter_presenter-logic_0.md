@@ -1,11 +1,16 @@
 ## presenter_presenter-logic_0
 ### API
-<pre style='text-wrap: wrap'>function getSlideDOMElement(slides) { ... }
+
+<pre style='text-wrap: wrap'>
+function getSlideDOMElement(slides) { ... }
                     const altText = line.match(/!\[(.*?)\]/)[1];
                     const src = line.match(/\((.*?)\)/)[1];
+
 </pre>
 ### Instruction
-<pre style='text-wrap: wrap'>define a function called getSlideDOMElement that takes an array of strings as an argument
+
+<pre style='text-wrap: wrap'>
+define a function called getSlideDOMElement that takes an array of strings as an argument
 iterate the array and for each item:
  split item by `\n`
    iterate the split result and for each line:
@@ -13,9 +18,12 @@ iterate the array and for each item:
      create a slide div element with class slide
      generate html dom elements corresponding to the markdown syntax with headers, text, image and backtick as pre support and append them to the slide element
    append the slide element to the result array
-return the result array</pre>
+return the result array
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>function getSlideDOMElement(slides) {
+
+<pre style='text-wrap: wrap'>
+function getSlideDOMElement(slides) {
     const result = [];
     
     slides.forEach(item => {
@@ -59,4 +67,5 @@ return the result array</pre>
 
     return result;
 }
+
 </pre>

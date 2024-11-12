@@ -1,8 +1,13 @@
 ## gui_gui-styles_3
 ### API
-<pre style='text-wrap: wrap'></pre>
+
+<pre style='text-wrap: wrap'>
+
+</pre>
 ### Instruction
-<pre style='text-wrap: wrap'>css style for `.toolbar` class to follow the following rules:
+
+<pre style='text-wrap: wrap'>
+css style for `.toolbar` class to follow the following rules:
 - a padding of 2px
 - a background of antique white
 - a margin-bottom of 2px
@@ -12,9 +17,12 @@
 inner buttons have:
  - no border
  - cursor pointer
- - transparent background</pre>
+ - transparent background
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>.titleBar {
+
+<pre style='text-wrap: wrap'>
+.titleBar {
     background-color: orange;
     border-bottom: 1px solid black;
     display: flex;
@@ -84,4 +92,5 @@ inner buttons have:
     cursor: pointer;
     background: transparent;
 }
+
 </pre>

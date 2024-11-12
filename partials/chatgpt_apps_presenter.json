@@ -62,7 +62,7 @@
                     " read the file provided in the argument and merge the output in a single string"
                 ],
                 [
-                    "define a function called presenter on window.apps that takes a _ and path string with default value '/itdays.xmd' as arguments",
+                    "define on window.apps namespace a function called presenter  that takes a _ and path string with default value '/itdays.xmd' as arguments",
                     "gets the root element by executing getPresenterLayout and gets .content child as local reference",
                     "execute readFileContentSync with the argument and store value",
                     "execute getSlideDOMElement with the stored value split by `---` and append elements of result to the content element",

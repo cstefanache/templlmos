@@ -1,19 +1,27 @@
 ## gui_window_1
 ### API
-<pre style='text-wrap: wrap'>/**
- * Attaches a content element to the content placeholder of a window element.
+
+<pre style='text-wrap: wrap'>
+/**
+ * Appends a content element to the content placeholder of a window element.
  * @param {HTMLElement} windowElement - The window element to which the content will be attached.
- * @param {HTMLElement} contentElement - The content element to be appended to the window's content placeholder.
+ * @param {HTMLElement} contentElement - The content element to be appended.
  */
 window.os.gui.attachToWindow = function(windowElement, contentElement) { ... }
+
 </pre>
 ### Instruction
-<pre style='text-wrap: wrap'>Define a function called `attachToWindow` on the `window.os.gui` object that takes two parameters: windowElement and contentElement that takes the contentElement and appends it to the `.contentPlaceholder` of the windowElement</pre>
+
+<pre style='text-wrap: wrap'>
+Define a function called `attachToWindow` on the `window.os.gui` object that takes two parameters: windowElement and contentElement that takes the contentElement and appends it to the `.contentPlaceholder` of the windowElement
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>/**
- * Creates a new window with a title, emoji, and specified dimensions.
- * @param {string} emoji - The emoji to display in the title.
- * @param {string} title - The title of the window.
+
+<pre style='text-wrap: wrap'>
+/**
+ * Creates a new window element with a title bar, draggable and resizable functionality.
+ * @param {string} emoji - The emoji to display in the title bar.
+ * @param {string} title - The title to display in the title bar.
  * @param {number} [width=400] - The width of the window.
  * @param {number} [height=300] - The height of the window.
  * @returns {HTMLElement} The created window element.
@@ -60,9 +68,9 @@ window.os.gui.createWindow = function(emoji, title, width = 400, height = 300) {
     return root;
 };
 /**
- * Attaches a content element to the content placeholder of a window element.
+ * Appends a content element to the content placeholder of a window element.
  * @param {HTMLElement} windowElement - The window element to which the content will be attached.
- * @param {HTMLElement} contentElement - The content element to be appended to the window's content placeholder.
+ * @param {HTMLElement} contentElement - The content element to be appended.
  */
 window.os.gui.attachToWindow = function(windowElement, contentElement) {
     const contentPlaceholder = windowElement.querySelector('.contentPlaceholder');
@@ -70,4 +78,5 @@ window.os.gui.attachToWindow = function(windowElement, contentElement) {
         contentPlaceholder.appendChild(contentElement);
     }
 };
+
 </pre>

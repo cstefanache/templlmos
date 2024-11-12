@@ -1,45 +1,29 @@
 ## terminal_terminal-runtime_0
 ### API
-<pre style='text-wrap: wrap'>/**
- * Changes the current path to the specified path.
- * @param {string} path - The path to change to.
- */
-function cd(path) { ... }
+
+<pre style='text-wrap: wrap'>
 /**
- * Returns the current working directory.
- * @returns {string} - The current path.
+ * Removes all elements with the class name 'terminal-line' from the document.
+ * @function
  */
-function pwd() { ... }
+function clear() { ... }
+
 </pre>
 ### Instruction
-<pre style='text-wrap: wrap'>keep a local variable called currentPath with value '/'
-define a local function `cd` that takes a string parameter and sets currentPath to it
-define a local function `pwd` that returns the parent scope defined currentPath
-define and object called bin and referece functions from objects:
- - window.os.fs
- - `cd` and `pwd` functions</pre>
+
+<pre style='text-wrap: wrap'>
+define a function clear that removres all .terminal-line elements
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>let currentPath = '/';
 
+<pre style='text-wrap: wrap'>
 /**
- * Changes the current path to the specified path.
- * @param {string} path - The path to change to.
+ * Removes all elements with the class name 'terminal-line' from the document.
+ * @function
  */
-function cd(path) {
-    currentPath = path;
+function clear() {
+    const terminalLines = document.querySelectorAll('.terminal-line');
+    terminalLines.forEach(line => line.remove());
 }
 
-/**
- * Returns the current working directory.
- * @returns {string} - The current path.
- */
-function pwd() {
-    return currentPath;
-}
-
-const bin = {
-    fs: window.os.fs,
-    cd: cd,
-    pwd: pwd
-};
 </pre>

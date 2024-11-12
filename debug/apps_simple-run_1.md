@@ -1,10 +1,18 @@
 ## apps_simple-run_1
 ### API
-<pre style='text-wrap: wrap'></pre>
+
+<pre style='text-wrap: wrap'>
+
+</pre>
 ### Instruction
-<pre style='text-wrap: wrap'>call register application with 'Run' title, ▶️ as emoji, already defined `application` function reference and 400x70 size</pre>
+
+<pre style='text-wrap: wrap'>
+call register application with 'Run' title, ▶️ as emoji, already defined `application` function reference and 400x70 size
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>function application(parent) {
+
+<pre style='text-wrap: wrap'>
+function application(parent) {
     const root = document.createElement('div');
     root.className = 'chat';
 
@@ -38,4 +46,5 @@
     return root;
 }
 window.os.registerApplication('Run', '▶️', application, 400, 70);
+
 </pre>

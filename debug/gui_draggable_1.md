@@ -1,18 +1,26 @@
 ## gui_draggable_1
 ### API
-<pre style='text-wrap: wrap'>/**
+
+<pre style='text-wrap: wrap'>
+/**
  * Makes an element resizable by changing its width and height when dragging a specified resize handle.
  * @param {HTMLElement} root - The element to be made resizable.
  * @param {HTMLElement} resizeHandleHTMLElement - The element that will be used to resize the root element.
  */
 window.os.gui.makeResizable = function(root, resizeHandleHTMLElement) { ... }
+
 </pre>
 ### Instruction
-<pre style='text-wrap: wrap'>Implement `makeResizable` on `window.os.gui` object  that takes two parameters: root, resizeHandleHTMLElement with the following functionality:` 
+
+<pre style='text-wrap: wrap'>
+Implement `makeResizable` on `window.os.gui` object  that takes two parameters: root, resizeHandleHTMLElement with the following functionality:` 
  - resize (both width and height) the root HTMLElement element by dragging the resizeHandle DOM element.
- - update starting width and height on mouseup</pre>
+ - update starting width and height on mouseup
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>window.os = window.os || {};
+
+<pre style='text-wrap: wrap'>
+window.os = window.os || {};
 window.os.gui = window.os.gui || {};
 
 /**
@@ -78,4 +86,5 @@ window.os.gui.makeResizable = function(root, resizeHandleHTMLElement) {
         isResizing = false;
     });
 };
+
 </pre>

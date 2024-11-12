@@ -56,6 +56,7 @@ class Compiler:
                 library = package.get("library", False)
                 to = package.get("to")
                 tag = package.get("tag")
+                max_tokens = package.get("max_tokens", 2048)
                 instructions = package.get("instructions")
 
                 compiled_dependencies = ""
@@ -105,16 +106,17 @@ class Compiler:
 
                     if not skip_compilation:
                         print(
-                            f"----------[ {app} {package_id} {index} ]----------")
+                            f"----------[ {app} {package_id} {index} {max_tokens}]----------")
                         print(compiled_instruction)
                         result = self.llm.execute(
-                            instruction, compiled_dependencies, to, tag, library
+                            instruction, compiled_dependencies, to, tag, library, max_tokens=max_tokens
                         )
                         output_src = self.process_output(result)
                         package_src += output_src
                         cache_data = {
                             "crc": crc,
                             "compiled_instruction": compiled_instruction,
+                            "result": result,
                             "output": output_src,
                         }
 
@@ -131,17 +133,17 @@ class Compiler:
                     # write debug markdown file
                     with open(f"{DEBUG}/{app}_{package_id}_{index}.md", "w") as file:
                         file.write(f"## {app}_{package_id}_{index}\n")
-                        file.write("### API\n")
+                        file.write("### API\n\n")
                         file.write(
-                            f"<pre style='text-wrap: wrap'>{local_api}</pre>\n")
+                            f"<pre style='text-wrap: wrap'>\n{local_api}\n</pre>\n")
 
-                        file.write("### Instruction\n")
+                        file.write("### Instruction\n\n")
                         file.write(
-                            f"<pre style='text-wrap: wrap'>{instruction}</pre>\n"
+                            f"<pre style='text-wrap: wrap'>\n{instruction}\n</pre>\n"
                         )
-                        file.write("### Output\n")
+                        file.write("### Output\n\n")
                         file.write(
-                            f"<pre style='text-wrap: wrap'>{package_src}</pre>\n"
+                            f"<pre style='text-wrap: wrap'>\n{package_src}\n</pre>\n"
                         )
 
                     package_api += local_api
@@ -249,9 +251,9 @@ class Compiler:
                                 package_src += cache_data["output"]
 
                     if not skip_compilation:
-                        print(
-                            f"----------[ {app} {package_id} {index} ]----------")
-                        print(compiled_instruction)
+                        # print(
+                        # f"----------[ {app} {package_id} {index} ]----------")
+                        # print(compiled_instruction)
                         result = self.llm.call_llm(
                             model, compiled_instruction, update_response=update_response
                         )
@@ -317,7 +319,7 @@ class Compiler:
         return result
 
     def build(self, update_response=None):
-        print("Compiling...")
+        # print("Compiling...")
 
         html = {
             "head": {"_children_": []},
@@ -331,20 +333,22 @@ class Compiler:
 
                 for app, packages in partial_data.items():
                     for package_id, package in packages.items():
-                        print("*"*100)
-                        print(
-                            f"Compiling package: {app} {package_id} {package}...")
+                        # print("*"*100)
+                        # print(
+                        # f"Compiling package: {app} {package_id} {package}...")
 
                         for index, _ in enumerate(package.get("instructions", [])):
                             debug_file_name = f"{DEBUG}/{app}_{package_id}_{index}.md"
-                            
+
                             try:
                                 with open(debug_file_name, "r") as file:
                                     source = file.read()
                                     source = source.replace(
                                         "'", '"').replace("\n", "\\n")
+
+                                    name = partial[:-5].replace("chatgpt_", "")
                                     sources.append(
-                                        f"window.os.fs.write('/sources/{partial[:-5]}/{package_id}_{index}.md', '{source}')"
+                                        f"window.os.fs.write('/sources/{name}/{package_id}_{index}.md', '{source}')"
                                     )
                             except FileNotFoundError:
                                 print(">>>>"+debug_file_name)

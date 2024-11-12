@@ -1,21 +1,29 @@
 ## gui_draggable_2
 ### API
-<pre style='text-wrap: wrap'>/**
- * Brings the specified element to the front by adjusting its z-index.
+
+<pre style='text-wrap: wrap'>
+/**
+ * Brings the specified DOM node to the front by adjusting its z-index.
  * @param {HTMLElement} rootDOMNode - The element to be brought to the front.
  */
 window.os.gui.bringToFront = function(rootDOMNode) { ... }
 const bringToFrontInternal = function() { ... }
+
 </pre>
 ### Instruction
-<pre style='text-wrap: wrap'>Implement `bringToFront` on `window.os.gui` object that taskes a single parameter: rootDOMNode  with the following functionality:
+
+<pre style='text-wrap: wrap'>
+Implement `bringToFront` on `window.os.gui` object that taskes a single parameter: rootDOMNode  with the following functionality:
 - creates an internal function that:
   * takes all elements with the same class as rootDomNode
   * iterate through them and sets the z-index to 0 and at the end sets the z-index of rootDOMNode to 1
 - adds a mousedown event listener to rootDOMNode that calls the internal function
-- call the internal function</pre>
+- call the internal function
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>window.os = window.os || {};
+
+<pre style='text-wrap: wrap'>
+window.os = window.os || {};
 window.os.gui = window.os.gui || {};
 
 /**
@@ -82,7 +90,7 @@ window.os.gui.makeResizable = function(root, resizeHandleHTMLElement) {
     });
 };
 /**
- * Brings the specified element to the front by adjusting its z-index.
+ * Brings the specified DOM node to the front by adjusting its z-index.
  * @param {HTMLElement} rootDOMNode - The element to be brought to the front.
  */
 window.os.gui.bringToFront = function(rootDOMNode) {
@@ -97,4 +105,5 @@ window.os.gui.bringToFront = function(rootDOMNode) {
     rootDOMNode.addEventListener('mousedown', bringToFrontInternal);
     bringToFrontInternal();
 };
+
 </pre>

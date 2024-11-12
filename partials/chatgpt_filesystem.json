@@ -31,7 +31,7 @@
             ],
             "instructions": [
                 [
-                    "call write with the path `/logo.txt` and ascii art of text `TempLLM OS` fill empty spaces with ."
+                    "call write with the path `/logo.txt` and ascii art of text `TempLLM OS` on 10 lines"
                 ]
             ]
         },

@@ -1,6 +1,7 @@
 {
     "crc": 581526092,
     "compiled_instruction": "\nYou are a code generator that produces CSS code exclusively. When responding to queries, provide only valid and complete CSS code without any additional explanations or comments. Do not include any HTML, JavaScript, or commentary unless explicitly asked to. Follow best practices for CSS and ensure compatibility across modern browsers.\n\ndefine a terminal class with the following css properties\n- width: 100%\n- height: 100%\n- background-color: black\n- color: white\n- font-family: monospace\n- overflow: hidden\n- display: flex\n- flex-direction: column\n",
+    "result": "```css\n.terminal {\n    width: 100%;\n    height: 100%;\n    background-color: black;\n    color: white;\n    font-family: monospace;\n    overflow: hidden;\n    display: flex;\n    flex-direction: column;\n}\n```",
     "output": ".terminal {\n    width: 100%;\n    height: 100%;\n    background-color: black;\n    color: white;\n    font-family: monospace;\n    overflow: hidden;\n    display: flex;\n    flex-direction: column;\n}\n",
     "library": ""
 }

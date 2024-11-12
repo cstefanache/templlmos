@@ -1,8 +1,13 @@
 ## gui_gui-styles_1
 ### API
-<pre style='text-wrap: wrap'></pre>
+
+<pre style='text-wrap: wrap'>
+
+</pre>
 ### Instruction
-<pre style='text-wrap: wrap'>css style for a .window class to follow the following rules:
+
+<pre style='text-wrap: wrap'>
+css style for a .window class to follow the following rules:
 - white background color
 - disable text selection
 - a border of 2px solid black
@@ -12,9 +17,12 @@
 - absolute position
 - display of flex and flex-direction of column
 - inner .contentPlaceholder class should have a padding of 5px, flex-grow of 1 and overflow of auto
-- inner .statusPlaceholder class should have  a border-top of 1px solid black and a monospaced small text</pre>
+- inner .statusPlaceholder class should have  a border-top of 1px solid black and a monospaced small text
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>.titleBar {
+
+<pre style='text-wrap: wrap'>
+.titleBar {
     background-color: orange;
     border-bottom: 1px solid black;
     display: flex;
@@ -58,4 +66,5 @@
     font-family: monospace;
     font-size: small;
 }
+
 </pre>

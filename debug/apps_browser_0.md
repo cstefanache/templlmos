@@ -1,9 +1,14 @@
 ## apps_browser_0
 ### API
-<pre style='text-wrap: wrap'>function browser(win, path = '') { ... }
+
+<pre style='text-wrap: wrap'>
+function browser(win, path = '') { ... }
+
 </pre>
 ### Instruction
-<pre style='text-wrap: wrap'>1. Create a `browser` function that takes a win and path defaulting to '' parameter:
+
+<pre style='text-wrap: wrap'>
+1. Create a `browser` function that takes a win and path defaulting to '' parameter:
  - create a container dom element with class `browser`
  - set browserPath to path or `''` if path is undefined or not string
  - generate internal load function that takes path parameter:
@@ -18,16 +23,21 @@
  - call `addButton` on the toolbar with `📁` text and prompt for a name and call mkdir on current browserPath and provided name
  - call `addButton` on the toolbar with `📄` text and prompt for a name and call write on current browserPath and provided name and '' as content
  - call `addButton` on the toolbar with `🗑️` text and list all the selected checkbox values, removes them and calls load on the current path
- - return dom element</pre>
+ - return dom element
+</pre>
 ### Output
-<pre style='text-wrap: wrap'>function browser(win, path = '') {
+
+<pre style='text-wrap: wrap'>
+function browser(win, path = '') {
     const container = document.createElement('div');
     container.className = 'browser';
     let browserPath = typeof path === 'string' ? path : '';
 
     function load(path) {
         browserPath = path;
-        container.innerHTML = '';
+        while (container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
 
         if (path) {
             const backIcon = document.createElement('div');
@@ -42,11 +52,13 @@
 
         const entries = window.os.fs.ls(path);
         entries.forEach(item => {
-            const icon = window.os.getOSIcon(path + '/' + item, load);
+            const itemPath = path + '/' + item;
+            const icon = window.os.getOSIcon(itemPath, load);
             container.appendChild(icon);
+
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
-            checkbox.value = path + '/' + item;
+            checkbox.value = itemPath;
             checkbox.onclick = (e) => e.stopPropagation();
             container.appendChild(checkbox);
         });
@@ -79,4 +91,5 @@
 
     return container;
 }
+
 </pre>
