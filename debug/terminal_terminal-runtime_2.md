@@ -3,7 +3,7 @@
 
 <pre style='text-wrap: wrap'>
 /**
- * Executes a command with the given parameters, processing the input string.
+ * Executes a command with the given string input, processing the command and its arguments.
  * @param {string} input - The command input string to execute.
  * @returns {any} - The result of the command execution or an error message.
  */
@@ -47,7 +47,7 @@ function cd(path) {
 }
 
 /**
- * Returns the current path.
+ * Returns the current working directory.
  * @returns {string} - The current path.
  */
 function pwd() {
@@ -67,7 +67,7 @@ const bin = {
     pwd: pwd
 };
 /**
- * Executes a command with the given parameters, processing the input string.
+ * Executes a command with the given string input, processing the command and its arguments.
  * @param {string} input - The command input string to execute.
  * @returns {any} - The result of the command execution or an error message.
  */
@@ -75,13 +75,9 @@ function execute(input) {
     const args = input.match(/(?:[^\s"]+|"[^"]*")+/g).map(arg => arg.replace(/(^"|"$)/g, ''));
     let path = currentPath;
     const command = `bin.${args[0]}`;
-    
+
     if (args[1]) {
-        if (!args[1].startsWith('/')) {
-            path = window.os.fs.getPath(`${currentPath}/${args[1]}`);
-        } else {
-            path = window.os.fs.getPath(args[1]);
-        }
+        path = args[1].startsWith('/') ? window.os.fs.getPath(args[1]) : window.os.fs.getPath(`${currentPath}/${args[1]}`);
     }
 
     try {

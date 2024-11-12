@@ -31,7 +31,7 @@ function cd(path) {
 }
 
 /**
- * Returns the current path.
+ * Returns the current working directory.
  * @returns {string} - The current path.
  */
 function pwd() {
@@ -51,7 +51,7 @@ const bin = {
     pwd: pwd
 };
 /**
- * Executes a command with the given parameters, processing the input string.
+ * Executes a command with the given string input, processing the command and its arguments.
  * @param {string} input - The command input string to execute.
  * @returns {any} - The result of the command execution or an error message.
  */
@@ -59,13 +59,9 @@ function execute(input) {
     const args = input.match(/(?:[^\s"]+|"[^"]*")+/g).map(arg => arg.replace(/(^"|"$)/g, ''));
     let path = currentPath;
     const command = `bin.${args[0]}`;
-    
+
     if (args[1]) {
-        if (!args[1].startsWith('/')) {
-            path = window.os.fs.getPath(`${currentPath}/${args[1]}`);
-        } else {
-            path = window.os.fs.getPath(args[1]);
-        }
+        path = args[1].startsWith('/') ? window.os.fs.getPath(args[1]) : window.os.fs.getPath(`${currentPath}/${args[1]}`);
     }
 
     try {
@@ -76,62 +72,74 @@ function execute(input) {
 }
 window.apps = window.apps || {};
 
+/**
+ * Creates a terminal interface with output and input elements.
+ * @returns {HTMLElement} - The terminal root element.
+ */
 window.apps.terminal = function() {
     const terminal = document.createElement('div');
     terminal.className = 'terminal';
 
     const terminalOutput = document.createElement('div');
     terminalOutput.className = 'terminal-output';
-    const welcomeLine = document.createElement('pre');
-    welcomeLine.className = 'terminal-line';
-    welcomeLine.textContent = 'Welcome to TempLLM OS';
-    terminalOutput.appendChild(welcomeLine);
     terminal.appendChild(terminalOutput);
+
+    const welcomeMessage = document.createElement('pre');
+    welcomeMessage.className = 'terminal-line';
+    welcomeMessage.textContent = 'Welcome to TempLLM OS';
+    terminalOutput.appendChild(welcomeMessage);
 
     const terminalInput = document.createElement('div');
     terminalInput.className = 'terminal-input';
+    terminal.appendChild(terminalInput);
+
     const prefix = document.createElement('span');
     prefix.className = 'prefix';
     prefix.textContent = '>';
-    const input = document.createElement('input');
-    input.className = 'terminal-input-text';
     terminalInput.appendChild(prefix);
-    terminalInput.appendChild(input);
-    terminal.appendChild(terminalInput);
 
+    const inputField = document.createElement('input');
+    inputField.className = 'terminal-input-text';
+    terminalInput.appendChild(inputField);
+
+    /**
+     * Outputs a value to the terminal with a specified color.
+     * @param {string|Array} value - The value to output.
+     * @param {string} [color='white'] - The color of the output text.
+     */
     function output(value, color = 'white') {
         if (Array.isArray(value)) {
             value.forEach(item => {
-                const line = document.createElement('pre');
-                line.className = 'terminal-line';
-                line.style.color = color;
-                line.textContent = item;
-                terminalOutput.prepend(line);
+                const pre = document.createElement('pre');
+                pre.className = 'terminal-line';
+                pre.style.color = color;
+                pre.textContent = item;
+                terminalOutput.prepend(pre);
             });
         } else {
-            const line = document.createElement('pre');
-            line.className = 'terminal-line';
-            line.style.color = color;
-            line.textContent = value;
-            terminalOutput.prepend(line);
+            const pre = document.createElement('pre');
+            pre.className = 'terminal-line';
+            pre.style.color = color;
+            pre.textContent = value;
+            terminalOutput.prepend(pre);
         }
     }
 
-    input.addEventListener('keydown', function(event) {
+    inputField.addEventListener('keydown', function(event) {
         if (event.key === 'Enter') {
             const currentTime = new Date().toLocaleTimeString();
-            const content = input.value;
-            output(`[${currentTime}] ${content}`, 'yellow');
-            const result = execute(content);
+            const inputValue = inputField.value;
+            output(`[${currentTime}] ${inputValue}`, 'yellow');
+            const result = execute(inputValue);
             output(result);
-            input.value = '';
-            input.focus();
+            inputField.value = '';
+            inputField.focus();
             prefix.textContent = pwd() + '>';
         }
     });
 
     return terminal;
 };
-window.os.registerApplication('Terminal', '🖥️', window.apps.terminal, 800, 500);
+window.os.registerApplication('Terminal', '🖥️', window.apps.terminal);
 
 </pre>

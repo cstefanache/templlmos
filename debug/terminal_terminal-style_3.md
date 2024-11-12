@@ -34,10 +34,9 @@ define a terminal-input class with the following css properties
 .terminal-line {
     display: flex;
     flex-direction: row;
-    overflow-wrap: anywhere;
     margin: 0;
     padding: 0;
-    min-height: 20px;
+    overflow-wrap: break-word; /* 'text-wrap' is not a valid CSS property */
 }
 .terminal-input {
     display: flex;
