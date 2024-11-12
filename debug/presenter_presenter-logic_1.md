@@ -44,14 +44,14 @@ function getSlideDOMElement(slides) {
                     element = document.createElement('h3');
                     element.textContent = line.substring(4).trim();
                 } else if (line.startsWith('![')) {
-                    const altText = line.match(/!\[(.*?)\]/)[1];
-                    const src = line.match(/\((.*?)\)/)[1];
+                    const altText = line.substring(line.indexOf('[') + 1, line.indexOf(']'));
+                    const src = line.substring(line.indexOf('(') + 1, line.indexOf(')'));
                     element = document.createElement('img');
                     element.src = src;
                     element.alt = altText;
                 } else if (line.startsWith('`')) {
                     element = document.createElement('pre');
-                    element.textContent = line.substring(1, line.length - 1).trim();
+                    element.textContent = line.substring(1, line.lastIndexOf('`')).trim();
                 } else {
                     element = document.createElement('p');
                     element.textContent = line.trim();

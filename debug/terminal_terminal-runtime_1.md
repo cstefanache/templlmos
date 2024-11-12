@@ -8,7 +8,7 @@
  */
 function cd(path) { ... }
 /**
- * Returns the current working directory.
+ * Returns the current path.
  * @returns {string} - The current path.
  */
 function pwd() { ... }
@@ -47,7 +47,7 @@ function cd(path) {
 }
 
 /**
- * Returns the current working directory.
+ * Returns the current path.
  * @returns {string} - The current path.
  */
 function pwd() {

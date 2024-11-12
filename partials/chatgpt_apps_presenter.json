@@ -59,7 +59,7 @@
                 ],
                 [
                     "define a function called readFileContentSync that takes a path as an argument",
-                    " read the file provided in the argument and merge the output in a single string"
+                    " read the file provided in the argument and return the content"
                 ],
                 [
                     "define on window.apps namespace a function called presenter  that takes a _ and path string with default value '/itdays.xmd' as arguments",

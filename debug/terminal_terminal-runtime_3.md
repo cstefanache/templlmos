@@ -41,7 +41,7 @@ function cd(path) {
 }
 
 /**
- * Returns the current working directory.
+ * Returns the current path.
  * @returns {string} - The current path.
  */
 function pwd() {
@@ -61,7 +61,7 @@ const bin = {
     pwd: pwd
 };
 /**
- * Executes a command with the given input string, processing the command and its arguments.
+ * Executes a command with the given parameters, processing the input string.
  * @param {string} input - The command input string to execute.
  * @returns {any} - The result of the command execution or an error message.
  */
@@ -69,9 +69,13 @@ function execute(input) {
     const args = input.match(/(?:[^\s"]+|"[^"]*")+/g).map(arg => arg.replace(/(^"|"$)/g, ''));
     let path = currentPath;
     const command = `bin.${args[0]}`;
-
+    
     if (args[1]) {
-        path = args[1].startsWith('/') ? window.os.fs.getPath(args[1]) : window.os.fs.getPath(`${currentPath}/${args[1]}`);
+        if (!args[1].startsWith('/')) {
+            path = window.os.fs.getPath(`${currentPath}/${args[1]}`);
+        } else {
+            path = window.os.fs.getPath(args[1]);
+        }
     }
 
     try {
@@ -106,18 +110,18 @@ window.apps.terminal = function() {
     terminal.appendChild(terminalInput);
 
     function output(value, color = 'white') {
-        const line = document.createElement('pre');
-        line.className = 'terminal-line';
-        line.style.color = color;
         if (Array.isArray(value)) {
             value.forEach(item => {
-                const itemLine = document.createElement('pre');
-                itemLine.className = 'terminal-line';
-                itemLine.style.color = color;
-                itemLine.textContent = item;
-                terminalOutput.prepend(itemLine);
+                const line = document.createElement('pre');
+                line.className = 'terminal-line';
+                line.style.color = color;
+                line.textContent = item;
+                terminalOutput.prepend(line);
             });
         } else {
+            const line = document.createElement('pre');
+            line.className = 'terminal-line';
+            line.style.color = color;
             line.textContent = value;
             terminalOutput.prepend(line);
         }

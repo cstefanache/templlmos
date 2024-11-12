@@ -5,11 +5,11 @@
 /**
  * Registers a new application in the OS with a title, emoji, and a callback function.
  * The callback function should return a DOM element that will be displayed in the body.
- * A close button will be added to remove the application from the body.
+ * A close button will be added to allow removal of the application from the body.
  * 
  * @param {string} title - The title of the application.
  * @param {string} emoji - The emoji representing the application.
- * @param {function} callback - A function that returns a DOM element.
+ * @param {function} callback - A function that returns a DOM element to be displayed.
  */
 window.os.registerApplication = function(title, emoji, callback) { ... }
 
@@ -29,11 +29,11 @@ create a new function `registerApplication` on the `window.os` object and jsdoc 
 /**
  * Registers a new application in the OS with a title, emoji, and a callback function.
  * The callback function should return a DOM element that will be displayed in the body.
- * A close button will be added to remove the application from the body.
+ * A close button will be added to allow removal of the application from the body.
  * 
  * @param {string} title - The title of the application.
  * @param {string} emoji - The emoji representing the application.
- * @param {function} callback - A function that returns a DOM element.
+ * @param {function} callback - A function that returns a DOM element to be displayed.
  */
 window.os = window.os || {};
 

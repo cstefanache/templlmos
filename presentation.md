@@ -7,12 +7,20 @@
 .dark
 # kernel panic!
 ---
-# Purpose
-## Anyone should be able to:
-## Change the color of the window title bar to light blue
----
 # Can LLM Write Good OS Code?
 ---
 # Can LLM Write OS Code?
 ---
 # Can LLM Write OS?
+---
+# What to expect
+![image](https://github.com/cstefanache/templlmos/blob/main/images/code-1.png?raw=true)
+---
+# What to expect
+![image](https://github.com/cstefanache/templlmos/blob/main/images/code-2.png?raw=true)
+---
+# What to expect
+![image](https://github.com/cstefanache/templlmos/blob/main/images/code-3.png?raw=true)
+---
+# What to expect
+![image](https://github.com/cstefanache/templlmos/blob/main/images/mistakes.png?raw=true)
