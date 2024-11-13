@@ -16,6 +16,7 @@ define a function called readFileContentSync that takes a path as an argument
 <pre style='text-wrap: wrap'>
 function getSlideDOMElement(slides) {
     const result = [];
+    
     slides.forEach(item => {
         const lines = item.split('\n');
         const slideElement = document.createElement('div');
@@ -54,6 +55,7 @@ function getSlideDOMElement(slides) {
 
         result.push(slideElement);
     });
+
     return result;
 }
 function getPresenterLayout() {

@@ -20,6 +20,7 @@ returns the root element
 <pre style='text-wrap: wrap'>
 function getSlideDOMElement(slides) {
     const result = [];
+    
     slides.forEach(item => {
         const lines = item.split('\n');
         const slideElement = document.createElement('div');
@@ -58,6 +59,7 @@ function getSlideDOMElement(slides) {
 
         result.push(slideElement);
     });
+
     return result;
 }
 function getPresenterLayout() {
@@ -120,7 +122,7 @@ window.apps.presenter = function(_, path = '/itdays.xmd') {
     
     window.addEventListener('keydown', function(event) {
         if (event.key === 'ArrowRight') {
-            currentIndex = Math.min(currentIndex + 1, contentElement.children.length - 1);
+            currentIndex = Math.min(currentIndex + 1, slides.length - 1);
             showSlide(currentIndex);
         } else if (event.key === 'ArrowLeft') {
             currentIndex = Math.max(currentIndex - 1, 0);

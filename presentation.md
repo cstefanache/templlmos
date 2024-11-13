@@ -9,6 +9,9 @@
 ### cto@ascentcore
 ### co-creator@monkeyuser.com
 ---
+.dark
+![image](https://github.com/cstefanache/templlmos/blob/main/images/inspiration.png?raw=true)
+---
 # Can LLM Write Good OS Code?
 ---
 # Can LLM Write OS Code?

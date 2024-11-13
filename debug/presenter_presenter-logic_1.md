@@ -23,6 +23,7 @@ and return the .presenter element
 <pre style='text-wrap: wrap'>
 function getSlideDOMElement(slides) {
     const result = [];
+    
     slides.forEach(item => {
         const lines = item.split('\n');
         const slideElement = document.createElement('div');
@@ -61,6 +62,7 @@ function getSlideDOMElement(slides) {
 
         result.push(slideElement);
     });
+
     return result;
 }
 function getPresenterLayout() {
