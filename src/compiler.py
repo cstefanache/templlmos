@@ -362,16 +362,15 @@ class Compiler:
         html["body"]["_children_"].append(f"<script>{gen}</script>")
 
         # read presentation.md file
-        with open("./presentation.md", "r") as file:
-            presentation = file.read()
+        for file_name in ["presentation", "conclusions"]:
+            with open(f"./{file_name}.md", "r") as file:
+                presentation = file.read()
 
-            presentation = presentation.replace(
-                "'", '"').replace("\n", "\\n")
+                presentation = presentation.replace(
+                    "'", '"').replace("\n", "\\n")
 
-            print(presentation)
-
-            html["body"]["_children_"].append(
-                f"<script>window.os.fs.write('/itdays.xmd', '{presentation}')</script>")
+                html["body"]["_children_"].append(
+                    f"<script>window.os.fs.write('/{file_name}.xmd', '{presentation}')</script>")
 
         with open(f"{DEBUG}/compiled.json", "w") as file:
             json.dump(html, file, indent=4)
