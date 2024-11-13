@@ -1,27 +1,12 @@
 #include run
 
-create an addParticles function that takes an array as parameter and adds a particle at position x random (100,102), y:random(2, 4) if the number of particles is less than 1000 and random < 0.1
-
----
-
-create isFree function that takes a list of particles an x and an y and returns if any particle is located at the provided x and y, if y >= 180 return false
-
----
-
-create an particlesFrame function that takes an array as parameter and:
-- iterate through all the items in the arrays
-- if isFree at x and y+1 move down, else if isFree at x-1 and y+1 move to the left, else if isFree at x+1 any y+1 move to the right
----
-
-define myApp function that:
-- create a  canvas 400x400 element
-- set context scale to 2
-- create an empty array called particles
-
-- create internal function drawParticles that clears canvas, runs addParticles and calls particlesFrame and adds a black pixel for each particle
-- call drawParticles on requestAnimationFrame
-- return canvas element
-
---- 
-
-run application with the defined myApp callback 450x450 size
+create a myApp function that takes a win parameter:
+- create a root dom element 400x300 relative position
+- create a character element with 🦅 as content absolute position of 20,100 and add it to the root element
+- set a gravity variable with value of 2
+- on each animation frame:
+  - increase gravity with 0.05
+  - update character position with gravity
+  - if the user hits space key set gravity to -3
+  - if the current top is larger than 300 then set current top to 100 and gravity to 2
+- return root dom element

@@ -13,6 +13,7 @@
 .slide h2 with font-size 3em
 .slide h3 with font-size 2em
 .slide pre with white-space pre-wrap and background-color #201e30, white text, padding 5, margin 0 auto, max-width 720 and text-align left
+.slide image with max-width 600px and max-height 500px
 </pre>
 ### Output
 
@@ -107,6 +108,11 @@
     margin: 0 auto;
     max-width: 720px;
     text-align: left;
+}
+
+.slide img {
+    max-width: 600px;
+    max-height: 500px;
 }
 
 </pre>
